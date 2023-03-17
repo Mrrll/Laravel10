@@ -34,6 +34,7 @@
 - [Instalación](#item1)
 - [Rutas en laravel](#item2)
 - [Controladores en laravel](#item3)
+- [Vistas en laravel](#item4)
 
 <a name="item1"></a>
 
@@ -166,7 +167,7 @@ Route::get('/',HomeController::class);
 ```console
     php artisan make:controller CursoController
 ```
->Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y creamos un función `__invoke` dentro de la Clase `HomController`.
+>Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y escribimos  dentro de la Clase `HomController`.
 
 ```php
     public function index()
@@ -215,5 +216,122 @@ Route::controller(CursoController::class)->group(function(){
 });
 ```
 **`Nota:`Disponible desde la version 9^ Laravel.**
+
+[Subir](#top)
+
+<a name="item4"></a>
+
+## Vistas en Laravel
+
+>Creamos y Abrimos el archivo `Home.php`  en la carpeta `resources\views\home.php` escribimos lo siguiente  .
+
+```php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Hola mundo</h1>
+</body>
+</html>
+```
+>Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y escribimos  dentro de la función `__invoke`.
+
+```php
+return view('home');
+```
+
+>Creamos y Abrimos el archivo `index.php`  en la carpeta `resources\views\cursos\index.php` escribimos lo siguiente  .
+
+```php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Bienvenido a la pagina cursos</h1>
+</body>
+</html>
+```
+>Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos  dentro de la función `index`.
+
+```php
+return view('cursos.index');
+```
+
+>Creamos y Abrimos el archivo `show.php`  en la carpeta `resources\views\cursos\show.php` escribimos lo siguiente  .
+
+```php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Bienvenido al curso <?php echo $curso; ?></h1>
+</body>
+</html>
+```
+
+>Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos  dentro de la función `show`.
+
+```php
+return view('cursos.show',['curso' => $curso]);
+return view('cursos.show',[compact('curso')]); // Si el nombre de la variable es igual.
+```
+###### Sistema de plantillas Blade
+
+>Creamos y Abrimos el archivo `plantilla.blade.php`  en la carpeta `resources\views\layouts\plantilla.blade.php` escribimos lo siguiente  .
+
+```php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title')</title>
+</head>
+<body>
+    @yield('content')
+</body>
+</html>
+```
+
+>Cambiamos el nombre y Abrimos el archivo `home.php` a `home.blade.php`  que esta en la carpeta `resources\views\home.php` y escribimos.
+
+```php
+@extends('layouts.plantilla')
+
+@section('title', 'Home')
+
+@section('content')
+    <h1>Hola mundo</h1>
+@endsection
+```
+**`Nota:` Modificamos los demás archivos de las vistas.**
+
+>Cambiamos el nombre y Abrimos el archivo `show.php` a `show.blade.php`  que esta en la carpeta `resources\views\cursos\show.php` y escribimos.
+
+```php
+@extends('layouts.plantilla')
+
+@section('title', 'Cursos')
+
+@section('content')
+    <h1>Bienvenido al curso {{$curso}} </h1>
+@endsection
+```
 
 [Subir](#top)
