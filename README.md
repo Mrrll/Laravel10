@@ -203,4 +203,17 @@ Route::get('cursos/create',[CursoController::class,'create']);
 Route::get('cursos/{curso}',[CursoController::class,'show']);
 ```
 
+###### Agrupar rutas por Controlador
+
+>Abrimos el archivo `routes.php` que esta en la carpeta `routes\web.php`  escribimos lo siguiente  .
+
+```php
+Route::controller(CursoController::class)->group(function(){
+    Route::get('cursos','index');
+    Route::get('cursos/create','create');
+    Route::get('cursos/{curso}','show');
+});
+```
+**`Nota:`Disponible desde la version 9^ Laravel.**
+
 [Subir](#top)

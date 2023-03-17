@@ -26,11 +26,11 @@ Route::get('/',HomeController::class);
 // Route::get('cursos', function () {
     //     return 'Bienvenido a la pagina cursos';
 // });
-Route::get('cursos',[CursoController::class,'index']);
+// Route::get('cursos',[CursoController::class,'index']);
 // Route::get('cursos/{curso}', function ($curso) {
 //     return "Bienvenido al cursos: $curso";
 // });
-Route::get('cursos/create',[CursoController::class,'create']);
+// Route::get('cursos/create',[CursoController::class,'create']);
 // Route::get('cursos/{curso}/{categoria}', function ($curso, $categoria) {
 //     return "Bienvenido al cursos: $curso, de la categoria: $categoria";
 // });
@@ -41,4 +41,9 @@ Route::get('cursos/create',[CursoController::class,'create']);
 //         return "Bienvenido al cursos: $curso";
 //     }
 // });
-Route::get('cursos/{curso}',[CursoController::class,'show']);
+// Route::get('cursos/{curso}',[CursoController::class,'show']);
+Route::controller(CursoController::class)->group(function(){
+    Route::get('cursos','index');
+    Route::get('cursos/create','create');
+    Route::get('cursos/{curso}','show');
+});
