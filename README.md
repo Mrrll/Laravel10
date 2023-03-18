@@ -37,6 +37,7 @@
 - [Vistas en laravel](#item4)
 - [Bases de datos en laravel](#item5)
 - [Generando migraciones](#item6)
+- [Introducción a Eloquent ORM](#item7)
 
 <a name="item1"></a>
 
@@ -364,7 +365,7 @@ DB_PASSWORD= // Password del servidor
 
 ## Generando migraciones
 
-###### Ejecutar migraciones del método up
+###### Ejecutar migraciones
 
 >Typee: en la Consola:
 ```console
@@ -448,7 +449,7 @@ DB_PASSWORD= // Password del servidor
 ```console
     php artisan migrate:refresh
 ```
-**`Nota:` El comando `php artisan migrate:fresh` ejecuta el método `down` y seguido ejecuta el método `up` No es recomendable en producción.**
+**`Nota:` El comando `php artisan migrate:refresh` ejecuta el método `down` y seguido ejecuta el método `up` No es recomendable en producción.**
 
 >Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_users_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_users_table.php` y en la función `up` eliminamos lo siguiente.
 
@@ -473,7 +474,7 @@ DB_PASSWORD= // Password del servidor
     php artisan make:migration add_avatar_to_users_table
 ```
 
->Abrimos el archivo `XXXX_XX_XX_XXXXXX_add_avatar_to_users_table`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_add_avatar_to_users_table` y en la función `up` escribimos lo siguiente.
+>Abrimos el archivo `XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php` y en la función `up` escribimos lo siguiente.
 
 ```php
         $table->string('avatar')->nullable()->after('email');
@@ -505,7 +506,7 @@ DB_PASSWORD= // Password del servidor
     php artisan make:migration cambiar_propiedades_to_users_table
 ```
 
->Abrimos el archivo `XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table` y en la función `up` escribimos lo siguiente.
+>Abrimos el archivo `XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php` y en la función `up` escribimos lo siguiente.
 
 ```php
         $table->string('name', 150)->change()->nullable();
@@ -519,3 +520,73 @@ DB_PASSWORD= // Password del servidor
 
 [Subir](#top)
 
+<a name="item7"></a>
+
+## Introducción a Eloquent ORM
+
+###### Crear un modelo
+
+>Typee: en la Consola:
+```console
+    php artisan make:model Curso
+```
+>Utilizaremos tinker para ejecutar métodos de los modelos desde consola.
+
+>Typee: en la Consola:
+```console
+    php artisan tinker
+```
+**`Nota:` Para salir de tinker escribimos `exit`.**
+
+###### Agregar un nuevo objeto
+
+>Especificamos el uso del Modelo Curso
+
+>Typee: en la Consola:
+```tinker
+    use App\Models\Curso;
+```
+
+>Creamos el Objeto
+
+>Typee: en la Consola:
+```tinker
+    $curso = new Curso;
+```
+
+>Llenar las propiedades al Objeto
+
+>Typee: en la Consola:
+```tinker
+    $curso->name = 'Laravel';
+    $curso->description = 'El mejor framework de PHP';
+```
+
+>Llamar al Objeto
+
+>Typee: en la Consola:
+```tinker
+    $curso
+```
+>Guardar Objeto a la base de datos
+
+>Typee: en la Consola:
+```tinker
+    $curso->save();
+```
+>Modificar Objeto
+
+>Typee: en la Consola:
+```tinker
+    $curso->description = 'El mejor framework del mundo';
+```
+
+###### Cambiar la tabla al modelo
+
+>Abrimos el archivo `Curso.php` en la carpeta `app\Models\Curso.php` y dentro de la clase `curso` escribimos lo siguiente.
+
+```php
+    protected $table = "users";
+```
+
+[Subir](#top)
