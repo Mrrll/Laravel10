@@ -40,6 +40,7 @@
 - [Introducción a Eloquent ORM](#item7)
 - [Seeders en laravel](#item8)
 - [Factory's en laravel](#item9)
+- [Generador de Consultas de Eloquent](#item10)
 
 <a name="item1"></a>
 
@@ -685,15 +686,16 @@ php artisan migrate:fresh --seed
 ###### Creamos un factory del Curso
 
 >Typee: en la Consola:
-```php
+```console
 php artisan make:factory CursoFactory
 ```
+
 >Eliminamos el archivo `CursoFactory.php`  en la carpeta `database\factories\CursoFactory.php`.
 
 >Indicamos el modelo al crear el factory
 
 >Typee: en la Consola:
-```php
+```console
 php artisan make:factory CursoFactory --model=Curso
 ```
 
@@ -713,6 +715,89 @@ php artisan make:factory CursoFactory --model=Curso
 Curso::factory(50)->create();
 ```
 
-**`Nota:` También se puede prescindir del archivo `CursoSeeder` si añadimos la instrucción `Curso::factory(50)->create();` en el archivo `DatabaseSeeder.php` y importar la clase del modelo `use App\Models\Curso;`.**
+**`Nota:` También se puede prescindir del archivo `CursoSeeder` si añadimos la instrucción `Curso::factory(50)->create();` en el archivo `DatabaseSeeder.php` y importarmos la clase del modelo `use App\Models\Curso;`.**
+
+[Subir](#top)
+
+<a name="item10"></a>
+
+## Generador de Consultas de Eloquent
+
+###### Consultar datos desde Tinker
+
+>Typee: en la Consola:
+```console
+php artisan tinker
+```
+>Especificamos el uso del Modelo Curso
+
+>Typee: en la Consola:
+```tinker
+use App\Models\Curso;
+```
+>Consultamos todos los registros del modelo Curso
+
+>Typee: en la Consola:
+```tinker
+$curso = Curso::all();
+```
+
+>Consultamos todos los registros que contengan la categoria `Diseño web`.
+
+>Typee: en la Consola:
+```tinker
+$curso = Curso::where('categoria', 'Diseño web')->orderBy('id', 'desc')->get();
+```
+
+**`Note:` Con el parámetro adicional `orderBy` indicamos el orden y con el parámetro `get` hace que lo muestre como una colección de datos.**
+
+>Consultamos un registro que contengan la categoria `Diseño web`.
+
+>Typee: en la Consola:
+```tinker
+$curso = Curso::where('categoria', 'Diseño web')->orderBy('id', 'asc')->first();
+```
+
+>Consultamos por los campos indicados.
+
+>Typee: en la Consola:
+```tinker
+$curso = Curso::select('name', 'description')->get();
+```
+
+>Consultamos  por los campos indicados cambiando el nombre de la propiedad.
+
+>Typee: en la Consola:
+```tinker
+$curso = Curso::select('name as title', 'description')->get();
+```
+
+>Consultamos  por la cantidad de registros a mostrar.
+
+>Typee: en la Consola:
+```tinker
+$curso = Curso::select('name as title', 'description')->take(1)->get();
+```
+
+>Consultamos por id.
+
+>Typee: en la Consola:
+```tinker
+$curso = Curso::find(5);
+```
+
+>Consultamos por id mayor de que.
+
+>Typee: en la Consola:
+```tinker
+$curso = Curso::where('id', '>', '45')->get();
+```
+
+>Consultamos registros que contenga dicha palabra.
+
+>Typee: en la Consola:
+```tinker
+$curso = Curso::where('name', 'like', '% voluptate %')->get();
+```
 
 [Subir](#top)
