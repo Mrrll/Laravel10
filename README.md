@@ -35,6 +35,7 @@
 - [Rutas en laravel](#item2)
 - [Controladores en laravel](#item3)
 - [Vistas en laravel](#item4)
+- [Bases de datos en laravel](#item5)
 
 <a name="item1"></a>
 
@@ -333,5 +334,28 @@ return view('cursos.show',[compact('curso')]); // Si el nombre de la variable es
     <h1>Bienvenido al curso {{$curso}} </h1>
 @endsection
 ```
+
+[Subir](#top)
+
+
+<a name="item5"></a>
+
+## Bases de datos en laravel
+
+>Crear Base de datos Laravel soporta estos tipos de bases MariaDB 10.3+, MySQL 5.7+, PostgreSQL 10.0+, SQLite 3.8.8+, SQL Server 2017+.
+
+###### Conectando Laravel a la Base de datos
+
+>Abrimos el archivo `.env`  en la carpeta `/` y en el apartado de base de datos escribimos
+
+```
+DB_CONNECTION=mysql // Motor Base de datos
+DB_HOST=127.0.0.1 // Url del localhost
+DB_PORT=3306 // puerto del servidor
+DB_DATABASE=laravel // Nombre de la base de datos
+DB_USERNAME=root // Nombre del usuario del servidor
+DB_PASSWORD= // Password del servidor
+```
+
 
 [Subir](#top)
