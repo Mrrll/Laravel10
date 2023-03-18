@@ -38,6 +38,7 @@
 - [Bases de datos en laravel](#item5)
 - [Generando migraciones](#item6)
 - [Introducción a Eloquent ORM](#item7)
+- [Seeders en laravel](#item8)
 
 <a name="item1"></a>
 
@@ -588,5 +589,88 @@ DB_PASSWORD= // Password del servidor
 ```php
     protected $table = "users";
 ```
+
+[Subir](#top)
+
+<a name="item8"></a>
+
+## Seeders en laravel
+
+>Eliminamos todas la tablas de la base de datos
+
+>Typee: en la Consola:
+```console
+php artisan migrate:reset
+```
+
+>Eliminamos el archivo `XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php`.
+
+>Eliminamos el archivo `XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php`.
+
+>Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_cursos_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_cursos_table.php` y en la función `up` añadimos lo siguiente.
+
+```php
+$table->text('categoria');
+```
+>Abrimos el archivo `DatabaseSeeder.php`  en la carpeta `database\seeders\DatabaseSeeder.php` y en la función `run` escribimos lo siguiente.
+
+```php
+        $curso = new Curso();
+        $curso->name = "Laravel";
+        $curso->description = "El mejor Framework PHP";
+        $curso->categoria = "Desarrollo Web";
+        $curso->save();
+```
+
+>Importamos el modelo user
+```php
+use App\Models\Curso;
+```
+
+>Typee: en la Consola:
+```console
+php artisan migrate:fresh
+```
+
+###### Ejecutamos los seeders
+
+>Typee: en la Consola:
+```console
+php artisan db:seed
+```
+###### Creamos un seeder del Curso
+
+>Typee: en la Consola:
+```console
+php artisan make:seeder CursoSeeder
+```
+
+>Abrimos el archivo `CursoSeeder.php`  en la carpeta `database\seeders\CursoSeeder.php` y en la función `run` escribimos lo siguiente.
+
+```php
+        $curso = new Curso();
+        $curso->name = "Laravel";
+        $curso->description = "El mejor Framework PHP";
+        $curso->categoria = "Desarrollo Web";
+        $curso->save();
+```
+
+>Importamos el modelo user
+```php
+use App\Models\Curso;
+```
+
+>Abrimos el archivo `DatabaseSeeder.php`  en la carpeta `database\seeders\DatabaseSeeder.php` y en la función `run` escribimos lo siguiente.
+
+```php
+$this->call(CursoSeeder::class);
+```
+
+>Typee: en la Consola:
+```console
+php artisan migrate:fresh --seed
+```
+
+**`Notas:` Ejecutamos el refresco de la base de datos y con `--seed` ejecutamos los seeders en la misma sentencia.**
 
 [Subir](#top)
