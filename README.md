@@ -39,6 +39,7 @@
 - [Generando migraciones](#item6)
 - [Introducción a Eloquent ORM](#item7)
 - [Seeders en laravel](#item8)
+- [Factory's en laravel](#item9)
 
 <a name="item1"></a>
 
@@ -389,6 +390,8 @@ DB_PASSWORD= // Password del servidor
         });
 ```
 
+**`Nota:` [Tipos de columnas disponibles](https://laravel.com/docs/10.x/migrations#available-column-types).**
+
 >Y en la función `down` escribimos lo siguiente.
 
 ```php
@@ -672,5 +675,44 @@ php artisan migrate:fresh --seed
 ```
 
 **`Notas:` Ejecutamos el refresco de la base de datos y con `--seed` ejecutamos los seeders en la misma sentencia.**
+
+[Subir](#top)
+
+<a name="item9"></a>
+
+## Factory's en laravel
+
+###### Creamos un factory del Curso
+
+>Typee: en la Consola:
+```php
+php artisan make:factory CursoFactory
+```
+>Eliminamos el archivo `CursoFactory.php`  en la carpeta `database\factories\CursoFactory.php`.
+
+>Indicamos el modelo al crear el factory
+
+>Typee: en la Consola:
+```php
+php artisan make:factory CursoFactory --model=Curso
+```
+
+>Abrimos el archivo `CursoFactory.php`  en la carpeta `database\factories\CursoFactory.php` y en la función `definition` dentro del array `return` escribimos lo siguiente.
+
+```php
+        'name' => $this->faker->sentence(),
+        'description' => $this->faker->paragraph(),
+        'categoria' => $this->faker->randomElement(["Desarrollo web", "Diseño web"])
+```
+
+**`Nota:` [Tipos de columnas disponibles faker](https://fakerphp.github.io/).**
+
+>Abrimos el archivo `CursoSeeder.php`  en la carpeta `database\seeders\CursoSeeder.php` y en la función `run` remplazamos y escribimos lo siguiente.
+
+```php
+Curso::factory(50)->create();
+```
+
+**`Nota:` También se puede prescindir del archivo `CursoSeeder` si añadimos la instrucción `Curso::factory(50)->create();` en el archivo `DatabaseSeeder.php` y importar la clase del modelo `use App\Models\Curso;`.**
 
 [Subir](#top)
