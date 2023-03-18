@@ -36,6 +36,7 @@
 - [Controladores en laravel](#item3)
 - [Vistas en laravel](#item4)
 - [Bases de datos en laravel](#item5)
+- [Generando migraciones](#item6)
 
 <a name="item1"></a>
 
@@ -168,7 +169,7 @@ Route::get('/',HomeController::class);
 ```console
     php artisan make:controller CursoController
 ```
->Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y escribimos  dentro de la Clase `HomController`.
+>Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y escribimos dentro de la Clase `HomController`.
 
 ```php
     public function index()
@@ -240,7 +241,7 @@ Route::controller(CursoController::class)->group(function(){
 </body>
 </html>
 ```
->Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y escribimos  dentro de la función `__invoke`.
+>Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y escribimos dentro de la función `__invoke`.
 
 ```php
 return view('home');
@@ -262,7 +263,7 @@ return view('home');
 </body>
 </html>
 ```
->Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos  dentro de la función `index`.
+>Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos dentro de la función `index`.
 
 ```php
 return view('cursos.index');
@@ -285,7 +286,7 @@ return view('cursos.index');
 </html>
 ```
 
->Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos  dentro de la función `show`.
+>Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos dentro de la función `show`.
 
 ```php
 return view('cursos.show',['curso' => $curso]);
@@ -357,5 +358,164 @@ DB_USERNAME=root // Nombre del usuario del servidor
 DB_PASSWORD= // Password del servidor
 ```
 
+[Subir](#top)
+
+<a name="item6"></a>
+
+## Generando migraciones
+
+###### Ejecutar migraciones del método up
+
+>Typee: en la Consola:
+```console
+    php artisan migrate
+```
+###### Creación de migraciones
+
+>Typee: en la Consola:
+```console
+    php artisan make:migration cursos
+```
+>Abrimos el archivo `XXXX_XX_XX_XXXXXX_cursos.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_cursos.php` y en la función `up` escribimos lo siguiente.
+
+```php
+        Schema::create('cursos',function(Blueprint $table){
+            $table->id();
+            $table->string('name');
+            $table->text('description');
+            $table->timestamps();
+        });
+```
+
+>Y en la función `down` escribimos lo siguiente.
+
+```php
+        Schema::dropIfExists('cursos');
+```
+>Typee: en la Consola:
+```console
+    php artisan migrate
+```
+
+###### Revertir ultima migración
+
+>Typee: en la Consola:
+```console
+    php artisan migrate:rollback
+```
+
+>Eliminamos el archivo `XXXX_XX_XX_XXXXXX_cursos.php`.
+
+>Typee: en la Consola:
+```console
+    php artisan migrate
+```
+
+>Typee: en la Consola:
+```console
+    php artisan make:migration create_cursos_table
+```
+**`Nota:` Es la forma correcta de creación de una tabla.**
+
+>Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_cursos_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_cursos_table.php` y en la función `up` añadimos lo siguiente.
+
+```php
+            $table->string('name');
+            $table->text('description');
+```
+
+>Typee: en la Consola:
+```console
+    php artisan migrate
+```
+
+###### Modificar una tabla ya migrada
+
+>Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_users_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_users_table.php` y en la función `up` añadimos lo siguiente.
+
+```php
+        $table->string('avatar');
+```
+
+>Typee: en la Consola:
+```console
+    php artisan migrate:fresh
+```
+
+**`Nota:` El comando `php artisan migrate:fresh` borra las tablas y seguido ejecuta el método `up` No es recomendable en producción.**
+
+>Typee: en la Consola:
+```console
+    php artisan migrate:refresh
+```
+**`Nota:` El comando `php artisan migrate:fresh` ejecuta el método `down` y seguido ejecuta el método `up` No es recomendable en producción.**
+
+>Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_users_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_users_table.php` y en la función `up` eliminamos lo siguiente.
+
+```php
+        $table->string('avatar');
+```
+
+>Typee: en la Consola:
+```console
+    php artisan migrate:rollback
+```
+
+>Typee: en la Consola:
+```console
+    php artisan migrate
+```
+
+###### Creamos migración de añadido
+
+>Typee: en la Consola:
+```console
+    php artisan make:migration add_avatar_to_users_table
+```
+
+>Abrimos el archivo `XXXX_XX_XX_XXXXXX_add_avatar_to_users_table`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_add_avatar_to_users_table` y en la función `up` escribimos lo siguiente.
+
+```php
+        $table->string('avatar')->nullable()->after('email');
+```
+
+**`Nota:` Le indicamos la opción `nullable` para si la tabla ya contiene datos no nos de un error a la hora de hacer la migración y la opción `after` es para indicarle en que posición queremos el nuevo campo.**
+
+>Y en la función `down` escribimos lo siguiente.
+
+```php
+         $table->dropColumn('avatar');
+```
+
+**`Nota:`Elimina el campo `avatar` de la tabla.**
+
+###### Modificar propiedades de los campos
+
+>Añadir dependencia a Composer.
+
+>Typee: en la Consola:
+```console
+    composer require doctrine/dbal
+```
+
+>Creamos migración de añadido/modificación
+
+>Typee: en la Consola:
+```console
+    php artisan make:migration cambiar_propiedades_to_users_table
+```
+
+>Abrimos el archivo `XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table` y en la función `up` escribimos lo siguiente.
+
+```php
+        $table->string('name', 150)->change()->nullable();
+```
+
+>Y en la función `down` escribimos lo siguiente.
+
+```php
+        $table->string('name', 255)->nullable(false)->change();
+```
 
 [Subir](#top)
+
