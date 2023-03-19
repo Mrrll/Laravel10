@@ -42,6 +42,7 @@
 - [Factory's en laravel](#item9)
 - [Generador de Consultas de Eloquent](#item10)
 - [Mutadores y Accesores](#item11)
+- [Crud en laravel](#item12)
 
 <a name="item1"></a>
 
@@ -716,7 +717,7 @@ php artisan make:factory CursoFactory --model=Curso
 Curso::factory(50)->create();
 ```
 
-**`Nota:` También se puede prescindir del archivo `CursoSeeder` si añadimos la instrucción `Curso::factory(50)->create();` en el archivo `DatabaseSeeder.php` y importarmos la clase del modelo `use App\Models\Curso;`.**
+**`Nota:` También se puede prescindir del archivo `CursoSeeder` si añadimos la instrucción `Curso::factory(50)->create();` en el archivo `DatabaseSeeder.php` y importamos la clase del modelo `use App\Models\Curso;`.**
 
 [Subir](#top)
 
@@ -843,5 +844,293 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 **`Nota:` También podemos usar el método flecha gracias a php8^ `get:fn($value) => ucwords($value)`.**
 
+[Subir](#top)
+
+<a name="item12"></a>
+
+## Crud en laravel
+
+###### Listar y leer registros
+
+>Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en la función `index` escribimos lo siguiente.
+
+```php
+        $cursos = Curso::paginate();
+        return view('cursos.index', compact('cursos'));
+```
+
+**`Nota:` Importamos el modelo Curso `use App\Models\Curso;`.**
+
+>Abrimos el archivo `index.blade.php`  en la carpeta `resources\views\cursos\index.blade.php` y dentro de `@section('content')` escribimos lo siguiente.
+
+```php
+    <a href="{{route('cursos.create')}}">Crear Curso</a>
+    <ul>
+        @foreach ($cursos as $curso)
+            <li><a href="{{route('cursos.show', $curso->id)}}">{{$curso->name}}</a></li>
+        @endforeach
+    </ul>
+    {{$cursos->links()}}
+```
+
+**`Nota:` Importamos el CDN de `Tailwind`.**
+
+>Abrimos el archivo `plantilla.blade.php`  en la carpeta `resources\views\layouts\plantilla.blade.php` y importamos el CDN.
+
+```php
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+```
+
+**`Nota:` Seguimos sin el CDN de `Tailwind`.**
+
+>Crear nombre identificativo a las rutas.
+
+>Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y añadimos lo siguiente.
+
+```php
+    Route::get('cursos','index')->name('cursos.index');
+    Route::get('cursos/create','create')->name('cursos.create');
+    Route::get('cursos/{curso}','show')->name('cursos.show');
+```
+
+>Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en la función `show` escribimos lo siguiente.
+
+```php
+    public function show($id)
+    {
+        $curso = Curso::find($id);
+        return view('cursos.show', compact('curso'));
+    }
+```
+
+>Abrimos el archivo `show.blade.php`  en la carpeta `resources\views\cursos\show.blade.php` y escribimos lo siguiente.
+
+```php
+@section('title', 'Cursos '. $curso->name)
+
+@section('content')
+    <h1>Bienvenido al curso {{$curso->name}} </h1>
+    <a href="{{route('cursos.index')}}">Volver a Cursos</a>
+    <p><strong>Categoria : </strong>{{$curso->categoria}}</p>
+    <p>{{$curso->description}}</p>
+@endsection
+```
+###### Agregar registros
+
+>Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en la función `create` escribimos lo siguiente.
+
+```php
+return view('cursos.create');
+```
+
+>Creamos el archivo `create.blade.php`  en la carpeta `resources\views\cursos\create.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+
+@section('title', 'Cursos create ')
+
+@section('content')
+    <h1>Bienvenido a la pagina de crear cursos</h1>
+    <form action="{{route('cursos.store')}}" method="post">
+        @csrf
+        <label>
+            Nombre :
+            <br>
+            <input type="text" name="name" value="{{old('name')}}">
+        </label>
+        <br>
+        <label>
+            Descripción :
+            <br>
+            <textarea name="description" rows="5">{{old('description')}}</textarea>
+        </label>
+        <br>
+        <label>
+            Categoria :
+            <br>
+            <input type="text" name="categoria" value="{{old('categoria')}}">
+        </label>
+        <br>
+        <button type="submit">Enviar Formulario</button>
+    </form>
+@endsection
+```
+
+**`Nota :` Enviar Token `@csrf`.**
+
+>Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y escribimos lo siguiente.
+
+```php
+Route::post('cursos/create','store')->name('cursos.store');
+```
+
+>Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y escribimos lo siguiente.
+
+```php
+    public function store(Request $request)
+    {
+        $curso = new Curso();
+        $curso->name = $request->name;
+        $curso->description = $request->description;
+        $curso->categoria = $request->categoria;
+        $curso->save();
+
+        return redirect()->route('cursos.show', $curso);
+    }
+```
+
+> Y cambiamos en la función `index` lo siguiente.
+
+```php
+$cursos = Curso::orderBy('id', 'desc')->paginate();
+```
+
+###### Actualizar registros
+
+>Abrimos el archivo `show.blade.php`  en la carpeta `resources\views\cursos\show.blade.php` y añadimos lo siguiente.
+
+```php
+<br>
+    <a href="{{route('cursos.edit', $curso)}}">Editar Cursos</a>
+```
+
+>Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y escribimos lo siguiente.
+
+```php
+Route::get('cursos/{curso}/edit','edit')->name('cursos.edit');
+```
+
+>Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y escribimos lo siguiente.
+
+```php
+    public function edit(Curso $curso)
+    {
+        return view('cursos.edit', compact('curso'));
+    }
+```
+
+>Creamos el archivo `edit.blade.php`  en la carpeta `resources\views\cursos\edit.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+
+@section('title', 'Cursos edit')
+
+@section('content')
+    <h1>Bienvenido a la pagina de editar cursos</h1>
+    <form action="{{route('cursos.update', $curso)}}" method="post">
+        @csrf
+        @method('put')
+        <label>
+            Nombre :
+            <br>
+            <input type="text" name="name" value="{{$curso->name}}">
+        </label>
+        <br>
+        <label>
+            Descripción :
+            <br>
+            <textarea name="description" rows="5" >{{$curso->description}}</textarea>
+        </label>
+        <br>
+        <label>
+            Categoria :
+            <br>
+            <input type="text" name="categoria" value="{{$curso->categoria}}">
+        </label>
+        <br>
+        <button type="submit">Editar Formulario</button>
+    </form>
+@endsection
+```
+
+**`Nota :`El método `old` es capaz de guardar el ultimo o incluir datos `{{old('name', $curso->name)}}` .**
+
+>Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y escribimos lo siguiente.
+
+```php
+Route::put('cursos/{curso}','update')->name('cursos.update');
+```
+
+>Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y escribimos lo siguiente.
+
+```php
+    public function update(Request $request, Curso $curso)
+    {
+        $curso->name = $request->name;
+        $curso->description = $request->description;
+        $curso->categoria = $request->categoria;
+        $curso->save();
+        return redirect()->route('cursos.show', $curso);
+    }
+```
+
+###### Validar registros
+
+>Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en la función `store` escribimos lo siguiente.
+
+```php
+        $request->validate([
+            'name' => 'required|max:10',
+            'description' => 'required|min5',
+            'categoria' => 'required',
+        ]);
+```
+
+>Abrimos el archivo `create.blade.php`  en la carpeta `resources\views\cursos\create.blade.php` y añadimos debajo de los `label` lo siguiente.
+
+```php
+        @error('name')
+            <br>
+                <small>*{{$message}}</small>
+            <br>
+        @enderror
+        @error('description')
+            <br>
+                <small>*{{$message}}</small>
+            <br>
+        @enderror
+        @error('categoria')
+            <br>
+                <small>*{{$message}}</small>
+            <br>
+        @enderror
+```
+
+**`Nota :` Repetimos código remplazado lo pertinente o no agregando par el formulario `Edit` .**
+
+**`Nota :` [Lista de validaciones](https://laravel.com/docs/10.x/validation#available-validation-rules).**
+
+###### Traduciendo mensajes de validación
+
+>Typee: en la Consola:
+```console
+composer require laravel-lang/common
+```
+
+**`Nota :` Si tu proyecto no tiene la instalación del lenguaje.**
+
+>Typee: en la Consola:
+```console
+php artisan lang:add es
+```
+
+**`Nota :` Añade a tu proyecto el lenguaje.**
+
+>Typee: en la Consola:
+```console
+composer install
+```
+
+**`Nota :` Para instalar paquetes desde composer.json.**
+
+**`Nota :`[laravel-lang](https://laravel-lang.com/installation/).**
+
+>Abrimos el archivo `app.php`  en la carpeta `config\app.php` y en `locale` añadimos lo siguiente.
+
+```php
+'locale' => 'es'>
+```
 
 [Subir](#top)
