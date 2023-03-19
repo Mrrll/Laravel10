@@ -41,6 +41,7 @@
 - [Seeders en laravel](#item8)
 - [Factory's en laravel](#item9)
 - [Generador de Consultas de Eloquent](#item10)
+- [Mutadores y Accesores](#item11)
 
 <a name="item1"></a>
 
@@ -799,5 +800,48 @@ $curso = Curso::where('id', '>', '45')->get();
 ```tinker
 $curso = Curso::where('name', 'like', '% voluptate %')->get();
 ```
+
+[Subir](#top)
+
+<a name="item11"></a>
+
+## Mutadores y Accesores
+
+###### Crear Mutador
+
+>Abrimos el archivo `User.php`  en la carpeta `app\Models\User.php` y importamos la clase `Attribute`.
+
+```php
+use Illuminate\Database\Eloquent\Casts\Attribute;
+```
+
+>Y creamos un método protegido dentro de la clase User.
+
+```php
+    protected function name(): Attribute {
+        return new Attribute(
+            set:function($value){
+                return strtolower($value);
+            }
+        );
+    }
+```
+###### Crear Accesor
+
+>Y creamos un método protegido dentro de la clase User.
+
+```php
+    protected function name(): Attribute {
+        return new Attribute(
+            get:function($value){
+                return ucwords($value);
+            },
+        );
+    }
+```
+**`Nota:` El Mutador actúa antes del ingreso a la base de datos y el Accesor actúa cuando se muestra dicho dato.**
+
+**`Nota:` También podemos usar el método flecha gracias a php8^ `get:fn($value) => ucwords($value)`.**
+
 
 [Subir](#top)
