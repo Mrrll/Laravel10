@@ -43,6 +43,7 @@
 - [Generador de Consultas de Eloquent](#item10)
 - [Mutadores y Accesores](#item11)
 - [Crud en laravel](#item12)
+- [Request en laravel](#item13)
 
 <a name="item1"></a>
 
@@ -1132,5 +1133,67 @@ composer install
 ```php
 'locale' => 'es'>
 ```
+
+[Subir](#top)
+
+<a name="item13"></a>
+
+## Request en laravel
+
+>Typee: en la Consola:
+```console
+php artisan make:request StoreCursoRequest
+```
+
+>Abrimos el archivo `StoreCursoRequest.php`  en la carpeta `app\Http\Requests\StoreCursoRequest.php` y en `authorize` añadimos lo siguiente.
+
+```php
+return true;
+```
+
+>Y en `rules` escribimos lo siguiente.
+
+```php
+            'name' => 'required|max:10',
+            'description' => 'required|min:5',
+            'categoria' => 'required',
+```
+
+>Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en `store` eliminamos lo siguiente.
+
+```php
+        $request->validate([
+            'name' => 'required|max:10',
+            'description' => 'required|min:5',
+            'categoria' => 'required',
+        ]);
+```
+
+>Y en `store` cambiamos lo siguiente.
+
+```php
+public function store(StoreCursoRequest $request)
+```
+
+**`Nota :` Importamos la Clase `use App\Http\Requests\StoreCursoRequest;` .**
+
+>Abrimos el archivo `StoreCursoRequest.php`  en la carpeta `app\Http\Requests\StoreCursoRequest.php` y en `authorize` añadimos lo siguiente.
+
+```php
+    public function attributes()
+    {
+        return [
+            'name' => 'El nombre del curso'
+        ];
+    }
+    public function messages()
+    {
+        return [
+            'description.required' => 'Debe de ingresar una descripción del curso.'
+        ];
+    }
+```
+
+**`Nota :` Cambiar Atributos y Mensajes desde el Request .**
 
 [Subir](#top)
