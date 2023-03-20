@@ -45,6 +45,7 @@
 - [Crud en laravel](#item12)
 - [Request en laravel](#item13)
 - [Asignación Masiva](#item14)
+- [Agrupar Rutas con Route Resource](#item15)
 
 <a name="item1"></a>
 
@@ -1283,6 +1284,69 @@ public function update(StoreCursoRequest $request, Curso $curso)
 
 ```php
 $curso->update($request->all());
+```
+
+[Subir](#top)
+
+<a name="item15"></a>
+
+## Agrupar Rutas con Route Resource
+
+>Typee: en la Consola:
+```console
+php artisan r:l
+```
+**`Nota :` Lista las ruta de la app.**
+
+>Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y eliminamos lo siguiente.
+
+```php
+Route::controller(CursoController::class)->group(function(){
+    Route::get('cursos','index')->name('cursos.index');
+    Route::get('cursos/create','create')->name('cursos.create');
+    Route::post('cursos/create','store')->name('cursos.store');
+    Route::get('cursos/{curso}','show')->name('cursos.show');
+    Route::get('cursos/{curso}/edit','edit')->name('cursos.edit');
+    Route::put('cursos/{curso}','update')->name('cursos.update');
+    Route::delete('cursos/{curso}','destroy')->name('cursos.destroy');
+});
+```
+
+> Y añadimos lo siguiente.
+
+```php
+Route::resource('cursos',CursoController::class);
+```
+
+**`Nota :` Agrupa las rutas gracias a la convención de los nombres.**
+
+###### Cambiar nombres de sub-rutas utilizando resource
+
+>Abrimos el archivo `AppServiceProvider.php`  en la carpeta `app\Providers\AppServiceProvider.php` y en la función `boot` escribimos lo siguiente.
+
+```php
+        Route::resourceVerbs([
+            'create' => 'crear',
+            'edit' => 'editar',
+        ]);
+```
+
+**`Nota :` Importamos la clase `use Illuminate\Support\Facades\Route;`.**
+
+###### Cambiar nombres de rutas utilizando resource
+
+>Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y añadimos lo siguiente.
+
+```php
+Route::resource('asignaturas',CursoController::class)->names('cursos');
+```
+
+###### Cambiar nombres de las variables utilizando resource
+
+>Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y añadimos lo siguiente.
+
+```php
+Route::resource('asignaturas',CursoController::class)->parameter('asignaturas', 'curso')->names('cursos');
 ```
 
 [Subir](#top)
