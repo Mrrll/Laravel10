@@ -44,6 +44,7 @@
 - [Mutadores y Accesores](#item11)
 - [Crud en laravel](#item12)
 - [Request en laravel](#item13)
+- [Asignación Masiva](#item14)
 
 <a name="item1"></a>
 
@@ -1195,5 +1196,66 @@ public function store(StoreCursoRequest $request)
 ```
 
 **`Nota :` Cambiar Atributos y Mensajes desde el Request .**
+
+[Subir](#top)
+
+<a name="item14"></a>
+
+## Asignación Masiva
+
+>Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en `store` eliminamos lo siguiente.
+
+```php
+        $curso = new Curso();
+        $curso->name = $request->name;
+        $curso->description = $request->description;
+        $curso->categoria = $request->categoria;
+        $curso->save();
+```
+
+>Y añadimos lo siguiente.
+
+```php
+$curso = Curso::create($request->all());
+```
+
+>Abrimos el archivo `Curso.php`  en la carpeta `app\Models\Curso.php` y dentro de la clase `Curso` añadimos lo siguiente.
+
+```php
+    protected $fillable = [
+        'name','description','categoria'
+    ];
+    protected $guarded = ['status'];
+```
+
+**`Nota :` Con `$fillable` Añadimos los campos que pueden ser almacenados masivamente y con `$guarded` Excluimos los campos.**
+
+>Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en `update` eliminamos lo siguiente.
+
+```php
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'categoria' => 'required',
+        ]);
+
+        $curso->name = $request->name;
+        $curso->description = $request->description;
+        $curso->categoria = $request->categoria;
+        $curso->save();
+```
+>Y en `update` cambiamos lo siguiente.
+
+```php
+public function update(StoreCursoRequest $request, Curso $curso)
+```
+
+**`Nota :` Importamos la Clase `use App\Http\Requests\StoreCursoRequest;` .**
+
+>Y añadimos lo siguiente.
+
+```php
+$curso->update($request->all());
+```
 
 [Subir](#top)
