@@ -46,6 +46,7 @@
 - [Request en laravel](#item13)
 - [Asignación Masiva](#item14)
 - [Agrupar Rutas con Route Resource](#item15)
+- [Url's amigables](#item16)
 
 <a name="item1"></a>
 
@@ -1348,5 +1349,60 @@ Route::resource('asignaturas',CursoController::class)->names('cursos');
 ```php
 Route::resource('asignaturas',CursoController::class)->parameter('asignaturas', 'curso')->names('cursos');
 ```
+
+[Subir](#top)
+
+<a name="item1"></a>
+
+## Url's amigables
+
+>Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_cursos_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_cursos_table.php` y en la función `up` añadimos lo siguiente.
+
+```php
+$table->string('slug');
+```
+
+>Abrimos el archivo `CursoFactory.php`  en la carpeta `database\factories\CursoFactory.php` y en la función `definition` cambiamos lo siguiente.
+
+```php
+        $name = $this->faker->sentence();
+        return [
+            'name' => $name,
+           'slug' => Str::slug($name, '-'),
+           'description' => $this->faker->paragraph(),
+           'categoria' => $this->faker->randomElement(["Desarrollo web", "Diseño web"])
+        ];
+```
+
+**`Nota :` Importamos la clase `use Illuminate\Support\Str;`.**
+
+>Typee: en la Consola:
+```console
+php artisan migrate:fresh --seed
+```
+
+ >Abrimos el archivo `index.blade.php`  en la carpeta `resources\views\cursos\index.blade.php` y cambiamos lo siguiente.
+
+```php
+<a href="{{route('cursos.show', $curso)}}">{{$curso->name}}</a>
+```
+
+ >Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en la función `show` cambiamos lo siguiente.
+
+ ```php
+    public function show(Curso $curso)
+    {
+        return view('cursos.show', compact('curso'));
+    }
+ ```
+
+ >Abrimos el archivo `Curso.php`  en la carpeta `app\Models\Curso.php` y añadimos lo siguiente.
+
+ ```php
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+ ```
 
 [Subir](#top)
