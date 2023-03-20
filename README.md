@@ -1135,6 +1135,33 @@ composer install
 'locale' => 'es'>
 ```
 
+###### Eliminar registro
+
+>Abrimos el archivo `web.php`  en la carpeta `routes\web.php` añadimos lo siguiente.
+
+```php
+Route::delete('cursos/{curso}','destroy')->name('cursos.destroy');
+```
+
+>Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` añadimos lo siguiente.
+
+```php
+    public function destroy(Curso $curso)
+    {
+        $curso->delete();
+        return redirect()->route('cursos.index');
+    }
+```
+>Abrimos el archivo `show.blade.php`  en la carpeta `resources\views\cursos\show.blade.php` añadimos lo siguiente.
+
+```php
+    <form action="{{route('cursos.destroy', $curso)}}" method="post">
+        @csrf
+        @method('delete')
+        <button type="submit">Eliminar Curso</button>
+    </form>
+```
+
 [Subir](#top)
 
 <a name="item13"></a>
