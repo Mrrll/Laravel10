@@ -50,6 +50,7 @@
 - [Navegabilidad web](#item17)
 - [Enviar emails con laravel](#item18)
 - [Formulario de Contacto](#item19)
+- [Kits de inicio](#item20)
 
 <a name="item1"></a>
 
@@ -1641,6 +1642,13 @@ php artisan make:controller ContactanosController
     }
 ```
 
+> Añadimos las clases
+
+```php
+use App\Mail\ContactanosMailable;
+use Illuminate\Support\Facades\Mail;
+```
+
 >Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y borramos lo siguiente.
 
 ```php
@@ -1739,3 +1747,4 @@ Route::post('contactanos',[ContactanosController::class, 'store'])->name('contac
 ```
 
 [Subir](#top)
+
