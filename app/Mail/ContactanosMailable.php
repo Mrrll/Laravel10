@@ -13,12 +13,13 @@ class ContactanosMailable extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $contacto;
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($contacto)
     {
-        //
+        $this->contacto = $contacto;
     }
 
     /**

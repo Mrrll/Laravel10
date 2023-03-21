@@ -49,6 +49,7 @@
 - [Url's amigables](#item16)
 - [Navegabilidad web](#item17)
 - [Enviar emails con laravel](#item18)
+- [Formulario de Contacto](#item19)
 
 <a name="item1"></a>
 
@@ -1599,6 +1600,142 @@ Route::get('contactanos', function(){
 ```php
 use App\Mail\ContactanosMailable;
 use Illuminate\Support\Facades\Mail;
+```
+
+[Subir](#top)
+
+<a name="item19"></a>
+
+## Formulario de Contacto
+
+>Abrimos el archivo `header.blade.php`  en la carpeta `resources\views\layouts\partials\header.blade.php` y escribimos lo siguiente.
+
+```php
+<li>
+    <a href="{{route('contactanos.index')}}" class="{{request()->routeIs('contactanos.*') ? 'active' : ''}}">Contáctanos</a>
+</li>
+```
+
+>Typee: en la Consola:
+```console
+php artisan make:controller ContactanosController
+```
+
+>Abrimos el archivo `ContactanosController.php`  en la carpeta `app\Http\Controllers\ContactanosController.php` y escribimos lo siguiente.
+
+```php
+    public function index()
+    {
+        return view('contactanos.index');
+    }
+    public function store(Request $request)
+    {
+         $request->validate([
+            'name' => 'required',
+            'correo' => 'required|email',
+            'mensaje' => 'required',
+        ]);
+        $correo = new ContactanosMailable($request->all());
+        Mail::to('ejemplo@ejemplo.com')->send($correo);
+        return redirect()->route('contactanos.index')->with('info', 'Mensaje Enviado');
+    }
+```
+
+>Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y borramos lo siguiente.
+
+```php
+    Route::get('contactanos', function(){
+        $correo = new ContactanosMailable;
+        Mail::to('ejemplo@ejemplo.com')->send($correo);
+        return "Mensaje enviado";
+    });
+```
+
+> Y escribimos lo siguiente.
+
+```php
+Route::get('contactanos',[ContactanosController::class, 'index' ])->name('contactanos.index');
+```
+
+> Y escribimos lo siguiente.
+
+```php
+Route::post('contactanos',[ContactanosController::class, 'store'])->name('contactanos.store');
+```
+
+>Creamos el archivo `index.blade.php`  en la carpeta `resources\views\contactanos\index.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+
+@section('title', 'Contactanos')
+
+@section('content')
+    <h1>Déjanos un mensaje</h1>
+    <form action="{{route('contactanos.store')}}" method="post">
+        @csrf
+        <label>
+            Nombre:
+            <br>
+            <input type="text" name="name">
+        </label>
+        @error('name')
+            <br>
+                <small>*{{$message}}</small>
+            <br>
+        @enderror
+        <br>
+        <label>
+            Correo:
+            <br>
+            <input type="text" name="correo">
+        </label>
+        @error('correo')
+            <br>
+                <small>*{{$message}}</small>
+            <br>
+        @enderror
+        <br>
+        <label>
+            Mensaje:
+            <br>
+            <textarea name="mensaje" rows="4"></textarea>
+        </label>
+        @error('mensaje')
+            <br>
+                <small>*{{$message}}</small>
+            <br>
+        @enderror
+        <br>
+        <button type="submit">Enviar Mensaje</button>
+    </form>
+    @if (session('info'))
+        <script>
+            alert("{{session('info')}}");
+        </script>
+    @endif
+@endsection
+```
+
+>Abrimos el archivo `ContactanosMailable.php`  en la carpeta `app\Mail\ContactanosMailable.php` y escribimos lo siguiente.
+
+```php
+    public $contacto;
+    /**
+     * Create a new message instance.
+     */
+    public function __construct($contacto)
+    {
+        $this->contacto = $contacto;
+    }
+```
+
+>Abrimos el archivo `contactanos.blade.php`  en la carpeta `resources\views\emails\contactanos.blade.php` y escribimos lo siguiente.
+
+```php
+    <p><strong>Nombre: </strong>{{$contacto['name']}}</p>
+    <p><strong>Correo: </strong>{{$contacto['correo']}}</p>
+    <p><strong>Mensaje: </strong>{{$contacto['mensaje']}}</p>
 ```
 
 [Subir](#top)
