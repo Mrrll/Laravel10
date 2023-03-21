@@ -48,6 +48,7 @@
 - [Agrupar Rutas con Route Resource](#item15)
 - [Url's amigables](#item16)
 - [Navegabilidad web](#item17)
+- [Enviar emails con laravel](#item18)
 
 <a name="item1"></a>
 
@@ -1519,6 +1520,85 @@ Route::view('nosotros', 'nosotros')->name('nosotros');
 
 ```php
 @include('layouts.partials.header')
+```
+
+[Subir](#top)
+
+<a name="item18"></a>
+
+## Enviar emails con laravel
+
+>Abrimos el archivo `.env`  en la carpeta `/.env` y completamos las siguiente variables.
+
+```php
+MAIL_MAILER=
+MAIL_HOST=
+MAIL_PORT=
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_ENCRYPTION=
+MAIL_FROM_ADDRESS="null"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+**`Nota :` Utilizaremos [mailtrap.io](https://mailtrap.io) para recibir los correos.**
+
+###### Crear un mailable
+
+>Typee: en la Consola:
+```console
+php artisan make:mail ContactanosMailable
+```
+
+>Abrimos el archivo `ContactanosMailable.php`  en la carpeta `app\Mail\ContactanosMailable.php` dentro de la función `envelope` y escribimos lo siguiente.
+
+```php
+subject = "Información de Contacto",
+```
+
+**`Nota :` Asunto del mensaje.**
+
+>Y en la función `content` y escribimos lo siguiente.
+
+```php
+view: 'emails.contactanos',
+```
+
+**`Nota :` Nueva vista blade .**
+
+>Creamos el archivo `contactanos.blade.php`  en la carpeta `resources\views\emails\contactanos.blade.php` y escribimos lo siguiente.
+
+```php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Correo electrónico</h1>
+    <p>Este es el primer correo que mandaré por laravel</p>
+</body>
+</html>
+```
+
+>Abrimos el archivo `web`  en la carpeta `routes\web.php` y escribimos lo siguiente.
+
+```php
+Route::get('contactanos', function(){
+    $correo = new ContactanosMailable;
+    Mail::to('ejemplo@ejemplo.com')->send($correo);
+    return "Mensaje enviado";
+});
+```
+
+> Añadimos las clases
+
+```php
+use App\Mail\ContactanosMailable;
+use Illuminate\Support\Facades\Mail;
 ```
 
 [Subir](#top)
