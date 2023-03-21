@@ -16,39 +16,6 @@ use App\Http\Controllers\HomeController;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-// Route::get('/', function () {
-//     return 'Hola mundo';
-// });
-Route::get('/',HomeController::class);
-// Route::get('cursos', function () {
-    //     return 'Bienvenido a la pagina cursos';
-// });
-// Route::get('cursos',[CursoController::class,'index']);
-// Route::get('cursos/{curso}', function ($curso) {
-//     return "Bienvenido al cursos: $curso";
-// });
-// Route::get('cursos/create',[CursoController::class,'create']);
-// Route::get('cursos/{curso}/{categoria}', function ($curso, $categoria) {
-//     return "Bienvenido al cursos: $curso, de la categoria: $categoria";
-// });
-// Route::get('cursos/{curso}/{categoria?}', function ($curso, $categoria = null) {
-//     if($categoria){
-//         return "Bienvenido al cursos: $curso, de la categoria: $categoria";
-//     } else {
-//         return "Bienvenido al cursos: $curso";
-//     }
-// });
-// Route::get('cursos/{curso}',[CursoController::class,'show']);
-// Route::controller(CursoController::class)->group(function(){
-//     Route::get('cursos','index')->name('cursos.index');
-//     Route::get('cursos/create','create')->name('cursos.create');
-//     Route::post('cursos/create','store')->name('cursos.store');
-//     Route::get('cursos/{curso}','show')->name('cursos.show');
-//     Route::get('cursos/{curso}/edit','edit')->name('cursos.edit');
-//     Route::put('cursos/{curso}','update')->name('cursos.update');
-//     Route::delete('cursos/{curso}','destroy')->name('cursos.destroy');
-// });
+Route::get('/',HomeController::class)->name('home');
 Route::resource('cursos',CursoController::class);
+Route::view('nosotros', 'nosotros')->name('nosotros');

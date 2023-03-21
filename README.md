@@ -47,6 +47,7 @@
 - [Asignación Masiva](#item14)
 - [Agrupar Rutas con Route Resource](#item15)
 - [Url's amigables](#item16)
+- [Navegabilidad web](#item17)
 
 <a name="item1"></a>
 
@@ -1387,7 +1388,7 @@ php artisan migrate:fresh --seed
 <a href="{{route('cursos.show', $curso)}}">{{$curso->name}}</a>
 ```
 
- >Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en la función `show` cambiamos lo siguiente.
+>Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en la función `show` cambiamos lo siguiente.
 
  ```php
     public function show(Curso $curso)
@@ -1396,7 +1397,7 @@ php artisan migrate:fresh --seed
     }
  ```
 
- >Abrimos el archivo `Curso.php`  en la carpeta `app\Models\Curso.php` y añadimos lo siguiente.
+>Abrimos el archivo `Curso.php`  en la carpeta `app\Models\Curso.php` y añadimos lo siguiente.
 
  ```php
     public function getRouteKeyName()
@@ -1404,5 +1405,120 @@ php artisan migrate:fresh --seed
         return 'slug';
     }
  ```
+
+[Subir](#top)
+
+<a name="item17"></a>
+
+## Navegabilidad web
+
+>Abrimos el archivo `plantilla.blade.php`  en la carpeta `resources\views\layouts\plantilla.blade.php`  y dentro del `head` escribimos lo siguiente.
+
+```php
+    <style>
+        .active {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+```
+
+> Y dentro del `body` escribimos lo siguiente.
+
+ ```php
+    <header>
+        <h1>Laravel 10</h1>
+        <nav>
+            <ul>
+                <li>
+                    <a href="{{route('home')}}" class="{{request()->routeIs('home') ? 'active' : ''}}">Home</a>
+                </li>
+                <li>
+                    <a href="{{route('cursos.index')}}" class="{{request()->routeIs('cursos.*') ? 'active' : ''}}">Cursos</a>
+                </li>
+                <li>
+                    <a href="{{route('nosotros')}}" class="{{request()->routeIs('nosotros') ? 'active' : ''}}">Nosotros</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+ ```
+
+**`Nota :` El método `@dump` imprime en pantalla código php y los métodos `request()->routeIs('cursos.index')` determinan si estamos en una vista.**
+
+>Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y escribimos lo siguiente.
+
+```php
+Route::get('/',HomeController::class)->name('home');
+Route::view('nosotros', 'nosotros')->name('nosotros');
+```
+
+**`Nota :` El método `view` se utiliza para mostrar una vista que no conecte con la base de datos.**
+
+>Creamos el archivo `nosotros.php`  en la carpeta `resources\views\nosotros.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+
+@section('title', 'Nosotros')
+
+@section('content')
+    <h1>Nosotros</h1>
+@endsection
+```
+
+###### Trocear Código Blade
+
+>Creamos el archivo `header.blade.php`  en la carpeta `resources\views\layouts\partials\header.blade.php` y escribimos lo siguiente.
+
+```php
+<header>
+        <h1>Laravel 10</h1>
+        <nav>
+            <ul>
+                <li>
+                    <a href="{{route('home')}}" class="{{request()->routeIs('home') ? 'active' : ''}}">Home</a>
+                    {{-- @dump(request()->routeIs('home')); --}}
+                </li>
+                <li>
+                    <a href="{{route('cursos.index')}}" class="{{request()->routeIs('cursos.*') ? 'active' : ''}}">Cursos</a>
+                    {{-- @dump(request()->routeIs('cursos.index')); --}}
+                </li>
+                <li>
+                    <a href="{{route('nosotros')}}" class="{{request()->routeIs('nosotros') ? 'active' : ''}}">Nosotros</a>
+                    {{-- @dump(request()->routeIs('nosotros')); --}}
+                </li>
+            </ul>
+        </nav>
+</header>
+```
+>Abrimos el archivo `plantilla.blade.php`  en la carpeta `resources\views\layouts\plantilla.blade.php` y borramos lo siguiente.
+
+```php
+<header>
+        <h1>Laravel 10</h1>
+        <nav>
+            <ul>
+                <li>
+                    <a href="{{route('home')}}" class="{{request()->routeIs('home') ? 'active' : ''}}">Home</a>
+                    {{-- @dump(request()->routeIs('home')); --}}
+                </li>
+                <li>
+                    <a href="{{route('cursos.index')}}" class="{{request()->routeIs('cursos.*') ? 'active' : ''}}">Cursos</a>
+                    {{-- @dump(request()->routeIs('cursos.index')); --}}
+                </li>
+                <li>
+                    <a href="{{route('nosotros')}}" class="{{request()->routeIs('nosotros') ? 'active' : ''}}">Nosotros</a>
+                    {{-- @dump(request()->routeIs('nosotros')); --}}
+                </li>
+            </ul>
+        </nav>
+</header>
+```
+> Y lo remplazamos por lo siguiente.
+
+```php
+@include('layouts.partials.header')
+```
 
 [Subir](#top)
