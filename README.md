@@ -1748,3 +1748,10 @@ Route::post('contactanos',[ContactanosController::class, 'store'])->name('contac
 
 [Subir](#top)
 
+<a name="item20"></a>
+
+## Kits de inicio
+
+**`Nota:` El kit de inicio [Breeze](https://github.com/Mrrll/Breeze) y el kit de inicio [Jetstream](https://github.com/Mrrll/Jetstream) lo podemos ver desde los links a los repositorios GitHub.**
+
+[Subir](#top)
