@@ -51,6 +51,7 @@
 - [Enviar emails con laravel](#item18)
 - [Formulario de Contacto](#item19)
 - [Kits de inicio](#item20)
+- [Implementar Bootstrap](#item21)
 
 <a name="item1"></a>
 
@@ -60,15 +61,16 @@
 
 >Typee: en la Consola:
 ```console
-    composer create-project laravel/laravel example-app
+composer create-project laravel/laravel example-app
 ```
+
 **`Nota:` El nombre `example-app` lo cambiamos por el nombre de nuestra aplicación.**
 
 ###### Inicializar Git
 
 >Typee: en la Consola:
 ```console
-    git init
+git init
 ```
 ###### Subir Repositorio a GitHub
 
@@ -76,33 +78,34 @@
 
 >Typee: en la Consola:
 ```console
-    git remote add origin URL
+git remote add origin URL
 ```
 >Typee: en la Consola:
 ```console
-    git config --global user.email "email"
+git config --global user.email "email"
 ```
 >Typee: en la Consola:
 ```console
-    git config --global user.name "nombre"
+git config --global user.name "nombre"
 ```
+
 **`Nota:` Si no tenemos agregado el nombre y el email en la configuración de git.**
 
 >Typee: en la Consola:
 ```console
-    git add .
+git add .
 ```
 
 **`Nota:` Preparamos los archivos que queremos subir.**
 >Typee: en la Consola:
 ```console
-    git commit -m "Instalación del Proyecto"
+git commit -m "Instalación del Proyecto"
 ```
 **`Nota:` Creamos el Comentario y guardamos los archivo modificados o nuevos de nuestro repositorio en local.**
 
 >Typee: en la Consola:
 ```console
-    git push -f origin master
+git push -f origin master
 ```
 **`Nota:` Subimos los archivos o repositorio local al servidor de github.**
 
@@ -157,7 +160,7 @@ Route::get('cursos/{curso}/{categoria?}', function ($curso, $categoria = null) {
 
 >Typee: en la Consola:
 ```console
-    php artisan make:controller HomeController
+php artisan make:controller HomeController
 ```
 >Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y creamos un función `__invoke` dentro de la Clase `HomController`.
 
@@ -181,7 +184,7 @@ Route::get('/',HomeController::class);
 ```
 >Typee: en la Consola:
 ```console
-    php artisan make:controller CursoController
+php artisan make:controller CursoController
 ```
 >Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y escribimos dentro de la Clase `HomController`.
 
@@ -382,13 +385,13 @@ DB_PASSWORD= // Password del servidor
 
 >Typee: en la Consola:
 ```console
-    php artisan migrate
+php artisan migrate
 ```
 ###### Creación de migraciones
 
 >Typee: en la Consola:
 ```console
-    php artisan make:migration cursos
+php artisan make:migration cursos
 ```
 >Abrimos el archivo `XXXX_XX_XX_XXXXXX_cursos.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_cursos.php` y en la función `up` escribimos lo siguiente.
 
@@ -410,26 +413,26 @@ DB_PASSWORD= // Password del servidor
 ```
 >Typee: en la Consola:
 ```console
-    php artisan migrate
+php artisan migrate
 ```
 
 ###### Revertir ultima migración
 
 >Typee: en la Consola:
 ```console
-    php artisan migrate:rollback
+php artisan migrate:rollback
 ```
 
 >Eliminamos el archivo `XXXX_XX_XX_XXXXXX_cursos.php`.
 
 >Typee: en la Consola:
 ```console
-    php artisan migrate
+php artisan migrate
 ```
 
 >Typee: en la Consola:
 ```console
-    php artisan make:migration create_cursos_table
+php artisan make:migration create_cursos_table
 ```
 **`Nota:` Es la forma correcta de creación de una tabla.**
 
@@ -442,7 +445,7 @@ DB_PASSWORD= // Password del servidor
 
 >Typee: en la Consola:
 ```console
-    php artisan migrate
+php artisan migrate
 ```
 
 ###### Modificar una tabla ya migrada
@@ -455,14 +458,14 @@ DB_PASSWORD= // Password del servidor
 
 >Typee: en la Consola:
 ```console
-    php artisan migrate:fresh
+php artisan migrate:fresh
 ```
 
 **`Nota:` El comando `php artisan migrate:fresh` borra las tablas y seguido ejecuta el método `up` No es recomendable en producción.**
 
 >Typee: en la Consola:
 ```console
-    php artisan migrate:refresh
+php artisan migrate:refresh
 ```
 **`Nota:` El comando `php artisan migrate:refresh` ejecuta el método `down` y seguido ejecuta el método `up` No es recomendable en producción.**
 
@@ -474,19 +477,19 @@ DB_PASSWORD= // Password del servidor
 
 >Typee: en la Consola:
 ```console
-    php artisan migrate:rollback
+php artisan migrate:rollback
 ```
 
 >Typee: en la Consola:
 ```console
-    php artisan migrate
+php artisan migrate
 ```
 
 ###### Creamos migración de añadido
 
 >Typee: en la Consola:
 ```console
-    php artisan make:migration add_avatar_to_users_table
+php artisan make:migration add_avatar_to_users_table
 ```
 
 >Abrimos el archivo `XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php` y en la función `up` escribimos lo siguiente.
@@ -511,14 +514,14 @@ DB_PASSWORD= // Password del servidor
 
 >Typee: en la Consola:
 ```console
-    composer require doctrine/dbal
+composer require doctrine/dbal
 ```
 
 >Creamos migración de añadido/modificación
 
 >Typee: en la Consola:
 ```console
-    php artisan make:migration cambiar_propiedades_to_users_table
+php artisan make:migration cambiar_propiedades_to_users_table
 ```
 
 >Abrimos el archivo `XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php` y en la función `up` escribimos lo siguiente.
@@ -543,13 +546,13 @@ DB_PASSWORD= // Password del servidor
 
 >Typee: en la Consola:
 ```console
-    php artisan make:model Curso
+php artisan make:model Curso
 ```
 >Utilizaremos tinker para ejecutar métodos de los modelos desde consola.
 
 >Typee: en la Consola:
 ```console
-    php artisan tinker
+php artisan tinker
 ```
 **`Nota:` Para salir de tinker escribimos `exit`.**
 
@@ -559,41 +562,41 @@ DB_PASSWORD= // Password del servidor
 
 >Typee: en la Consola:
 ```tinker
-    use App\Models\Curso;
+use App\Models\Curso;
 ```
 
 >Creamos el Objeto
 
 >Typee: en la Consola:
 ```tinker
-    $curso = new Curso;
+$curso = new Curso;
 ```
 
 >Llenar las propiedades al Objeto
 
 >Typee: en la Consola:
 ```tinker
-    $curso->name = 'Laravel';
-    $curso->description = 'El mejor framework de PHP';
+$curso->name = 'Laravel';
+$curso->description = 'El mejor framework de PHP';
 ```
 
 >Llamar al Objeto
 
 >Typee: en la Consola:
 ```tinker
-    $curso
+$curso
 ```
 >Guardar Objeto a la base de datos
 
 >Typee: en la Consola:
 ```tinker
-    $curso->save();
+$curso->save();
 ```
 >Modificar Objeto
 
 >Typee: en la Consola:
 ```tinker
-    $curso->description = 'El mejor framework del mundo';
+$curso->description = 'El mejor framework del mundo';
 ```
 
 ###### Cambiar la tabla al modelo
@@ -1753,5 +1756,161 @@ Route::post('contactanos',[ContactanosController::class, 'store'])->name('contac
 ## Kits de inicio
 
 **`Nota:` El kit de inicio [Breeze](https://github.com/Mrrll/Breeze) y el kit de inicio [Jetstream](https://github.com/Mrrll/Jetstream) lo podemos ver desde los links a los repositorios GitHub.**
+
+[Subir](#top)
+
+<a name="item21"></a>
+
+## Implementar Bootstrap
+
+###### Instalación de Bootstrap
+
+>Typee: en la Consola:
+```console
+npm install bootstrap @popperjs/core
+```
+> Instalamos Sass
+
+>Typee: en la Consola:
+```console
+npm install sass --save-dev
+```
+
+>Creamos o renombramos la carpeta `css` de `resources\css` a `scss` y creamos o renombramos el archivo `app.css` a `app.scss`.
+
+>Abrimos el archivo `app.scss` de la carpeta `resources\scss\app.scss` y escribimos lo siguiente.
+
+```scss
+@import "~bootstrap/scss/bootstrap";
+```
+
+>Abrimos el archivo `app.js` de la carpeta `resources\js\app.js` y escribimos lo siguiente.
+
+```js
+import * as bootstrap from 'bootstrap';
+```
+
+>Abrimos el archivo `vite.config.js` de la carpeta `/` y escribimos lo siguiente.
+
+```js
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+import path from 'path';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ['resources/scss/app.scss', 'resources/js/app.js'],
+            refresh: true,
+        }),
+    ],
+    resolve: {
+        alias: {
+            '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap')
+        }
+    }
+});
+```
+
+>Abrimos el archivo `plantilla.blade.php` de la carpeta `resources\views\layouts\plantilla.blade.php/` y dentro del `head` escribimos lo siguiente.
+
+```php
+@vite(['resources/scss/app.scss', 'resources/js/app.js'])
+```
+>Podemos inicializar los servidores Frontend y Backend
+
+```console
+php artisan serve
+npm run dev
+```
+
+**`Nota :` Agradecimientos por el aporte y información a `Kim Hallberg` por su tutorial [Como usar bootstrap con laravel y vite](https://devdojo.com/thinkverse/how-to-use-bootstrap-with-laravel-and-vite).**
+
+###### Ejemplo de modificación de vistas con  Bootstrap
+
+>Abrimos el archivo `AppServiceProvider.php` de la carpeta `app\Providers\AppServiceProvider.php` y dentro del `boot` escribimos lo siguiente.
+
+```php
+Paginator::useBootstrap();
+```
+
+>Y importamos la clase `Paginator`.
+
+```php
+use Illuminate\Pagination\Paginator;
+```
+
+**`Nota :` Agradecimientos por el aporte y información a `codeanddeploy` por su tutorial [Laravel 9 Pagination Example using Bootstrap 5](https://codeanddeploy.com/blog/laravel/laravel-8-pagination-example-using-bootstrap-5).**
+
+>Abrimos el archivo `header.blade.php` de la carpeta `resources\views\layouts\partials\header.blade.php` y modificamos la etiqueta `nav` escribimos lo siguiente.
+
+```php
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand">Laravel 10</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" aria-current="page" href="{{ route('home') }}">Home</a>
+                    </li>
+                    <li class="nav-item {{ request()->routeIs('cursos.*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('cursos.index') }}">Cursos</a>
+                    </li>
+                    <li class="nav-item {{ request()->routeIs('nosotros') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('nosotros') }}">Nosotros</a>
+                    </li>
+                    <li class="nav-item {{ route('contactanos.index') }}">
+                        <a class="nav-link {{ request()->routeIs('contactanos.*') ? 'active' : '' }}" href="{{ route('contactanos.index') }}">Contáctanos</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+```
+
+>Abrimos el archivo `header.blade.php` de la carpeta `resources\views\layouts\partials\header.blade.php` y modificamos la etiqueta `nav` escribimos lo siguiente.
+
+```php
+    <div class="container">
+        <div class="card" style="width: 18rem;">
+            <form action="{{ route('contactanos.store') }}" method="post">
+                <div class="card-header text-center">
+                    <h5>Déjanos un mensaje</h5>
+                </div>
+                <div class="card-body">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Name:</label>
+                        <input type="text" class="form-control" placeholder="Iñigo Casper">
+                        @error('name')
+                            <small class="text-danger">*{{ $message }}</small>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Correo:</label>
+                        <input type="email" class="form-control" placeholder="name@example.com">
+                        @error('correo')
+                            <small class="text-danger">*{{ $message }}</small>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mensaje:</label>
+                        <textarea class="form-control" rows="4"></textarea>
+                        @error('mensaje')
+                            <small class="text-danger">*{{ $message }}</small>
+                        @enderror
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Enviar Mensaje</button>
+                </div>
+            </form>
+        </div>
+    </div>
+```
 
 [Subir](#top)
