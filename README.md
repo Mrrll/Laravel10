@@ -52,6 +52,7 @@
 - [Formulario de Contacto](#item19)
 - [Kits de inicio](#item20)
 - [Implementar Bootstrap](#item21)
+- [Componentes Blade](#item22)
 
 <a name="item1"></a>
 
@@ -1819,6 +1820,7 @@ export default defineConfig({
 ```
 >Podemos inicializar los servidores Frontend y Backend
 
+>Typee: en la Consola:
 ```console
 php artisan serve
 npm run dev
@@ -2062,6 +2064,78 @@ body {
 
 ```scss
 @import "/resources/css/app.css";
+```
+
+[Subir](#top)
+
+<a name="item22"></a>
+
+## Componentes Blade
+
+>Typee: en la Consola:
+```console
+php artisan make:component Alert
+```
+
+>Abrimos el archivo `ContactanosController.php` de la carpeta `app\Http\Controllers\ContactanosController.php` y modificamos lo siguiente.
+
+```php
+return redirect()->route('contactanos.index')->with('success', 'Mensaje Enviado');
+```
+
+>Abrimos el archivo `index.blade.php` de la carpeta `resources\views\contactanos\index.blade.php` y modificamos lo siguiente.
+
+```php
+    @php
+    $type = 'success';
+    @endphp
+    @if (session('success'))
+        <x-alert :type="$type">
+            <x-slot name="title">
+                Enviado!
+            </x-slot>
+            Su mensaje a sido enviado con éxito.
+        </x-alert>
+    @endif
+```
+
+>Abrimos el archivo `alert.blade.php` de la carpeta `resources\views\components\alert.blade.php` y escribimos lo siguiente.
+
+```php
+<div {{ $attributes->merge(['class' => "alert $clases alert-dismissible fade show"]) }} role="alert">
+    <strong>{{ $title }}</strong> {{ $slot }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+```
+
+>Abrimos el archivo `Alert.php` de la carpeta `app\View\Components\Alert.php` y escribimos lo siguiente.
+
+```php
+    public $clases;
+    /**
+     * Create a new component instance.
+     */
+    public function __construct($type = 'info') // Pasar Atributos
+    {
+        switch ($type) {
+         case 'info':
+             $clases = 'alert-info';
+             break;
+         case 'success':
+             $clases = 'alert-success';
+             break;
+         case 'warning':
+             $clases = 'alert-warning';
+             break;
+         case 'danger':
+             $clases = 'alert-danger';
+             break;
+         default:
+             # code...
+             break;
+        }
+        $this->clases = $clases;
+    }
 ```
 
 [Subir](#top)

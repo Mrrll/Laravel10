@@ -1,7 +1,6 @@
 @extends('layouts.plantilla')
 
 @section('title', 'Contactanos')
-
 @section('content')
     <main class="container center_container">
         <div class="card" style="width: 18rem;">
@@ -39,10 +38,15 @@
             </form>
         </div>
     </main>
-    @if (session('info'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong>Enviado!</strong> Su email a sido enviado con éxito.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    @php
+        $type = 'success';
+    @endphp
+    @if (session('success'))
+        <x-alert :type="$type">
+            <x-slot name="title">
+                Enviado!
+            </x-slot>
+            Su mensaje a sido enviado con éxito.
+        </x-alert>
     @endif
 @endsection

@@ -21,6 +21,6 @@ class ContactanosController extends Controller
         ]);
         $correo = new ContactanosMailable($request->all());
         Mail::to('ejemplo@ejemplo.com')->send($correo);
-        return redirect()->route('contactanos.index')->with('info', 'Mensaje Enviado');
+        return redirect()->route('contactanos.index')->with('success', 'Mensaje Enviado');
     }
 }
