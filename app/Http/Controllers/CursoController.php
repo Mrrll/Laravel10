@@ -9,7 +9,7 @@ class CursoController extends Controller
 {
     public function index()
     {
-        $cursos = Curso::orderBy('id', 'desc')->paginate();
+        $cursos = Curso::orderBy('id', 'desc')->paginate(10);
         return view('cursos.index', compact('cursos'));
     }
     public function create()

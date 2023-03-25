@@ -994,7 +994,7 @@ Route::post('cursos/create','store')->name('cursos.store');
 > Y cambiamos en la función `index` lo siguiente.
 
 ```php
-$cursos = Curso::orderBy('id', 'desc')->paginate();
+$cursos = Curso::orderBy('id', 'desc')->paginate(10);
 ```
 
 ###### Actualizar registros
@@ -1220,7 +1220,7 @@ public function store(StoreCursoRequest $request)
     public function attributes()
     {
         return [
-            'name' => 'El nombre del curso'
+            'name' => 'nombre del curso'
         ];
     }
     public function messages()
@@ -1845,6 +1845,7 @@ use Illuminate\Pagination\Paginator;
 >Abrimos el archivo `header.blade.php` de la carpeta `resources\views\layouts\partials\header.blade.php` y modificamos la etiqueta `nav` escribimos lo siguiente.
 
 ```php
+<header class="bg-light border-bottom">
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand">Laravel 10</a>
@@ -1857,11 +1858,11 @@ use Illuminate\Pagination\Paginator;
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" aria-current="page" href="{{ route('home') }}">Home</a>
                     </li>
-                    <li class="nav-item {{ request()->routeIs('cursos.*') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('cursos.index') }}">Cursos</a>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('cursos.*') ? 'active' : '' }}" href="{{ route('cursos.index') }}">Cursos</a>
                     </li>
-                    <li class="nav-item {{ request()->routeIs('nosotros') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('nosotros') }}">Nosotros</a>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('nosotros') ? 'active' : '' }}" href="{{ route('nosotros') }}">Nosotros</a>
                     </li>
                     <li class="nav-item {{ route('contactanos.index') }}">
                         <a class="nav-link {{ request()->routeIs('contactanos.*') ? 'active' : '' }}" href="{{ route('contactanos.index') }}">Contáctanos</a>
@@ -1870,12 +1871,30 @@ use Illuminate\Pagination\Paginator;
             </div>
         </div>
     </nav>
+</header>
 ```
 
->Abrimos el archivo `header.blade.php` de la carpeta `resources\views\layouts\partials\header.blade.php` y modificamos la etiqueta `nav` escribimos lo siguiente.
+>Abrimos el archivo `index.blade.php` de la carpeta `resources\views\cursos\index.blade.php` y escribimos lo siguiente.
 
 ```php
-    <div class="container">
+    <main class="container">
+        <h1>Bienvenido a la pagina cursos</h1>
+        <a class="btn btn-success" href="{{ route('cursos.create') }}">Crear Curso</a>
+        <ul>
+            @foreach ($cursos as $curso)
+                <li>
+                    <a href="{{ route('cursos.show', $curso) }}">{{ $curso->name }}</a>
+                </li>
+            @endforeach
+        </ul>
+        {{ $cursos->links() }}
+    </main>
+```
+
+>Abrimos el archivo `index.blade.php` de la carpeta `resources\views\contactanos\index.blade.php` y escribimos lo siguiente.
+
+```php
+    <main class="container center_container">
         <div class="card" style="width: 18rem;">
             <form action="{{ route('contactanos.store') }}" method="post">
                 <div class="card-header text-center">
@@ -1883,34 +1902,166 @@ use Illuminate\Pagination\Paginator;
                 </div>
                 <div class="card-body">
                     @csrf
-                    <div class="mb-3">
+                    <div class="mb-0">
                         <label class="form-label">Name:</label>
-                        <input type="text" class="form-control" placeholder="Iñigo Casper">
+                        <input type="text" class="form-control" placeholder="Iñigo Casper" name="name">
                         @error('name')
                             <small class="text-danger">*{{ $message }}</small>
                         @enderror
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-0">
                         <label class="form-label">Correo:</label>
-                        <input type="email" class="form-control" placeholder="name@example.com">
+                        <input type="email" class="form-control" placeholder="name@example.com" name="correo">
                         @error('correo')
                             <small class="text-danger">*{{ $message }}</small>
                         @enderror
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-0">
                         <label class="form-label">Mensaje:</label>
-                        <textarea class="form-control" rows="4"></textarea>
+                        <textarea class="form-control" rows="3" name="mensaje"></textarea>
                         @error('mensaje')
                             <small class="text-danger">*{{ $message }}</small>
                         @enderror
                     </div>
                 </div>
                 <div class="card-footer text-center">
-                    <button type="submit" class="btn btn-primary btn-lg">Enviar Mensaje</button>
+                    <button type="submit" class="btn btn-primary">Enviar Mensaje</button>
                 </div>
             </form>
         </div>
+    </main>
+    @if (session('info'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Enviado!</strong> Su email a sido enviado con éxito.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+```
+
+>Creamos el archivo `form.blade.php` de la carpeta `resources\views\cursos\partials\form.blade.php` y escribimos lo siguiente.
+
+```php
+<div class="card" style="width: 18rem;">
+    <div class="card-header text-center">
+        <h5>
+            {{ Route::currentRouteName() == 'cursos.edit' ? 'Editar curso' : 'Crear curso' }}
+        </h5>
     </div>
+    <div class="card-body">
+        @csrf
+        <div class="mb-0">
+            <label class="form-label">Name:</label>
+            <input type="text" class="form-control" placeholder="Html 5"
+                value="{{ Route::currentRouteName() == 'cursos.edit' ? old('name', $curso->name) : old('name') }}">
+            @error('name')
+                <small class="text-danger">*{{ $message }}</small>
+            @enderror
+        </div>
+        <div class="mb-0">
+            <label class="form-label">Descripción:</label>
+            <textarea class="form-control" rows="3">{{ Route::currentRouteName() == 'cursos.edit' ? old('description', $curso->description) : old('description') }}</textarea>
+            @error('description')
+                <small class="text-danger">*{{ $message }}</small>
+            @enderror
+        </div>
+        <div class="mb-0">
+            <label class="form-label">Categoria:</label>
+            <input type="text" class="form-control" placeholder="Desarrollo web"
+                value="{{ Route::currentRouteName() == 'cursos.edit' ? old('categoria', $curso->categoria) : old('categoria') }}">
+            @error('categoria')
+                <small class="text-danger">*{{ $message }}</small>
+            @enderror
+        </div>
+    </div>
+    <div class="card-footer text-center">
+        <button type="submit"
+            class="btn btn-primary">{{ Route::currentRouteName() == 'cursos.edit' ? 'Editar Curso' : 'Crear Curso' }}</button>
+    </div>
+</div>
+```
+
+>Abrimos el archivo `edit.blade.php` de la carpeta `resources\views\cursos\edit.blade.php` y escribimos lo siguiente.
+
+```php
+    <main class="container center_container container-float">
+        <a class="btn btn-success btn-float btn-position-top-0-left-0 m-2" href="{{route('cursos.show', $curso)}}">Volver</a>
+        <form action="{{route('cursos.update', $curso)}}" method="post">
+            @csrf
+            @method('put')
+            @include('cursos.partials.form')
+        </form>
+    </main>
+```
+
+>Abrimos el archivo `create.blade.php` de la carpeta `resources\views\cursos\create.blade.php` y escribimos lo siguiente.
+
+```php
+    <main class="container center_container container-float">
+        <a class="btn btn-success btn-float btn-position-top-0-left-0 m-2" href="{{ route('cursos.index') }}">Volver</a>
+        <form action="{{route('cursos.store')}}" method="post">
+            @csrf
+            @include('cursos.partials.form')
+        </form>
+    </main>
+```
+
+>Abrimos el archivo `show.blade.php` de la carpeta `resources\views\cursos\show.blade.php` y escribimos lo siguiente.
+
+```php
+    <main class="container">
+        <h1>Bienvenido al curso {{$curso->name}} </h1>
+        <a class="btn btn-success ml-2" href="{{route('cursos.index')}}">Volver a Cursos</a>
+        <a class="btn btn-warning" href="{{route('cursos.edit', $curso)}}">Editar Cursos</a>
+        <p><strong>Categoria : </strong>{{$curso->categoria}}</p>
+        <p>{{$curso->description}}</p>
+        <form action="{{route('cursos.destroy', $curso)}}" method="post">
+            @csrf
+            @method('delete')
+            <button class="btn btn-danger" type="submit">Eliminar Curso</button>
+        </form>
+    </main>
+```
+
+>Creamos el archivo `footer.blade.php` de la carpeta `resources\views\layouts\partials\footer.blade.php` y escribimos lo siguiente.
+
+```php
+<footer class="bg-light text-center text-lg-start border-top">
+  <div class="text-center p-3">
+    © 2023 Copyright:
+    <a class="text-dark" href="#">Un Footer</a>
+  </div>
+</footer>
+```
+
+>Abrimos o creamos el archivo `app.css` de la carpeta `resources\css\app.css` y escribimos lo siguiente.
+
+```css
+.center_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body {
+    display: grid;
+    min-height: 100vh;
+    grid-template-rows: auto 1fr auto;
+}
+.container-float {
+    position: relative;
+}
+.btn-float {
+    position: absolute;
+}
+.btn-position-top-0-left-0{
+    top: 0;
+    left: 0;
+}
+```
+
+>Abrimos `app.scss` de la carpeta `resources\scss\app.scss` y escribimos lo siguiente.
+
+```scss
+@import "/resources/css/app.css";
 ```
 
 [Subir](#top)

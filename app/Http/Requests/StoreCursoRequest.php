@@ -30,7 +30,7 @@ class StoreCursoRequest extends FormRequest
     public function attributes()
     {
         return [
-            'name' => 'El nombre del curso'
+            'name' => 'nombre del curso'
         ];
     }
     public function messages()

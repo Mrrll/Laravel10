@@ -1,0 +1,21 @@
+.center_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body {
+    display: grid;
+    min-height: 100vh;
+    grid-template-rows: auto 1fr auto;
+}
+.container-float {
+    position: relative;
+}
+.btn-float {
+    position: absolute;
+}
+.btn-position-top-0-left-0{
+    top: 0;
+    left: 0;
+}
+

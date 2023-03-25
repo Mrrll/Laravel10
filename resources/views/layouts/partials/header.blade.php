@@ -1,4 +1,4 @@
-<header>
+<header class="bg-light border-bottom">
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand">Laravel 10</a>
@@ -11,11 +11,11 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" aria-current="page" href="{{ route('home') }}">Home</a>
                     </li>
-                    <li class="nav-item {{ request()->routeIs('cursos.*') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('cursos.index') }}">Cursos</a>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('cursos.*') ? 'active' : '' }}" href="{{ route('cursos.index') }}">Cursos</a>
                     </li>
-                    <li class="nav-item {{ request()->routeIs('nosotros') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('nosotros') }}">Nosotros</a>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('nosotros') ? 'active' : '' }}" href="{{ route('nosotros') }}">Nosotros</a>
                     </li>
                     <li class="nav-item {{ route('contactanos.index') }}">
                         <a class="nav-link {{ request()->routeIs('contactanos.*') ? 'active' : '' }}" href="{{ route('contactanos.index') }}">Contáctanos</a>
