@@ -53,6 +53,7 @@
 - [Kits de inicio](#item20)
 - [Implementar Bootstrap](#item21)
 - [Componentes Blade](#item22)
+- [Middleware](#item23)
 
 <a name="item1"></a>
 
@@ -2136,6 +2137,54 @@ return redirect()->route('contactanos.index')->with('success', 'Mensaje Enviado'
         }
         $this->clases = $clases;
     }
+```
+
+[Subir](#top)
+
+<a name="item23"></a>
+
+## Middleware
+
+>Abrimos el archivo `web.php` de la carpeta `routes\web.php` y escribimos lo siguiente.
+
+```php
+Route::get('prueba', function () {
+    return "Has accedido correctamente a esta ruta";
+});
+Route::get('no-autorizado', function () {
+    return "Usted no es mayor de edad";
+});
+```
+
+>Typee: en la Consola:
+```console
+php artisan make:middleware CheckAge
+```
+
+**`Nota :`Registrar middleware en nuestra app.**
+
+>Abrimos el archivo `Kernel.php` de la carpeta `app\Http\Kernel.php` y en la sección `protected $middlewareAliases` escribimos lo siguiente.
+
+```php
+'age' => \App\Http\Middleware\CheckAge::class,
+```
+
+>Abrimos el archivo `web.php` de la carpeta `routes\web.php` y modificamos lo siguiente.
+
+```php
+Route::get('prueba', function () {
+    return "Has accedido correctamente a esta ruta";
+})->middleware('age');
+```
+
+>Abrimos el archivo `CheckAge.php` de la carpeta `app\Http\Middleware\CheckAge.php` y en la función `handle` escribimos lo siguiente.
+
+```php
+        if($request->age >= 18){
+            return $next($request);
+        } else {
+            return redirect('no-autorizado');
+        }
 ```
 
 [Subir](#top)

@@ -23,3 +23,11 @@ Route::resource('cursos',CursoController::class);
 Route::view('nosotros', 'nosotros')->name('nosotros');
 Route::get('contactanos',[ContactanosController::class, 'index' ])->name('contactanos.index');
 Route::post('contactanos',[ContactanosController::class, 'store'])->name('contactanos.store');
+
+Route::get('prueba', function () {
+    return "Has accedido correctamente a esta ruta";
+})->middleware('age');
+
+Route::get('no-autorizado', function () {
+    return "Usted no es mayor de edad";
+});
