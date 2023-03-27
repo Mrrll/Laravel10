@@ -5,7 +5,6 @@
         </h5>
     </div>
     <div class="card-body">
-        @csrf
         <div class="mb-0">
             <label class="form-label">Name:</label>
             <input type="text" class="form-control" placeholder="Html 5"

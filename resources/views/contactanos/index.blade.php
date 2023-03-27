@@ -2,7 +2,18 @@
 
 @section('title', 'Contactanos')
 @section('content')
-    <main class="container center_container">
+    <main class="container center_container flex-column">
+        @php
+            $type = 'success';
+        @endphp
+        @if (session('success'))
+            <x-alert :type="$type">
+                <x-slot name="title">
+                    Enviado!
+                </x-slot>
+                Su mensaje a sido enviado con éxito.
+            </x-alert>
+        @endif
         <div class="card" style="width: 18rem;">
             <form action="{{ route('contactanos.store') }}" method="post">
                 <div class="card-header text-center">
@@ -38,15 +49,4 @@
             </form>
         </div>
     </main>
-    @php
-        $type = 'success';
-    @endphp
-    @if (session('success'))
-        <x-alert :type="$type">
-            <x-slot name="title">
-                Enviado!
-            </x-slot>
-            Su mensaje a sido enviado con éxito.
-        </x-alert>
-    @endif
 @endsection

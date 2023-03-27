@@ -13,16 +13,20 @@
 
 > Actualizar Composer que requiere laravel : Utilizar Consola como Admin.
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
     composer clearcache
 ```
+
 **`Nota:` Borra la cache de composer .**
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
     composer selfupdate
 ```
+
 **`Nota:` Actualiza composer .**
 
 > Al instalar Laravel hay que asegurarse que en el archivo `php.ini` que esta en la carpeta `C:\xampp\php\php.ini` este hay que descomentar la extension `extension=zip`.
@@ -54,6 +58,7 @@
 - [Implementar Bootstrap](#item21)
 - [Componentes Blade](#item22)
 - [Middleware](#item23)
+- [Autentificación](#item24)
 
 <a name="item1"></a>
 
@@ -61,7 +66,8 @@
 
 ###### Instalación de Laravel
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 composer create-project laravel/laravel example-app
 ```
@@ -70,85 +76,107 @@ composer create-project laravel/laravel example-app
 
 ###### Inicializar Git
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 git init
 ```
+
 ###### Subir Repositorio a GitHub
 
 > Accedemos a [github](https://github.com/) y creamos un nuevo repositorio una vez creado copiamos la url de dicho repositorio.
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 git remote add origin URL
 ```
->Typee: en la Consola:
+
+> Typee: en la Consola:
+
 ```console
 git config --global user.email "email"
 ```
->Typee: en la Consola:
+
+> Typee: en la Consola:
+
 ```console
 git config --global user.name "nombre"
 ```
 
 **`Nota:` Si no tenemos agregado el nombre y el email en la configuración de git.**
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 git add .
 ```
 
 **`Nota:` Preparamos los archivos que queremos subir.**
->Typee: en la Consola:
+
+> Typee: en la Consola:
+
 ```console
 git commit -m "Instalación del Proyecto"
 ```
+
 **`Nota:` Creamos el Comentario y guardamos los archivo modificados o nuevos de nuestro repositorio en local.**
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 git push -f origin master
 ```
+
 **`Nota:` Subimos los archivos o repositorio local al servidor de github.**
 
 [Subir](#top)
 
 <a name="item2"></a>
+
 ## Rutas en laravel
 
->Abrimos el archivo `routes.php` que esta en la carpeta `routes\web.php` el archivo donde se registran las rutas web.
+> Abrimos el archivo `routes.php` que esta en la carpeta `routes\web.php` el archivo donde se registran las rutas web.
 
 ```php
 Route::get('/', function () {
-    return 'Hola mundo';
+  return 'Hola mundo';
 });
 ```
->Nueva ruta
+
+> Nueva ruta
+
 ```php
 Route::get('cursos', function () {
-    return 'Bienvenido a la pagina cursos';
+  return 'Bienvenido a la pagina cursos';
 });
 ```
->Mandar variable en las rutas
+
+> Mandar variable en las rutas
+
 ```php
 Route::get('cursos/{curso}', function ($curso) {
-    return "Bienvenido al cursos: $curso";
+  return "Bienvenido al cursos: $curso";
 });
 ```
->Mandar mas variable en las rutas
+
+> Mandar mas variable en las rutas
+
 ```php
 Route::get('cursos/{curso}/{categoria}', function ($curso, $categoria) {
-    return "Bienvenido al cursos: $curso, de la categoria: $categoria";
+  return "Bienvenido al cursos: $curso, de la categoria: $categoria";
 });
 ```
->Unificar rutas `variable?`Opcional
+
+> Unificar rutas `variable?`Opcional
+
 ```php
 Route::get('cursos/{curso}/{categoria?}', function ($curso, $categoria = null) {
-    if($categoria){
-        return "Bienvenido al cursos: $curso, de la categoria: $categoria";
-    } else {
-        return "Bienvenido al cursos: $curso";
-    }
+  if ($categoria) {
+    return "Bienvenido al cursos: $curso, de la categoria: $categoria";
+  } else {
+    return "Bienvenido al cursos: $curso";
+  }
 });
 ```
 
@@ -160,11 +188,13 @@ Route::get('cursos/{curso}/{categoria?}', function ($curso, $categoria = null) {
 
 ###### Crear Controlador
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:controller HomeController
 ```
->Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y creamos un función `__invoke` dentro de la Clase `HomController`.
+
+> Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y creamos un función `__invoke` dentro de la Clase `HomController`.
 
 ```php
     public function __invoke()
@@ -174,21 +204,26 @@ php artisan make:controller HomeController
 ```
 
 ###### Asignar Controlador a una ruta
->Abrimos el archivo `routes.php` que esta en la carpeta `routes\web.php` y importamos el controlador escribimos lo siguiente  .
+
+> Abrimos el archivo `routes.php` que esta en la carpeta `routes\web.php` y importamos el controlador escribimos lo siguiente .
 
 ```php
 use App\Http\Controllers\HomeController;
 ```
+
 > Cambiamos la ruta `/`.
 
 ```php
-Route::get('/',HomeController::class);
+Route::get('/', HomeController::class);
 ```
->Typee: en la Consola:
+
+> Typee: en la Consola:
+
 ```console
 php artisan make:controller CursoController
 ```
->Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y escribimos dentro de la Clase `HomController`.
+
+> Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y escribimos dentro de la Clase `HomController`.
 
 ```php
     public function index()
@@ -204,38 +239,43 @@ php artisan make:controller CursoController
         return "Bienvenido al curso: $curso";
     }
 ```
->Abrimos el archivo `routes.php` que esta en la carpeta `routes\web.php` y importamos el controlador escribimos lo siguiente  .
+
+> Abrimos el archivo `routes.php` que esta en la carpeta `routes\web.php` y importamos el controlador escribimos lo siguiente .
 
 ```php
 use App\Http\Controllers\CursoController;
 ```
+
 > Cambiamos la ruta `cursos`.
 
 ```php
-Route::get('cursos',[CursoController::class,'index']);
+Route::get('cursos', [CursoController::class, 'index']);
 ```
+
 > Cambiamos la ruta `cursos/{curso}`.
 
 ```php
-Route::get('cursos/create',[CursoController::class,'create']);
+Route::get('cursos/create', [CursoController::class, 'create']);
 ```
+
 > Cambiamos la ruta `cursos/{curso}/{categoria?}`.
 
 ```php
-Route::get('cursos/{curso}',[CursoController::class,'show']);
+Route::get('cursos/{curso}', [CursoController::class, 'show']);
 ```
 
 ###### Agrupar rutas por Controlador
 
->Abrimos el archivo `routes.php` que esta en la carpeta `routes\web.php`  escribimos lo siguiente  .
+> Abrimos el archivo `routes.php` que esta en la carpeta `routes\web.php` escribimos lo siguiente .
 
 ```php
-Route::controller(CursoController::class)->group(function(){
-    Route::get('cursos','index');
-    Route::get('cursos/create','create');
-    Route::get('cursos/{curso}','show');
+Route::controller(CursoController::class)->group(function () {
+  Route::get('cursos', 'index');
+  Route::get('cursos/create', 'create');
+  Route::get('cursos/{curso}', 'show');
 });
 ```
+
 **`Nota:`Disponible desde la version 9^ Laravel.**
 
 [Subir](#top)
@@ -244,7 +284,7 @@ Route::controller(CursoController::class)->group(function(){
 
 ## Vistas en Laravel
 
->Creamos y Abrimos el archivo `Home.php`  en la carpeta `resources\views\home.php` escribimos lo siguiente  .
+> Creamos y Abrimos el archivo `Home.php` en la carpeta `resources\views\home.php` escribimos lo siguiente .
 
 ```php
 <!DOCTYPE html>
@@ -260,13 +300,14 @@ Route::controller(CursoController::class)->group(function(){
 </body>
 </html>
 ```
->Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y escribimos dentro de la función `__invoke`.
+
+> Abrimos el archivo `HomeController.php` que esta en la carpeta `app\Http\Controllers\HomeController.php` y escribimos dentro de la función `__invoke`.
 
 ```php
 return view('home');
 ```
 
->Creamos y Abrimos el archivo `index.php`  en la carpeta `resources\views\cursos\index.php` escribimos lo siguiente  .
+> Creamos y Abrimos el archivo `index.php` en la carpeta `resources\views\cursos\index.php` escribimos lo siguiente .
 
 ```php
 <!DOCTYPE html>
@@ -282,13 +323,14 @@ return view('home');
 </body>
 </html>
 ```
->Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos dentro de la función `index`.
+
+> Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos dentro de la función `index`.
 
 ```php
 return view('cursos.index');
 ```
 
->Creamos y Abrimos el archivo `show.php`  en la carpeta `resources\views\cursos\show.php` escribimos lo siguiente  .
+> Creamos y Abrimos el archivo `show.php` en la carpeta `resources\views\cursos\show.php` escribimos lo siguiente .
 
 ```php
 <!DOCTYPE html>
@@ -302,18 +344,18 @@ return view('cursos.index');
 <body>
     <h1>Bienvenido al curso <?php echo $curso; ?></h1>
 </body>
-</html>
-```
+</html>```
 
->Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos dentro de la función `show`.
+> Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos dentro de la función `show`.
 
 ```php
-return view('cursos.show',['curso' => $curso]);
-return view('cursos.show',[compact('curso')]); // Si el nombre de la variable es igual.
+return view('cursos.show', ['curso' => $curso]);
+return view('cursos.show', [compact('curso')]); // Si el nombre de la variable es igual.
 ```
+
 ###### Sistema de plantillas Blade
 
->Creamos y Abrimos el archivo `plantilla.blade.php`  en la carpeta `resources\views\layouts\plantilla.blade.php` escribimos lo siguiente  .
+> Creamos y Abrimos el archivo `plantilla.blade.php` en la carpeta `resources\views\layouts\plantilla.blade.php` escribimos lo siguiente .
 
 ```php
 <!DOCTYPE html>
@@ -330,7 +372,7 @@ return view('cursos.show',[compact('curso')]); // Si el nombre de la variable es
 </html>
 ```
 
->Cambiamos el nombre y Abrimos el archivo `home.php` a `home.blade.php`  que esta en la carpeta `resources\views\home.php` y escribimos.
+> Cambiamos el nombre y Abrimos el archivo `home.php` a `home.blade.php` que esta en la carpeta `resources\views\home.php` y escribimos.
 
 ```php
 @extends('layouts.plantilla')
@@ -341,9 +383,10 @@ return view('cursos.show',[compact('curso')]); // Si el nombre de la variable es
     <h1>Hola mundo</h1>
 @endsection
 ```
+
 **`Nota:` Modificamos los demás archivos de las vistas.**
 
->Cambiamos el nombre y Abrimos el archivo `show.php` a `show.blade.php`  que esta en la carpeta `resources\views\cursos\show.php` y escribimos.
+> Cambiamos el nombre y Abrimos el archivo `show.php` a `show.blade.php` que esta en la carpeta `resources\views\cursos\show.php` y escribimos.
 
 ```php
 @extends('layouts.plantilla')
@@ -357,16 +400,15 @@ return view('cursos.show',[compact('curso')]); // Si el nombre de la variable es
 
 [Subir](#top)
 
-
 <a name="item5"></a>
 
 ## Bases de datos en laravel
 
->Crear Base de datos Laravel soporta estos tipos de bases MariaDB 10.3+, MySQL 5.7+, PostgreSQL 10.0+, SQLite 3.8.8+, SQL Server 2017+.
+> Crear Base de datos Laravel soporta estos tipos de bases MariaDB 10.3+, MySQL 5.7+, PostgreSQL 10.0+, SQLite 3.8.8+, SQL Server 2017+.
 
 ###### Conectando Laravel a la Base de datos
 
->Abrimos el archivo `.env`  en la carpeta `/` y en el apartado de base de datos escribimos
+> Abrimos el archivo `.env` en la carpeta `/` y en el apartado de base de datos escribimos
 
 ```
 DB_CONNECTION=mysql // Motor Base de datos
@@ -385,157 +427,185 @@ DB_PASSWORD= // Password del servidor
 
 ###### Ejecutar migraciones
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan migrate
 ```
+
 ###### Creación de migraciones
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:migration cursos
 ```
->Abrimos el archivo `XXXX_XX_XX_XXXXXX_cursos.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_cursos.php` y en la función `up` escribimos lo siguiente.
+
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_cursos.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_cursos.php` y en la función `up` escribimos lo siguiente.
 
 ```php
-        Schema::create('cursos',function(Blueprint $table){
-            $table->id();
-            $table->string('name');
-            $table->text('description');
-            $table->timestamps();
-        });
+Schema::create('cursos', function (Blueprint $table) {
+  $table->id();
+  $table->string('name');
+  $table->text('description');
+  $table->timestamps();
+});
 ```
 
 **`Nota:` [Tipos de columnas disponibles](https://laravel.com/docs/10.x/migrations#available-column-types).**
 
->Y en la función `down` escribimos lo siguiente.
+> Y en la función `down` escribimos lo siguiente.
 
 ```php
-        Schema::dropIfExists('cursos');
+Schema::dropIfExists('cursos');
 ```
->Typee: en la Consola:
+
+> Typee: en la Consola:
+
 ```console
 php artisan migrate
 ```
 
 ###### Revertir ultima migración
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan migrate:rollback
 ```
 
->Eliminamos el archivo `XXXX_XX_XX_XXXXXX_cursos.php`.
+> Eliminamos el archivo `XXXX_XX_XX_XXXXXX_cursos.php`.
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan migrate
 ```
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:migration create_cursos_table
 ```
+
 **`Nota:` Es la forma correcta de creación de una tabla.**
 
->Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_cursos_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_cursos_table.php` y en la función `up` añadimos lo siguiente.
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_cursos_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_cursos_table.php` y en la función `up` añadimos lo siguiente.
 
 ```php
-            $table->string('name');
-            $table->text('description');
+$table->string('name');
+$table->text('description');
 ```
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan migrate
 ```
 
 ###### Modificar una tabla ya migrada
 
->Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_users_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_users_table.php` y en la función `up` añadimos lo siguiente.
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_users_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_users_table.php` y en la función `up` añadimos lo siguiente.
 
 ```php
-        $table->string('avatar');
+$table->string('avatar');
 ```
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan migrate:fresh
 ```
 
 **`Nota:` El comando `php artisan migrate:fresh` borra las tablas y seguido ejecuta el método `up` No es recomendable en producción.**
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan migrate:refresh
 ```
+
 **`Nota:` El comando `php artisan migrate:refresh` ejecuta el método `down` y seguido ejecuta el método `up` No es recomendable en producción.**
 
->Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_users_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_users_table.php` y en la función `up` eliminamos lo siguiente.
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_users_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_users_table.php` y en la función `up` eliminamos lo siguiente.
 
 ```php
-        $table->string('avatar');
+$table->string('avatar');
 ```
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan migrate:rollback
 ```
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan migrate
 ```
 
 ###### Creamos migración de añadido
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:migration add_avatar_to_users_table
 ```
 
->Abrimos el archivo `XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php` y en la función `up` escribimos lo siguiente.
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php` y en la función `up` escribimos lo siguiente.
 
 ```php
-        $table->string('avatar')->nullable()->after('email');
+$table
+  ->string('avatar')
+  ->nullable()
+  ->after('email');
 ```
 
 **`Nota:` Le indicamos la opción `nullable` para si la tabla ya contiene datos no nos de un error a la hora de hacer la migración y la opción `after` es para indicarle en que posición queremos el nuevo campo.**
 
->Y en la función `down` escribimos lo siguiente.
+> Y en la función `down` escribimos lo siguiente.
 
 ```php
-         $table->dropColumn('avatar');
+$table->dropColumn('avatar');
 ```
 
 **`Nota:`Elimina el campo `avatar` de la tabla.**
 
 ###### Modificar propiedades de los campos
 
->Añadir dependencia a Composer.
+> Añadir dependencia a Composer.
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 composer require doctrine/dbal
 ```
 
->Creamos migración de añadido/modificación
+> Creamos migración de añadido/modificación
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:migration cambiar_propiedades_to_users_table
 ```
 
->Abrimos el archivo `XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php` y en la función `up` escribimos lo siguiente.
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php` y en la función `up` escribimos lo siguiente.
 
 ```php
-        $table->string('name', 150)->change()->nullable();
+$table
+  ->string('name', 150)
+  ->change()
+  ->nullable();
 ```
 
->Y en la función `down` escribimos lo siguiente.
+> Y en la función `down` escribimos lo siguiente.
 
 ```php
-        $table->string('name', 255)->nullable(false)->change();
+$table
+  ->string('name', 255)
+  ->nullable(false)
+  ->change();
 ```
 
 [Subir](#top)
@@ -546,64 +616,76 @@ php artisan make:migration cambiar_propiedades_to_users_table
 
 ###### Crear un modelo
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:model Curso
 ```
->Utilizaremos tinker para ejecutar métodos de los modelos desde consola.
 
->Typee: en la Consola:
+> Utilizaremos tinker para ejecutar métodos de los modelos desde consola.
+
+> Typee: en la Consola:
+
 ```console
 php artisan tinker
 ```
+
 **`Nota:` Para salir de tinker escribimos `exit`.**
 
 ###### Agregar un nuevo objeto
 
->Especificamos el uso del Modelo Curso
+> Especificamos el uso del Modelo Curso
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```tinker
 use App\Models\Curso;
 ```
 
->Creamos el Objeto
+> Creamos el Objeto
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```tinker
 $curso = new Curso;
 ```
 
->Llenar las propiedades al Objeto
+> Llenar las propiedades al Objeto
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```tinker
 $curso->name = 'Laravel';
 $curso->description = 'El mejor framework de PHP';
 ```
 
->Llamar al Objeto
+> Llamar al Objeto
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```tinker
 $curso
 ```
->Guardar Objeto a la base de datos
 
->Typee: en la Consola:
+> Guardar Objeto a la base de datos
+
+> Typee: en la Consola:
+
 ```tinker
 $curso->save();
 ```
->Modificar Objeto
 
->Typee: en la Consola:
+> Modificar Objeto
+
+> Typee: en la Consola:
+
 ```tinker
 $curso->description = 'El mejor framework del mundo';
 ```
 
 ###### Cambiar la tabla al modelo
 
->Abrimos el archivo `Curso.php` en la carpeta `app\Models\Curso.php` y dentro de la clase `curso` escribimos lo siguiente.
+> Abrimos el archivo `Curso.php` en la carpeta `app\Models\Curso.php` y dentro de la clase `curso` escribimos lo siguiente.
 
 ```php
     protected $table = "users";
@@ -615,77 +697,86 @@ $curso->description = 'El mejor framework del mundo';
 
 ## Seeders en laravel
 
->Eliminamos todas la tablas de la base de datos
+> Eliminamos todas la tablas de la base de datos
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan migrate:reset
 ```
 
->Eliminamos el archivo `XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php`.
+> Eliminamos el archivo `XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_cambiar_propiedades_to_users_table.php`.
 
->Eliminamos el archivo `XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php`.
+> Eliminamos el archivo `XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_add_avatar_to_users_table.php`.
 
->Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_cursos_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_cursos_table.php` y en la función `up` añadimos lo siguiente.
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_cursos_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_cursos_table.php` y en la función `up` añadimos lo siguiente.
 
 ```php
 $table->text('categoria');
 ```
->Abrimos el archivo `DatabaseSeeder.php`  en la carpeta `database\seeders\DatabaseSeeder.php` y en la función `run` escribimos lo siguiente.
+
+> Abrimos el archivo `DatabaseSeeder.php` en la carpeta `database\seeders\DatabaseSeeder.php` y en la función `run` escribimos lo siguiente.
 
 ```php
-        $curso = new Curso();
-        $curso->name = "Laravel";
-        $curso->description = "El mejor Framework PHP";
-        $curso->categoria = "Desarrollo Web";
-        $curso->save();
+$curso = new Curso();
+$curso->name = 'Laravel';
+$curso->description = 'El mejor Framework PHP';
+$curso->categoria = 'Desarrollo Web';
+$curso->save();
 ```
 
->Importamos el modelo user
+> Importamos el modelo user
+
 ```php
 use App\Models\Curso;
 ```
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan migrate:fresh
 ```
 
 ###### Ejecutamos los seeders
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan db:seed
 ```
+
 ###### Creamos un seeder del Curso
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:seeder CursoSeeder
 ```
 
->Abrimos el archivo `CursoSeeder.php`  en la carpeta `database\seeders\CursoSeeder.php` y en la función `run` escribimos lo siguiente.
+> Abrimos el archivo `CursoSeeder.php` en la carpeta `database\seeders\CursoSeeder.php` y en la función `run` escribimos lo siguiente.
 
 ```php
-        $curso = new Curso();
-        $curso->name = "Laravel";
-        $curso->description = "El mejor Framework PHP";
-        $curso->categoria = "Desarrollo Web";
-        $curso->save();
+$curso = new Curso();
+$curso->name = 'Laravel';
+$curso->description = 'El mejor Framework PHP';
+$curso->categoria = 'Desarrollo Web';
+$curso->save();
 ```
 
->Importamos el modelo user
+> Importamos el modelo user
+
 ```php
 use App\Models\Curso;
 ```
 
->Abrimos el archivo `DatabaseSeeder.php`  en la carpeta `database\seeders\DatabaseSeeder.php` y en la función `run` escribimos lo siguiente.
+> Abrimos el archivo `DatabaseSeeder.php` en la carpeta `database\seeders\DatabaseSeeder.php` y en la función `run` escribimos lo siguiente.
 
 ```php
 $this->call(CursoSeeder::class);
 ```
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan migrate:fresh --seed
 ```
@@ -700,21 +791,23 @@ php artisan migrate:fresh --seed
 
 ###### Creamos un factory del Curso
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:factory CursoFactory
 ```
 
->Eliminamos el archivo `CursoFactory.php`  en la carpeta `database\factories\CursoFactory.php`.
+> Eliminamos el archivo `CursoFactory.php` en la carpeta `database\factories\CursoFactory.php`.
 
->Indicamos el modelo al crear el factory
+> Indicamos el modelo al crear el factory
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:factory CursoFactory --model=Curso
 ```
 
->Abrimos el archivo `CursoFactory.php`  en la carpeta `database\factories\CursoFactory.php` y en la función `definition` dentro del array `return` escribimos lo siguiente.
+> Abrimos el archivo `CursoFactory.php` en la carpeta `database\factories\CursoFactory.php` y en la función `definition` dentro del array `return` escribimos lo siguiente.
 
 ```php
         'name' => $this->faker->sentence(),
@@ -724,7 +817,7 @@ php artisan make:factory CursoFactory --model=Curso
 
 **`Nota:` [Tipos de columnas disponibles faker](https://fakerphp.github.io/).**
 
->Abrimos el archivo `CursoSeeder.php`  en la carpeta `database\seeders\CursoSeeder.php` y en la función `run` remplazamos y escribimos lo siguiente.
+> Abrimos el archivo `CursoSeeder.php` en la carpeta `database\seeders\CursoSeeder.php` y en la función `run` remplazamos y escribimos lo siguiente.
 
 ```php
 Curso::factory(50)->create();
@@ -740,77 +833,90 @@ Curso::factory(50)->create();
 
 ###### Consultar datos desde Tinker
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan tinker
 ```
->Especificamos el uso del Modelo Curso
 
->Typee: en la Consola:
+> Especificamos el uso del Modelo Curso
+
+> Typee: en la Consola:
+
 ```tinker
 use App\Models\Curso;
 ```
->Consultamos todos los registros del modelo Curso
 
->Typee: en la Consola:
+> Consultamos todos los registros del modelo Curso
+
+> Typee: en la Consola:
+
 ```tinker
 $curso = Curso::all();
 ```
 
->Consultamos todos los registros que contengan la categoria `Diseño web`.
+> Consultamos todos los registros que contengan la categoria `Diseño web`.
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```tinker
 $curso = Curso::where('categoria', 'Diseño web')->orderBy('id', 'desc')->get();
 ```
 
 **`Note:` Con el parámetro adicional `orderBy` indicamos el orden y con el parámetro `get` hace que lo muestre como una colección de datos.**
 
->Consultamos un registro que contengan la categoria `Diseño web`.
+> Consultamos un registro que contengan la categoria `Diseño web`.
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```tinker
 $curso = Curso::where('categoria', 'Diseño web')->orderBy('id', 'asc')->first();
 ```
 
->Consultamos por los campos indicados.
+> Consultamos por los campos indicados.
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```tinker
 $curso = Curso::select('name', 'description')->get();
 ```
 
->Consultamos  por los campos indicados cambiando el nombre de la propiedad.
+> Consultamos por los campos indicados cambiando el nombre de la propiedad.
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```tinker
 $curso = Curso::select('name as title', 'description')->get();
 ```
 
->Consultamos  por la cantidad de registros a mostrar.
+> Consultamos por la cantidad de registros a mostrar.
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```tinker
 $curso = Curso::select('name as title', 'description')->take(1)->get();
 ```
 
->Consultamos por id.
+> Consultamos por id.
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```tinker
 $curso = Curso::find(5);
 ```
 
->Consultamos por id mayor de que.
+> Consultamos por id mayor de que.
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```tinker
 $curso = Curso::where('id', '>', '45')->get();
 ```
 
->Consultamos registros que contenga dicha palabra.
+> Consultamos registros que contenga dicha palabra.
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```tinker
 $curso = Curso::where('name', 'like', '% voluptate %')->get();
 ```
@@ -823,13 +929,13 @@ $curso = Curso::where('name', 'like', '% voluptate %')->get();
 
 ###### Crear Mutador
 
->Abrimos el archivo `User.php`  en la carpeta `app\Models\User.php` y importamos la clase `Attribute`.
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y importamos la clase `Attribute`.
 
 ```php
 use Illuminate\Database\Eloquent\Casts\Attribute;
 ```
 
->Y creamos un método protegido dentro de la clase User.
+> Y creamos un método protegido dentro de la clase User.
 
 ```php
     protected function name(): Attribute {
@@ -840,9 +946,10 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
         );
     }
 ```
+
 ###### Crear Accesor
 
->Y creamos un método protegido dentro de la clase User.
+> Y creamos un método protegido dentro de la clase User.
 
 ```php
     protected function name(): Attribute {
@@ -853,6 +960,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
         );
     }
 ```
+
 **`Nota:` El Mutador actúa antes del ingreso a la base de datos y el Accesor actúa cuando se muestra dicho dato.**
 
 **`Nota:` También podemos usar el método flecha gracias a php8^ `get:fn($value) => ucwords($value)`.**
@@ -865,16 +973,16 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 ###### Listar y leer registros
 
->Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en la función `index` escribimos lo siguiente.
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y en la función `index` escribimos lo siguiente.
 
 ```php
-        $cursos = Curso::paginate();
-        return view('cursos.index', compact('cursos'));
+$cursos = Curso::paginate();
+return view('cursos.index', compact('cursos'));
 ```
 
 **`Nota:` Importamos el modelo Curso `use App\Models\Curso;`.**
 
->Abrimos el archivo `index.blade.php`  en la carpeta `resources\views\cursos\index.blade.php` y dentro de `@section('content')` escribimos lo siguiente.
+> Abrimos el archivo `index.blade.php` en la carpeta `resources\views\cursos\index.blade.php` y dentro de `@section('content')` escribimos lo siguiente.
 
 ```php
     <a href="{{route('cursos.create')}}">Crear Curso</a>
@@ -888,7 +996,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 **`Nota:` Importamos el CDN de `Tailwind`.**
 
->Abrimos el archivo `plantilla.blade.php`  en la carpeta `resources\views\layouts\plantilla.blade.php` y importamos el CDN.
+> Abrimos el archivo `plantilla.blade.php` en la carpeta `resources\views\layouts\plantilla.blade.php` y importamos el CDN.
 
 ```php
 <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
@@ -896,17 +1004,17 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 **`Nota:` Seguimos sin el CDN de `Tailwind`.**
 
->Crear nombre identificativo a las rutas.
+> Crear nombre identificativo a las rutas.
 
->Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y añadimos lo siguiente.
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y añadimos lo siguiente.
 
 ```php
-    Route::get('cursos','index')->name('cursos.index');
-    Route::get('cursos/create','create')->name('cursos.create');
-    Route::get('cursos/{curso}','show')->name('cursos.show');
+Route::get('cursos', 'index')->name('cursos.index');
+Route::get('cursos/create', 'create')->name('cursos.create');
+Route::get('cursos/{curso}', 'show')->name('cursos.show');
 ```
 
->Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en la función `show` escribimos lo siguiente.
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y en la función `show` escribimos lo siguiente.
 
 ```php
     public function show($id)
@@ -916,7 +1024,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
     }
 ```
 
->Abrimos el archivo `show.blade.php`  en la carpeta `resources\views\cursos\show.blade.php` y escribimos lo siguiente.
+> Abrimos el archivo `show.blade.php` en la carpeta `resources\views\cursos\show.blade.php` y escribimos lo siguiente.
 
 ```php
 @section('title', 'Cursos '. $curso->name)
@@ -928,15 +1036,16 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
     <p>{{$curso->description}}</p>
 @endsection
 ```
+
 ###### Agregar registros
 
->Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en la función `create` escribimos lo siguiente.
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y en la función `create` escribimos lo siguiente.
 
 ```php
 return view('cursos.create');
 ```
 
->Creamos el archivo `create.blade.php`  en la carpeta `resources\views\cursos\create.blade.php` y escribimos lo siguiente.
+> Creamos el archivo `create.blade.php` en la carpeta `resources\views\cursos\create.blade.php` y escribimos lo siguiente.
 
 ```php
 @extends('layouts.plantilla')
@@ -972,13 +1081,13 @@ return view('cursos.create');
 
 **`Nota :` Enviar Token `@csrf`.**
 
->Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y escribimos lo siguiente.
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y escribimos lo siguiente.
 
 ```php
-Route::post('cursos/create','store')->name('cursos.store');
+Route::post('cursos/create', 'store')->name('cursos.store');
 ```
 
->Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y escribimos lo siguiente.
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y escribimos lo siguiente.
 
 ```php
     public function store(Request $request)
@@ -1001,20 +1110,20 @@ $cursos = Curso::orderBy('id', 'desc')->paginate(10);
 
 ###### Actualizar registros
 
->Abrimos el archivo `show.blade.php`  en la carpeta `resources\views\cursos\show.blade.php` y añadimos lo siguiente.
+> Abrimos el archivo `show.blade.php` en la carpeta `resources\views\cursos\show.blade.php` y añadimos lo siguiente.
 
 ```php
 <br>
     <a href="{{route('cursos.edit', $curso)}}">Editar Cursos</a>
 ```
 
->Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y escribimos lo siguiente.
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y escribimos lo siguiente.
 
 ```php
-Route::get('cursos/{curso}/edit','edit')->name('cursos.edit');
+Route::get('cursos/{curso}/edit', 'edit')->name('cursos.edit');
 ```
 
->Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y escribimos lo siguiente.
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y escribimos lo siguiente.
 
 ```php
     public function edit(Curso $curso)
@@ -1023,7 +1132,7 @@ Route::get('cursos/{curso}/edit','edit')->name('cursos.edit');
     }
 ```
 
->Creamos el archivo `edit.blade.php`  en la carpeta `resources\views\cursos\edit.blade.php` y escribimos lo siguiente.
+> Creamos el archivo `edit.blade.php` en la carpeta `resources\views\cursos\edit.blade.php` y escribimos lo siguiente.
 
 ```php
 @extends('layouts.plantilla')
@@ -1060,13 +1169,13 @@ Route::get('cursos/{curso}/edit','edit')->name('cursos.edit');
 
 **`Nota :`El método `old` es capaz de guardar el ultimo o incluir datos `{{old('name', $curso->name)}}` .**
 
->Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y escribimos lo siguiente.
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y escribimos lo siguiente.
 
 ```php
-Route::put('cursos/{curso}','update')->name('cursos.update');
+Route::put('cursos/{curso}', 'update')->name('cursos.update');
 ```
 
->Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y escribimos lo siguiente.
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y escribimos lo siguiente.
 
 ```php
     public function update(Request $request, Curso $curso)
@@ -1081,17 +1190,17 @@ Route::put('cursos/{curso}','update')->name('cursos.update');
 
 ###### Validar registros
 
->Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en la función `store` escribimos lo siguiente.
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y en la función `store` escribimos lo siguiente.
 
 ```php
-        $request->validate([
-            'name' => 'required|max:10',
-            'description' => 'required|min5',
-            'categoria' => 'required',
-        ]);
+$request->validate([
+  'name' => 'required|max:10',
+  'description' => 'required|min5',
+  'categoria' => 'required',
+]);
 ```
 
->Abrimos el archivo `create.blade.php`  en la carpeta `resources\views\cursos\create.blade.php` y añadimos debajo de los `label` lo siguiente.
+> Abrimos el archivo `create.blade.php` en la carpeta `resources\views\cursos\create.blade.php` y añadimos debajo de los `label` lo siguiente.
 
 ```php
         @error('name')
@@ -1117,21 +1226,24 @@ Route::put('cursos/{curso}','update')->name('cursos.update');
 
 ###### Traduciendo mensajes de validación
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 composer require laravel-lang/common
 ```
 
 **`Nota :` Si tu proyecto no tiene la instalación del lenguaje.**
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan lang:add es
 ```
 
 **`Nota :` Añade a tu proyecto el lenguaje.**
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 composer install
 ```
@@ -1140,7 +1252,7 @@ composer install
 
 **`Nota :`[laravel-lang](https://laravel-lang.com/installation/).**
 
->Abrimos el archivo `app.php`  en la carpeta `config\app.php` y en `locale` añadimos lo siguiente.
+> Abrimos el archivo `app.php` en la carpeta `config\app.php` y en `locale` añadimos lo siguiente.
 
 ```php
 'locale' => 'es'>
@@ -1148,13 +1260,13 @@ composer install
 
 ###### Eliminar registro
 
->Abrimos el archivo `web.php`  en la carpeta `routes\web.php` añadimos lo siguiente.
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` añadimos lo siguiente.
 
 ```php
-Route::delete('cursos/{curso}','destroy')->name('cursos.destroy');
+Route::delete('cursos/{curso}', 'destroy')->name('cursos.destroy');
 ```
 
->Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` añadimos lo siguiente.
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` añadimos lo siguiente.
 
 ```php
     public function destroy(Curso $curso)
@@ -1163,7 +1275,8 @@ Route::delete('cursos/{curso}','destroy')->name('cursos.destroy');
         return redirect()->route('cursos.index');
     }
 ```
->Abrimos el archivo `show.blade.php`  en la carpeta `resources\views\cursos\show.blade.php` añadimos lo siguiente.
+
+> Abrimos el archivo `show.blade.php` en la carpeta `resources\views\cursos\show.blade.php` añadimos lo siguiente.
 
 ```php
     <form action="{{route('cursos.destroy', $curso)}}" method="post">
@@ -1179,18 +1292,19 @@ Route::delete('cursos/{curso}','destroy')->name('cursos.destroy');
 
 ## Request en laravel
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:request StoreCursoRequest
 ```
 
->Abrimos el archivo `StoreCursoRequest.php`  en la carpeta `app\Http\Requests\StoreCursoRequest.php` y en `authorize` añadimos lo siguiente.
+> Abrimos el archivo `StoreCursoRequest.php` en la carpeta `app\Http\Requests\StoreCursoRequest.php` y en `authorize` añadimos lo siguiente.
 
 ```php
 return true;
 ```
 
->Y en `rules` escribimos lo siguiente.
+> Y en `rules` escribimos lo siguiente.
 
 ```php
             'name' => 'required|max:10',
@@ -1198,17 +1312,17 @@ return true;
             'categoria' => 'required',
 ```
 
->Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en `store` eliminamos lo siguiente.
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y en `store` eliminamos lo siguiente.
 
 ```php
-        $request->validate([
-            'name' => 'required|max:10',
-            'description' => 'required|min:5',
-            'categoria' => 'required',
-        ]);
+$request->validate([
+  'name' => 'required|max:10',
+  'description' => 'required|min:5',
+  'categoria' => 'required',
+]);
 ```
 
->Y en `store` cambiamos lo siguiente.
+> Y en `store` cambiamos lo siguiente.
 
 ```php
 public function store(StoreCursoRequest $request)
@@ -1216,7 +1330,7 @@ public function store(StoreCursoRequest $request)
 
 **`Nota :` Importamos la Clase `use App\Http\Requests\StoreCursoRequest;` .**
 
->Abrimos el archivo `StoreCursoRequest.php`  en la carpeta `app\Http\Requests\StoreCursoRequest.php` y en `authorize` añadimos lo siguiente.
+> Abrimos el archivo `StoreCursoRequest.php` en la carpeta `app\Http\Requests\StoreCursoRequest.php` y en `authorize` añadimos lo siguiente.
 
 ```php
     public function attributes()
@@ -1241,23 +1355,23 @@ public function store(StoreCursoRequest $request)
 
 ## Asignación Masiva
 
->Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en `store` eliminamos lo siguiente.
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y en `store` eliminamos lo siguiente.
 
 ```php
-        $curso = new Curso();
-        $curso->name = $request->name;
-        $curso->description = $request->description;
-        $curso->categoria = $request->categoria;
-        $curso->save();
+$curso = new Curso();
+$curso->name = $request->name;
+$curso->description = $request->description;
+$curso->categoria = $request->categoria;
+$curso->save();
 ```
 
->Y añadimos lo siguiente.
+> Y añadimos lo siguiente.
 
 ```php
 $curso = Curso::create($request->all());
 ```
 
->Abrimos el archivo `Curso.php`  en la carpeta `app\Models\Curso.php` y dentro de la clase `Curso` añadimos lo siguiente.
+> Abrimos el archivo `Curso.php` en la carpeta `app\Models\Curso.php` y dentro de la clase `Curso` añadimos lo siguiente.
 
 ```php
     protected $fillable = [
@@ -1268,21 +1382,22 @@ $curso = Curso::create($request->all());
 
 **`Nota :` Con `$fillable` Añadimos los campos que pueden ser almacenados masivamente y con `$guarded` Excluimos los campos.**
 
->Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en `update` eliminamos lo siguiente.
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y en `update` eliminamos lo siguiente.
 
 ```php
-        $request->validate([
-            'name' => 'required',
-            'description' => 'required',
-            'categoria' => 'required',
-        ]);
+$request->validate([
+  'name' => 'required',
+  'description' => 'required',
+  'categoria' => 'required',
+]);
 
-        $curso->name = $request->name;
-        $curso->description = $request->description;
-        $curso->categoria = $request->categoria;
-        $curso->save();
+$curso->name = $request->name;
+$curso->description = $request->description;
+$curso->categoria = $request->categoria;
+$curso->save();
 ```
->Y en `update` cambiamos lo siguiente.
+
+> Y en `update` cambiamos lo siguiente.
 
 ```php
 public function update(StoreCursoRequest $request, Curso $curso)
@@ -1290,7 +1405,7 @@ public function update(StoreCursoRequest $request, Curso $curso)
 
 **`Nota :` Importamos la Clase `use App\Http\Requests\StoreCursoRequest;` .**
 
->Y añadimos lo siguiente.
+> Y añadimos lo siguiente.
 
 ```php
 $curso->update($request->all());
@@ -1302,61 +1417,65 @@ $curso->update($request->all());
 
 ## Agrupar Rutas con Route Resource
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan r:l
 ```
+
 **`Nota :` Lista las ruta de la app.**
 
->Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y eliminamos lo siguiente.
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y eliminamos lo siguiente.
 
 ```php
-Route::controller(CursoController::class)->group(function(){
-    Route::get('cursos','index')->name('cursos.index');
-    Route::get('cursos/create','create')->name('cursos.create');
-    Route::post('cursos/create','store')->name('cursos.store');
-    Route::get('cursos/{curso}','show')->name('cursos.show');
-    Route::get('cursos/{curso}/edit','edit')->name('cursos.edit');
-    Route::put('cursos/{curso}','update')->name('cursos.update');
-    Route::delete('cursos/{curso}','destroy')->name('cursos.destroy');
+Route::controller(CursoController::class)->group(function () {
+  Route::get('cursos', 'index')->name('cursos.index');
+  Route::get('cursos/create', 'create')->name('cursos.create');
+  Route::post('cursos/create', 'store')->name('cursos.store');
+  Route::get('cursos/{curso}', 'show')->name('cursos.show');
+  Route::get('cursos/{curso}/edit', 'edit')->name('cursos.edit');
+  Route::put('cursos/{curso}', 'update')->name('cursos.update');
+  Route::delete('cursos/{curso}', 'destroy')->name('cursos.destroy');
 });
 ```
 
 > Y añadimos lo siguiente.
 
 ```php
-Route::resource('cursos',CursoController::class);
+Route::resource('cursos', CursoController::class);
 ```
 
 **`Nota :` Agrupa las rutas gracias a la convención de los nombres.**
 
 ###### Cambiar nombres de sub-rutas utilizando resource
 
->Abrimos el archivo `AppServiceProvider.php`  en la carpeta `app\Providers\AppServiceProvider.php` y en la función `boot` escribimos lo siguiente.
+> Abrimos el archivo `AppServiceProvider.php` en la carpeta `app\Providers\AppServiceProvider.php` y en la función `boot` escribimos lo siguiente.
 
 ```php
-        Route::resourceVerbs([
-            'create' => 'crear',
-            'edit' => 'editar',
-        ]);
+Route::resourceVerbs([
+  'create' => 'crear',
+  'edit' => 'editar',
+]);
 ```
 
 **`Nota :` Importamos la clase `use Illuminate\Support\Facades\Route;`.**
 
 ###### Cambiar nombres de rutas utilizando resource
 
->Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y añadimos lo siguiente.
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y añadimos lo siguiente.
 
 ```php
-Route::resource('asignaturas',CursoController::class)->names('cursos');
+Route::resource('asignaturas', CursoController::class)->names('cursos');
 ```
 
 ###### Cambiar nombres de las variables utilizando resource
 
->Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y añadimos lo siguiente.
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y añadimos lo siguiente.
 
 ```php
-Route::resource('asignaturas',CursoController::class)->parameter('asignaturas', 'curso')->names('cursos');
+Route::resource('asignaturas', CursoController::class)
+  ->parameter('asignaturas', 'curso')
+  ->names('cursos');
 ```
 
 [Subir](#top)
@@ -1365,54 +1484,55 @@ Route::resource('asignaturas',CursoController::class)->parameter('asignaturas', 
 
 ## Url's amigables
 
->Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_cursos_table.php`  en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_cursos_table.php` y en la función `up` añadimos lo siguiente.
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_cursos_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_cursos_table.php` y en la función `up` añadimos lo siguiente.
 
 ```php
 $table->string('slug');
 ```
 
->Abrimos el archivo `CursoFactory.php`  en la carpeta `database\factories\CursoFactory.php` y en la función `definition` cambiamos lo siguiente.
+> Abrimos el archivo `CursoFactory.php` en la carpeta `database\factories\CursoFactory.php` y en la función `definition` cambiamos lo siguiente.
 
 ```php
-        $name = $this->faker->sentence();
-        return [
-            'name' => $name,
-           'slug' => Str::slug($name, '-'),
-           'description' => $this->faker->paragraph(),
-           'categoria' => $this->faker->randomElement(["Desarrollo web", "Diseño web"])
-        ];
+$name = $this->faker->sentence();
+return [
+  'name' => $name,
+  'slug' => Str::slug($name, '-'),
+  'description' => $this->faker->paragraph(),
+  'categoria' => $this->faker->randomElement(['Desarrollo web', 'Diseño web']),
+];
 ```
 
 **`Nota :` Importamos la clase `use Illuminate\Support\Str;`.**
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan migrate:fresh --seed
 ```
 
- >Abrimos el archivo `index.blade.php`  en la carpeta `resources\views\cursos\index.blade.php` y cambiamos lo siguiente.
+> Abrimos el archivo `index.blade.php` en la carpeta `resources\views\cursos\index.blade.php` y cambiamos lo siguiente.
 
 ```php
 <a href="{{route('cursos.show', $curso)}}">{{$curso->name}}</a>
 ```
 
->Abrimos el archivo `CursoController.php`  en la carpeta `app\Http\Controllers\CursoController.php` y en la función `show` cambiamos lo siguiente.
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y en la función `show` cambiamos lo siguiente.
 
- ```php
-    public function show(Curso $curso)
-    {
-        return view('cursos.show', compact('curso'));
-    }
- ```
+```php
+   public function show(Curso $curso)
+   {
+       return view('cursos.show', compact('curso'));
+   }
+```
 
->Abrimos el archivo `Curso.php`  en la carpeta `app\Models\Curso.php` y añadimos lo siguiente.
+> Abrimos el archivo `Curso.php` en la carpeta `app\Models\Curso.php` y añadimos lo siguiente.
 
- ```php
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
- ```
+```php
+   public function getRouteKeyName()
+   {
+       return 'slug';
+   }
+```
 
 [Subir](#top)
 
@@ -1420,7 +1540,7 @@ php artisan migrate:fresh --seed
 
 ## Navegabilidad web
 
->Abrimos el archivo `plantilla.blade.php`  en la carpeta `resources\views\layouts\plantilla.blade.php`  y dentro del `head` escribimos lo siguiente.
+> Abrimos el archivo `plantilla.blade.php` en la carpeta `resources\views\layouts\plantilla.blade.php` y dentro del `head` escribimos lo siguiente.
 
 ```php
     <style>
@@ -1433,37 +1553,37 @@ php artisan migrate:fresh --seed
 
 > Y dentro del `body` escribimos lo siguiente.
 
- ```php
-    <header>
-        <h1>Laravel 10</h1>
-        <nav>
-            <ul>
-                <li>
-                    <a href="{{route('home')}}" class="{{request()->routeIs('home') ? 'active' : ''}}">Home</a>
-                </li>
-                <li>
-                    <a href="{{route('cursos.index')}}" class="{{request()->routeIs('cursos.*') ? 'active' : ''}}">Cursos</a>
-                </li>
-                <li>
-                    <a href="{{route('nosotros')}}" class="{{request()->routeIs('nosotros') ? 'active' : ''}}">Nosotros</a>
-                </li>
-            </ul>
-        </nav>
-    </header>
- ```
+```php
+   <header>
+       <h1>Laravel 10</h1>
+       <nav>
+           <ul>
+               <li>
+                   <a href="{{route('home')}}" class="{{request()->routeIs('home') ? 'active' : ''}}">Home</a>
+               </li>
+               <li>
+                   <a href="{{route('cursos.index')}}" class="{{request()->routeIs('cursos.*') ? 'active' : ''}}">Cursos</a>
+               </li>
+               <li>
+                   <a href="{{route('nosotros')}}" class="{{request()->routeIs('nosotros') ? 'active' : ''}}">Nosotros</a>
+               </li>
+           </ul>
+       </nav>
+   </header>
+```
 
 **`Nota :` El método `@dump` imprime en pantalla código php y los métodos `request()->routeIs('cursos.index')` determinan si estamos en una vista.**
 
->Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y escribimos lo siguiente.
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y escribimos lo siguiente.
 
 ```php
-Route::get('/',HomeController::class)->name('home');
+Route::get('/', HomeController::class)->name('home');
 Route::view('nosotros', 'nosotros')->name('nosotros');
 ```
 
 **`Nota :` El método `view` se utiliza para mostrar una vista que no conecte con la base de datos.**
 
->Creamos el archivo `nosotros.php`  en la carpeta `resources\views\nosotros.blade.php` y escribimos lo siguiente.
+> Creamos el archivo `nosotros.php` en la carpeta `resources\views\nosotros.blade.php` y escribimos lo siguiente.
 
 ```php
 @extends('layouts.plantilla')
@@ -1477,7 +1597,7 @@ Route::view('nosotros', 'nosotros')->name('nosotros');
 
 ###### Trocear Código Blade
 
->Creamos el archivo `header.blade.php`  en la carpeta `resources\views\layouts\partials\header.blade.php` y escribimos lo siguiente.
+> Creamos el archivo `header.blade.php` en la carpeta `resources\views\layouts\partials\header.blade.php` y escribimos lo siguiente.
 
 ```php
 <header>
@@ -1500,7 +1620,8 @@ Route::view('nosotros', 'nosotros')->name('nosotros');
         </nav>
 </header>
 ```
->Abrimos el archivo `plantilla.blade.php`  en la carpeta `resources\views\layouts\plantilla.blade.php` y borramos lo siguiente.
+
+> Abrimos el archivo `plantilla.blade.php` en la carpeta `resources\views\layouts\plantilla.blade.php` y borramos lo siguiente.
 
 ```php
 <header>
@@ -1523,10 +1644,11 @@ Route::view('nosotros', 'nosotros')->name('nosotros');
         </nav>
 </header>
 ```
+
 > Y lo remplazamos por lo siguiente.
 
 ```php
-@include('layouts.partials.header')
+@include 'layouts.partials.header';
 ```
 
 [Subir](#top)
@@ -1535,7 +1657,7 @@ Route::view('nosotros', 'nosotros')->name('nosotros');
 
 ## Enviar emails con laravel
 
->Abrimos el archivo `.env`  en la carpeta `/.env` y completamos las siguiente variables.
+> Abrimos el archivo `.env` en la carpeta `/.env` y completamos las siguiente variables.
 
 ```php
 MAIL_MAILER=
@@ -1552,12 +1674,13 @@ MAIL_FROM_NAME="${APP_NAME}"
 
 ###### Crear un mailable
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:mail ContactanosMailable
 ```
 
->Abrimos el archivo `ContactanosMailable.php`  en la carpeta `app\Mail\ContactanosMailable.php` dentro de la función `envelope` y escribimos lo siguiente.
+> Abrimos el archivo `ContactanosMailable.php` en la carpeta `app\Mail\ContactanosMailable.php` dentro de la función `envelope` y escribimos lo siguiente.
 
 ```php
 subject = "Información de Contacto",
@@ -1565,7 +1688,7 @@ subject = "Información de Contacto",
 
 **`Nota :` Asunto del mensaje.**
 
->Y en la función `content` y escribimos lo siguiente.
+> Y en la función `content` y escribimos lo siguiente.
 
 ```php
 view: 'emails.contactanos',
@@ -1573,7 +1696,7 @@ view: 'emails.contactanos',
 
 **`Nota :` Nueva vista blade .**
 
->Creamos el archivo `contactanos.blade.php`  en la carpeta `resources\views\emails\contactanos.blade.php` y escribimos lo siguiente.
+> Creamos el archivo `contactanos.blade.php` en la carpeta `resources\views\emails\contactanos.blade.php` y escribimos lo siguiente.
 
 ```php
 <!DOCTYPE html>
@@ -1591,13 +1714,13 @@ view: 'emails.contactanos',
 </html>
 ```
 
->Abrimos el archivo `web`  en la carpeta `routes\web.php` y escribimos lo siguiente.
+> Abrimos el archivo `web` en la carpeta `routes\web.php` y escribimos lo siguiente.
 
 ```php
-Route::get('contactanos', function(){
-    $correo = new ContactanosMailable;
-    Mail::to('ejemplo@ejemplo.com')->send($correo);
-    return "Mensaje enviado";
+Route::get('contactanos', function () {
+  $correo = new ContactanosMailable();
+  Mail::to('ejemplo@ejemplo.com')->send($correo);
+  return 'Mensaje enviado';
 });
 ```
 
@@ -1614,7 +1737,7 @@ use Illuminate\Support\Facades\Mail;
 
 ## Formulario de Contacto
 
->Abrimos el archivo `header.blade.php`  en la carpeta `resources\views\layouts\partials\header.blade.php` y escribimos lo siguiente.
+> Abrimos el archivo `header.blade.php` en la carpeta `resources\views\layouts\partials\header.blade.php` y escribimos lo siguiente.
 
 ```php
 <li>
@@ -1622,12 +1745,13 @@ use Illuminate\Support\Facades\Mail;
 </li>
 ```
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:controller ContactanosController
 ```
 
->Abrimos el archivo `ContactanosController.php`  en la carpeta `app\Http\Controllers\ContactanosController.php` y escribimos lo siguiente.
+> Abrimos el archivo `ContactanosController.php` en la carpeta `app\Http\Controllers\ContactanosController.php` y escribimos lo siguiente.
 
 ```php
     public function index()
@@ -1654,29 +1778,33 @@ use App\Mail\ContactanosMailable;
 use Illuminate\Support\Facades\Mail;
 ```
 
->Abrimos el archivo `web.php`  en la carpeta `routes\web.php` y borramos lo siguiente.
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y borramos lo siguiente.
 
 ```php
-    Route::get('contactanos', function(){
-        $correo = new ContactanosMailable;
-        Mail::to('ejemplo@ejemplo.com')->send($correo);
-        return "Mensaje enviado";
-    });
+Route::get('contactanos', function () {
+  $correo = new ContactanosMailable();
+  Mail::to('ejemplo@ejemplo.com')->send($correo);
+  return 'Mensaje enviado';
+});
 ```
 
 > Y escribimos lo siguiente.
 
 ```php
-Route::get('contactanos',[ContactanosController::class, 'index' ])->name('contactanos.index');
+Route::get('contactanos', [ContactanosController::class, 'index'])->name(
+  'contactanos.index'
+);
 ```
 
 > Y escribimos lo siguiente.
 
 ```php
-Route::post('contactanos',[ContactanosController::class, 'store'])->name('contactanos.store');
+Route::post('contactanos', [ContactanosController::class, 'store'])->name(
+  'contactanos.store'
+);
 ```
 
->Creamos el archivo `index.blade.php`  en la carpeta `resources\views\contactanos\index.blade.php` y escribimos lo siguiente.
+> Creamos el archivo `index.blade.php` en la carpeta `resources\views\contactanos\index.blade.php` y escribimos lo siguiente.
 
 ```php
 @extends('layouts.plantilla')
@@ -1730,7 +1858,7 @@ Route::post('contactanos',[ContactanosController::class, 'store'])->name('contac
 @endsection
 ```
 
->Abrimos el archivo `ContactanosMailable.php`  en la carpeta `app\Mail\ContactanosMailable.php` y escribimos lo siguiente.
+> Abrimos el archivo `ContactanosMailable.php` en la carpeta `app\Mail\ContactanosMailable.php` y escribimos lo siguiente.
 
 ```php
     public $contacto;
@@ -1743,7 +1871,7 @@ Route::post('contactanos',[ContactanosController::class, 'store'])->name('contac
     }
 ```
 
->Abrimos el archivo `contactanos.blade.php`  en la carpeta `resources\views\emails\contactanos.blade.php` y escribimos lo siguiente.
+> Abrimos el archivo `contactanos.blade.php` en la carpeta `resources\views\emails\contactanos.blade.php` y escribimos lo siguiente.
 
 ```php
     <p><strong>Nombre: </strong>{{$contacto['name']}}</p>
@@ -1767,61 +1895,66 @@ Route::post('contactanos',[ContactanosController::class, 'store'])->name('contac
 
 ###### Instalación de Bootstrap
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 npm install bootstrap @popperjs/core
 ```
+
 > Instalamos Sass
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 npm install sass --save-dev
 ```
 
->Creamos o renombramos la carpeta `css` de `resources\css` a `scss` y creamos o renombramos el archivo `app.css` a `app.scss`.
+> Creamos o renombramos la carpeta `css` de `resources\css` a `scss` y creamos o renombramos el archivo `app.css` a `app.scss`.
 
->Abrimos el archivo `app.scss` de la carpeta `resources\scss\app.scss` y escribimos lo siguiente.
+> Abrimos el archivo `app.scss` de la carpeta `resources\scss\app.scss` y escribimos lo siguiente.
 
 ```scss
-@import "~bootstrap/scss/bootstrap";
+@import '~bootstrap/scss/bootstrap';
 ```
 
->Abrimos el archivo `app.js` de la carpeta `resources\js\app.js` y escribimos lo siguiente.
+> Abrimos el archivo `app.js` de la carpeta `resources\js\app.js` y escribimos lo siguiente.
 
 ```js
-import * as bootstrap from 'bootstrap';
+import * as bootstrap from 'bootstrap'
 ```
 
->Abrimos el archivo `vite.config.js` de la carpeta `/` y escribimos lo siguiente.
+> Abrimos el archivo `vite.config.js` de la carpeta `/` y escribimos lo siguiente.
 
 ```js
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
-import path from 'path';
+import { defineConfig } from 'vite'
+import laravel from 'laravel-vite-plugin'
+import path from 'path'
 
 export default defineConfig({
-    plugins: [
-        laravel({
-            input: ['resources/scss/app.scss', 'resources/js/app.js'],
-            refresh: true,
-        }),
-    ],
-    resolve: {
-        alias: {
-            '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap')
-        }
-    }
-});
+  plugins: [
+    laravel({
+      input: ['resources/scss/app.scss', 'resources/js/app.js'],
+      refresh: true,
+    }),
+  ],
+  resolve: {
+    alias: {
+      '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
+    },
+  },
+})
 ```
 
->Abrimos el archivo `plantilla.blade.php` de la carpeta `resources\views\layouts\plantilla.blade.php/` y dentro del `head` escribimos lo siguiente.
+> Abrimos el archivo `plantilla.blade.php` de la carpeta `resources\views\layouts\plantilla.blade.php/` y dentro del `head` escribimos lo siguiente.
 
 ```php
-@vite(['resources/scss/app.scss', 'resources/js/app.js'])
+@vite(['resources/scss/app.scss', 'resources/js/app.js']);
 ```
->Podemos inicializar los servidores Frontend y Backend
 
->Typee: en la Consola:
+> Podemos inicializar los servidores Frontend y Backend
+
+> Typee: en la Consola:
+
 ```console
 php artisan serve
 npm run dev
@@ -1829,15 +1962,15 @@ npm run dev
 
 **`Nota :` Agradecimientos por el aporte y información a `Kim Hallberg` por su tutorial [Como usar bootstrap con laravel y vite](https://devdojo.com/thinkverse/how-to-use-bootstrap-with-laravel-and-vite).**
 
-###### Ejemplo de modificación de vistas con  Bootstrap
+###### Ejemplo de modificación de vistas con Bootstrap
 
->Abrimos el archivo `AppServiceProvider.php` de la carpeta `app\Providers\AppServiceProvider.php` y dentro del `boot` escribimos lo siguiente.
+> Abrimos el archivo `AppServiceProvider.php` de la carpeta `app\Providers\AppServiceProvider.php` y dentro del `boot` escribimos lo siguiente.
 
 ```php
 Paginator::useBootstrap();
 ```
 
->Y importamos la clase `Paginator`.
+> Y importamos la clase `Paginator`.
 
 ```php
 use Illuminate\Pagination\Paginator;
@@ -1845,7 +1978,7 @@ use Illuminate\Pagination\Paginator;
 
 **`Nota :` Agradecimientos por el aporte y información a `codeanddeploy` por su tutorial [Laravel 9 Pagination Example using Bootstrap 5](https://codeanddeploy.com/blog/laravel/laravel-8-pagination-example-using-bootstrap-5).**
 
->Abrimos el archivo `header.blade.php` de la carpeta `resources\views\layouts\partials\header.blade.php` y modificamos la etiqueta `nav` escribimos lo siguiente.
+> Abrimos el archivo `header.blade.php` de la carpeta `resources\views\layouts\partials\header.blade.php` y modificamos la etiqueta `nav` escribimos lo siguiente.
 
 ```php
 <header class="bg-light border-bottom">
@@ -1877,7 +2010,7 @@ use Illuminate\Pagination\Paginator;
 </header>
 ```
 
->Abrimos el archivo `index.blade.php` de la carpeta `resources\views\cursos\index.blade.php` y escribimos lo siguiente.
+> Abrimos el archivo `index.blade.php` de la carpeta `resources\views\cursos\index.blade.php` y escribimos lo siguiente.
 
 ```php
     <main class="container">
@@ -1894,7 +2027,7 @@ use Illuminate\Pagination\Paginator;
     </main>
 ```
 
->Abrimos el archivo `index.blade.php` de la carpeta `resources\views\contactanos\index.blade.php` y escribimos lo siguiente.
+> Abrimos el archivo `index.blade.php` de la carpeta `resources\views\contactanos\index.blade.php` y escribimos lo siguiente.
 
 ```php
     <main class="container center_container">
@@ -1941,7 +2074,7 @@ use Illuminate\Pagination\Paginator;
     @endif
 ```
 
->Creamos el archivo `form.blade.php` de la carpeta `resources\views\cursos\partials\form.blade.php` y escribimos lo siguiente.
+> Creamos el archivo `form.blade.php` de la carpeta `resources\views\cursos\partials\form.blade.php` y escribimos lo siguiente.
 
 ```php
 <div class="card" style="width: 18rem;">
@@ -1951,7 +2084,6 @@ use Illuminate\Pagination\Paginator;
         </h5>
     </div>
     <div class="card-body">
-        @csrf
         <div class="mb-0">
             <label class="form-label">Name:</label>
             <input type="text" class="form-control" placeholder="Html 5"
@@ -1983,7 +2115,7 @@ use Illuminate\Pagination\Paginator;
 </div>
 ```
 
->Abrimos el archivo `edit.blade.php` de la carpeta `resources\views\cursos\edit.blade.php` y escribimos lo siguiente.
+> Abrimos el archivo `edit.blade.php` de la carpeta `resources\views\cursos\edit.blade.php` y escribimos lo siguiente.
 
 ```php
     <main class="container center_container container-float">
@@ -1996,7 +2128,7 @@ use Illuminate\Pagination\Paginator;
     </main>
 ```
 
->Abrimos el archivo `create.blade.php` de la carpeta `resources\views\cursos\create.blade.php` y escribimos lo siguiente.
+> Abrimos el archivo `create.blade.php` de la carpeta `resources\views\cursos\create.blade.php` y escribimos lo siguiente.
 
 ```php
     <main class="container center_container container-float">
@@ -2008,7 +2140,7 @@ use Illuminate\Pagination\Paginator;
     </main>
 ```
 
->Abrimos el archivo `show.blade.php` de la carpeta `resources\views\cursos\show.blade.php` y escribimos lo siguiente.
+> Abrimos el archivo `show.blade.php` de la carpeta `resources\views\cursos\show.blade.php` y escribimos lo siguiente.
 
 ```php
     <main class="container">
@@ -2025,7 +2157,7 @@ use Illuminate\Pagination\Paginator;
     </main>
 ```
 
->Creamos el archivo `footer.blade.php` de la carpeta `resources\views\layouts\partials\footer.blade.php` y escribimos lo siguiente.
+> Creamos el archivo `footer.blade.php` de la carpeta `resources\views\layouts\partials\footer.blade.php` y escribimos lo siguiente.
 
 ```php
 <footer class="bg-light text-center text-lg-start border-top">
@@ -2036,7 +2168,7 @@ use Illuminate\Pagination\Paginator;
 </footer>
 ```
 
->Abrimos o creamos el archivo `app.css` de la carpeta `resources\css\app.css` y escribimos lo siguiente.
+> Abrimos o creamos el archivo `app.css` de la carpeta `resources\css\app.css` y escribimos lo siguiente.
 
 ```css
 .center_container {
@@ -2045,26 +2177,26 @@ use Illuminate\Pagination\Paginator;
   justify-content: center;
 }
 body {
-    display: grid;
-    min-height: 100vh;
-    grid-template-rows: auto 1fr auto;
+  display: grid;
+  min-height: 100vh;
+  grid-template-rows: auto 1fr auto;
 }
 .container-float {
-    position: relative;
+  position: relative;
 }
 .btn-float {
-    position: absolute;
+  position: absolute;
 }
-.btn-position-top-0-left-0{
-    top: 0;
-    left: 0;
+.btn-position-top-0-left-0 {
+  top: 0;
+  left: 0;
 }
 ```
 
->Abrimos `app.scss` de la carpeta `resources\scss\app.scss` y escribimos lo siguiente.
+> Abrimos `app.scss` de la carpeta `resources\scss\app.scss` y escribimos lo siguiente.
 
 ```scss
-@import "/resources/css/app.css";
+@import '/resources/css/app.css';
 ```
 
 [Subir](#top)
@@ -2073,18 +2205,21 @@ body {
 
 ## Componentes Blade
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:component Alert
 ```
 
->Abrimos el archivo `ContactanosController.php` de la carpeta `app\Http\Controllers\ContactanosController.php` y modificamos lo siguiente.
+> Abrimos el archivo `ContactanosController.php` de la carpeta `app\Http\Controllers\ContactanosController.php` y modificamos lo siguiente.
 
 ```php
-return redirect()->route('contactanos.index')->with('success', 'Mensaje Enviado');
+return redirect()
+  ->route('contactanos.index')
+  ->with('success', 'Mensaje Enviado');
 ```
 
->Abrimos el archivo `index.blade.php` de la carpeta `resources\views\contactanos\index.blade.php` y modificamos lo siguiente.
+> Abrimos el archivo `index.blade.php` de la carpeta `resources\views\contactanos\index.blade.php` y modificamos lo siguiente.
 
 ```php
     @php
@@ -2100,7 +2235,7 @@ return redirect()->route('contactanos.index')->with('success', 'Mensaje Enviado'
     @endif
 ```
 
->Abrimos el archivo `alert.blade.php` de la carpeta `resources\views\components\alert.blade.php` y escribimos lo siguiente.
+> Abrimos el archivo `alert.blade.php` de la carpeta `resources\views\components\alert.blade.php` y escribimos lo siguiente.
 
 ```php
 <div {{ $attributes->merge(['class' => "alert $clases alert-dismissible fade show"]) }} role="alert">
@@ -2109,7 +2244,7 @@ return redirect()->route('contactanos.index')->with('success', 'Mensaje Enviado'
 </div>
 ```
 
->Abrimos el archivo `Alert.php` de la carpeta `app\View\Components\Alert.php` y escribimos lo siguiente.
+> Abrimos el archivo `Alert.php` de la carpeta `app\View\Components\Alert.php` y escribimos lo siguiente.
 
 ```php
     public $clases;
@@ -2145,46 +2280,773 @@ return redirect()->route('contactanos.index')->with('success', 'Mensaje Enviado'
 
 ## Middleware
 
->Abrimos el archivo `web.php` de la carpeta `routes\web.php` y escribimos lo siguiente.
+> Abrimos el archivo `web.php` de la carpeta `routes\web.php` y escribimos lo siguiente.
 
 ```php
 Route::get('prueba', function () {
-    return "Has accedido correctamente a esta ruta";
+  return 'Has accedido correctamente a esta ruta';
 });
 Route::get('no-autorizado', function () {
-    return "Usted no es mayor de edad";
+  return 'Usted no es mayor de edad';
 });
 ```
 
->Typee: en la Consola:
+> Typee: en la Consola:
+
 ```console
 php artisan make:middleware CheckAge
 ```
 
 **`Nota :`Registrar middleware en nuestra app.**
 
->Abrimos el archivo `Kernel.php` de la carpeta `app\Http\Kernel.php` y en la sección `protected $middlewareAliases` escribimos lo siguiente.
+> Abrimos el archivo `Kernel.php` de la carpeta `app\Http\Kernel.php` y en la sección `protected $middlewareAliases` escribimos lo siguiente.
 
 ```php
 'age' => \App\Http\Middleware\CheckAge::class,
 ```
 
->Abrimos el archivo `web.php` de la carpeta `routes\web.php` y modificamos lo siguiente.
+> Abrimos el archivo `web.php` de la carpeta `routes\web.php` y modificamos lo siguiente.
 
 ```php
 Route::get('prueba', function () {
-    return "Has accedido correctamente a esta ruta";
+  return 'Has accedido correctamente a esta ruta';
 })->middleware('age');
 ```
 
->Abrimos el archivo `CheckAge.php` de la carpeta `app\Http\Middleware\CheckAge.php` y en la función `handle` escribimos lo siguiente.
+> Abrimos el archivo `CheckAge.php` de la carpeta `app\Http\Middleware\CheckAge.php` y en la función `handle` escribimos lo siguiente.
 
 ```php
-        if($request->age >= 18){
-            return $next($request);
-        } else {
-            return redirect('no-autorizado');
+if ($request->age >= 18) {
+  return $next($request);
+} else {
+  return redirect('no-autorizado');
+}
+```
+
+[Subir](#top)
+
+<a name="item24"></a>
+
+## Autentificación
+
+###### Registro del usuario
+
+> Creamos el archivo `register.blade.php` de la carpeta `resources\views\auth\register.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+@section('title', 'Sign Up')
+
+@section('content')
+    <main class="container center_container flex-column">
+        @if (session('message'))
+            <x-alert class="mb-2" type="{{ session('message')['type'] }}">
+                <x-slot name="title">
+                    {{ session('message')['title'] }}
+                </x-slot>
+                {{ session('message')['message'] }}
+            </x-alert>
+        @endif
+        <form action="{{ route('register.store') }}" method="post">
+            @csrf
+            <div class="card" style="width: 18rem;">
+                <div class="card-header text-center">
+                    <h5>Registro</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-0">
+                        <label class="form-label">Username:</label>
+                        <input type="text" class="form-control" placeholder="User Name" value="{{ old('name') }}"
+                            name="name">
+                        @error('name')
+                            <small class="text-danger">*{{ $message }}</small>
+                        @enderror
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label">Email:</label>
+                        <input type="email" class="form-control" placeholder="example@example.com"
+                            value="{{ old('email') }}" name="email">
+                        @error('email')
+                            <small class="text-danger">*{{ $message }}</small>
+                        @enderror
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label">Password:</label>
+                        <input type="password" class="form-control" name="password" id="pass1">
+                        @error('password')
+                            <small class="text-danger">*{{ $message }}</small>
+                        @enderror
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label">Repite Password:</label>
+                        <input type="password" class="form-control" id="pass2">
+                        <div id="pass2message" class="d-none invalid">
+                            <small>*Los passwords no coinciden.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </div>
+            </div>
+        </form>
+    </main>
+@endsection
+```
+
+> Creamos el archivo `RegisterController.php`.
+
+> Typee: en la Consola:
+```console
+php artisan make:controller Auth/RegisterController
+```
+
+> Abrimos el archivo `RegisterController.php` de la carpeta `app\Http\Controllers\Auth\RegisterController.php` y dentro de la clase escribimos lo siguiente.
+
+```php
+    public function index()
+    {
+        return view('auth.register');
+    }
+    public function store(RegisterRequest $request)
+    {
+        try {
+            $user = new User();
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->password = bcrypt($request->password);
+            $user->save();
+
+            event(new Registered($user)); // ! Comentar esta linea hasta que se configure la validación de email.
+
+            $credentials = $request->only('email', 'password');
+            if (Auth::attempt($credentials)) {
+                $request->session()->regenerate();
+
+                return redirect()->route('cursos.index');
+            }
+        } catch (\Throwable $th) {
+            return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' =>
+                    'Ha ocurrido un error revise los datos y vuelva a intentarlo si no se soluciona contacte con su administrador.',
+            ]);
         }
+    }
+```
+
+>Y importamos las clases
+
+```php
+use Illuminate\Auth\Events\Registered;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\RegisterRequest;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+```
+
+> Creamos el archivo `RegisterRequest.php`.
+
+> Typee: en la Consola:
+```console
+php artisan make:request RegisterRequest
+```
+
+> Abrimos el archivo `RegisterRequest.php` de la carpeta `app\Http\Requests\RegisterRequest.php` y dentro de la función `authorize` lo cambiamos.
+
+```php
+return true;
+```
+
+>Y dentro de la función `rules` escribimos lo siguiente.
+
+```php
+        return [
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required'
+        ];
+```
+
+> Abrimos el archivo `web.php` de la carpeta `routes\web.php` y escribimos lo siguiente.
+
+```php
+Route::resource('register', RegisterController::class);
+```
+
+> Creamos el archivo `interface.js` de la carpeta `resources\js\interface.js` y escribimos lo siguiente.
+
+```js
+let $password1 = document.getElementById("pass1")
+let $password2 = document.getElementById("pass2")
+let $pass2message = document.getElementById("pass2message")
+let timeout
+
+$password2.addEventListener('keydown', () => {
+  clearTimeout(timeout)
+  timeout = setTimeout(() => {
+    if ($password1.value == $password2.value) {
+        $pass2message.classList.replace("d-block", "d-none")
+    } else {
+        $pass2message.classList.replace("d-none", "d-block")
+    }
+    clearTimeout(timeout)
+  },1000)
+})
+```
+
+> Abrimos el archivo `app.js` de la carpeta `resources\js\app.js` y escribimos lo siguiente.
+
+```js
+import './interface';
+```
+
+> Abrimos o creamos el archivo `app.css` de la carpeta `resources\css\app.css` y escribimos lo siguiente.
+
+```css
+.invalid {
+    color: red;
+}
+```
+
+###### Acceso y cierre de sesión del usuario
+
+> Creamos el archivo `login.blade.php` de la carpeta `resources\views\auth\login.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+@section('title', 'Sign In')
+
+@section('content')
+    <main class="container center_container flex-column">
+        @if (session('message'))
+            <x-alert class="mb-2" type="{{ session('message')['type'] }}">
+                <x-slot name="title">
+                    {{ session('message')['title'] }}
+                </x-slot>
+                {{ session('message')['message'] }}
+            </x-alert>
+        @endif
+        <form action="{{ route('login.authenticate') }}" method="post">
+            @csrf
+            <div class="card" style="width: 18rem;">
+                <div class="card-header text-center">
+                    <h5>Acceso</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-0">
+                        <label class="form-label">Email:</label>
+                        <input type="email" class="form-control" placeholder="example@example.com"
+                            value="{{ old('email') }}" name="email">
+                        @error('email')
+                            <small class="text-danger">*{{ $message }}</small>
+                        @enderror
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label">Password: <small class="text-primary">
+                            <a href="{{ route('password.request') }}">Has olvidado tu contraseña?</a>
+                        </small></label>
+                        <input type="password" class="form-control" name="password">
+                        @error('password')
+                            <small class="text-danger">*{{ $message }}</small>
+                        @enderror
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <div class="form-check form-switch d-flex justify-content-center">
+                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" name="remember">
+                        <label class="form-check-label ms-1" for="flexSwitchCheckDefault">Acuérdate de mí !!!</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Access</button>
+                </div>
+            </div>
+        </form>
+    </main>
+@endsection
+```
+
+> Creamos el archivo `LoginController.php`.
+
+> Typee: en la Consola:
+```console
+php artisan make:controller Auth/LoginController
+```
+
+> Abrimos el archivo `LoginController.php` de la carpeta `app\Http\Controllers\Auth\LoginController.php` y dentro de la clase escribimos lo siguiente.
+
+```php
+    public function index()
+    {
+        return view('auth.login');
+    }
+    public function Authenticate(LoginRequest $request)
+    {
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials, $request->remember)) {
+            $request->session()->regenerate();
+            return redirect()->route('cursos.index');
+        }
+        return redirect()
+            ->route('login')
+            ->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => 'Las credenciales son incorrectas!!!',
+            ]);
+    }
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home');
+    }
+```
+
+>Y importamos las clases
+
+```php
+use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+```
+
+> Creamos el archivo `LoginRequest.php`.
+
+> Typee: en la Consola:
+```console
+php artisan make:request LoginRequest
+```
+
+> Abrimos el archivo `LoginRequest.php` de la carpeta `app\Http\Requests\LoginRequest.php` y dentro de la función `authorize` lo cambiamos.
+
+```php
+return true;
+```
+
+>Y dentro de la función `rules` escribimos lo siguiente.
+
+```php
+        return [
+            'email' => 'required|email',
+            'password' => 'required'
+        ];
+```
+
+> Abrimos el archivo `web.php` de la carpeta `routes\web.php` y escribimos lo siguiente.
+
+```php
+Route::controller(LoginController::class)->group(function () {
+    Route::get('login', 'index')->name('login');
+    Route::post('login', 'Authenticate')->name('login.authenticate');
+});
+```
+
+>Y Protegemos las rutas que necesiten autentificación.
+
+```php
+Route::group(['middleware' => ['auth', 'auth.session', 'verified']],
+    function () {
+        Route::get('logout', [LoginController::class, 'logout'])->name('logout');
+        Route::resource('cursos', CursoController::class);
+    }
+);
+```
+
+> Abrimos el archivo `header.blade.php` de la carpeta `resources\views\layouts\partials\header.blade.php` y escribimos lo siguiente.
+
+```php
+<header class="bg-light border-bottom">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand">Laravel 10</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse d-flex-lg justify-content-lg-between" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" aria-current="page" href="{{ route('home') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('cursos.*') ? 'active' : '' }}" href="{{ route('cursos.index') }}">Cursos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('nosotros') ? 'active' : '' }}" href="{{ route('nosotros') }}">Nosotros</a>
+                    </li>
+                    <li class="nav-item {{ route('contactanos.index') }}">
+                        <a class="nav-link {{ request()->routeIs('contactanos.*') ? 'active' : '' }}" href="{{ route('contactanos.index') }}">Contáctanos</a>
+                    </li>
+                </ul>
+                <hr class="hidden-lg">
+                <ul class="navbar-nav">
+                    @auth
+                    <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="{{ route('logout') }}">Cerrar Sesión</a>
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('login.*') ? 'active' : '' }}" aria-current="page" href="{{ route('login') }}">Acceso</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('register.*') ? 'active' : '' }}" href="{{ route('register.index') }}">Registrarse</a>
+                        </li>
+                    @endauth
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+```
+
+###### Verificación de email
+
+**`Nota :` No se va a poder enviar ningún email antes de configurar las rutas también debe de haber configurado las credenciales de email en el archivo `.env` .**
+
+> Creamos el archivo `verify-email.blade.php` de la carpeta `resources\views\auth\verify-email.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+@section('title', 'Email verify')
+
+@section('content')
+    <main class="container center_container flex-column">
+        @if (session('message'))
+            <x-alert class="mb-2" type="{{ session('message')['type'] }}">
+                <x-slot name="title">
+                    {{ session('message')['title'] }}
+                </x-slot>
+                {{ session('message')['message'] }}
+            </x-alert>
+        @endif
+        <div class="alert alert-warning" role="alert">
+            <form action="{{ route('verification.send') }}" method="post">
+                @csrf
+                <h4 class="alert-heading">Verificar email!</h4>
+                <p><strong>Se le ha enviado un mensaje a su correo electrónico revise bandeja de entrada!</strong> Usted
+                    debe de estar <strong>verificado</strong>, para que pueda visualizar el contenido de este sitio web,
+                    pudiendo acceder a los artículos, contenidos exclusivos y las ventajas para nuestros usuarios, Usted
+                    esta a un solo paso de poder disfrutar de una experiencia única,<strong> Adelante !!</strong></p>
+                <hr>
+                <p class="mb-0">Si el mensaje no le ha llegado asegúrese de que no este en la <strong>bandeja de spam</strong>, si no haga click en el siguiente botón y <strong>verifique su email</strong>. Tenga en cuenta que el enlace del mensaje caducara en 60 minutos. <button class="btn btn-warning"type="submit">Enviar mensaje de verificación</button></p>
+            </form>
+        </div>
+    </main>
+@endsection
+```
+
+> Abrimos el archivo `web.php` de la carpeta `routes\web.php` y escribimos lo siguiente.
+
+```php
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verification', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('cursos');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    try {
+        $request->user()->sendEmailVerificationNotification();
+
+        return back()->with('message', [
+            'type' => 'success',
+            'title' => 'Éxito !',
+            'message' =>
+                'Enlace de verificación a sido enviado correctamente!!! Revise su bandeja de entrada.',
+        ]);
+    } catch (\Throwable $th) {
+        return back()->with('message', [
+            'type' => 'danger',
+            'title' => 'Error !',
+            'message' =>
+                'Ha ocurrido un error revise los datos y vuelva a intentarlo si no se soluciona contacte con su administrador.',
+        ]);
+    }
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+```
+
+>Y importamos las clases.
+
+```php
+use Illuminate\Http\Request;
+use App\Http\Requests\EmailVerificationRequest;
+```
+
+> Creamos el archivo `EmailVerificationRequest.php`.
+
+>Typee en consola:
+```php
+php artisan make:request EmailVerificationRequest
+```
+
+> Creamos el archivo `EmailVerificationRequest.php` de la carpeta `app\Http\Requests\EmailVerificationRequest.php` y escribimos lo siguiente.
+
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
+
+class EmailVerificationRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        if (! hash_equals((string) $this->user()->getKey(), (string) $this->query('id'))) {
+            return false;
+        }
+
+        if (! hash_equals(sha1($this->user()->getEmailForVerification()), (string)  $this->query('hash'))) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            //
+        ];
+    }
+
+    /**
+     * Fulfill the email verification request.
+     *
+     * @return void
+     */
+    public function fulfill()
+    {
+        if (! $this->user()->hasVerifiedEmail()) {
+            $this->user()->markEmailAsVerified();
+
+            event(new Verified($this->user()));
+        }
+    }
+
+    /**
+     * Configure the validator instance.
+     *
+     * @param  \Illuminate\Validation\Validator  $validator
+     * @return void
+     */
+    public function withValidator(Validator $validator)
+    {
+        return $validator;
+    }
+}
+```
+
+**`Nota :` Este archivo no debería de haberlo ni creado ni  modificado pero la solicitud http que llegaba a la ruta no me reconocía los datos enviados por alguna forma que no logro entender ya que debería de funcionar sin tener que modificarlo.**
+
+
+> Abrimos el archivo `User.php` de la carpeta `app\Models\User.php` en la función `authorize` y escribimos lo siguiente.
+
+```php
+class User extends Authenticatable implements MustVerifyEmail
+```
+
+```php
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+```
+
+>Y importamos la clase.
+
+```php
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+```
+
+###### Reset de la password del usuario.
+
+> Creamos el archivo `forgot-password.blade.php` de la carpeta `resources\views\auth\forgot-password.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+@section('title', 'Forgot Password')
+
+@section('content')
+    <main class="container center_container flex-column">
+        @if (session('message'))
+            <x-alert class="mb-2" type="{{ session('message')['type'] }}">
+                <x-slot name="title">
+                    {{ session('message')['title'] }}
+                </x-slot>
+                {{session('status')}}
+            </x-alert>
+        @endif
+        <form action="{{ route('password.email') }}" method="post">
+            @csrf
+            <div class="card" style="width: 18rem;">
+                <div class="card-header text-center">
+                    <h5>Forgot Password</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-0">
+                        <label class="form-label">Email:</label>
+                        <input type="email" class="form-control" placeholder="example@example.com"
+                            value="{{ old('email') }}" name="email">
+                        @error('email')
+                            <small class="text-danger">*{{ $message }}</small>
+                        @enderror
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+            </div>
+        </form>
+    </main>
+@endsection
+```
+
+> Creamos el archivo `reset-password.blade.php` de la carpeta `resources\views\auth\reset-password.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+@section('title', 'Reset Password')
+
+@section('content')
+    <main class="container center_container flex-column">
+        @if (session('message'))
+            <x-alert class="mb-2" type="{{ session('message')['type'] }}">
+                <x-slot name="title">
+                    {{ session('message')['title'] }}
+                </x-slot>
+                {{ session('message')['message'] }}
+            </x-alert>
+        @endif
+        <form action="{{ route('password.update') }}" method="post">
+            @csrf
+            <input type="hidden" name="token" value="{{ $token }}">
+            <div class="card" style="width: 18rem;">
+                <div class="card-header text-center">
+                    <h5>Reset Password</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-0">
+                        <label class="form-label">Email:</label>
+                        <input type="email" class="form-control" placeholder="example@example.com"
+                            value="{{ old('email', $email) }}" name="email">
+                        @error('email')
+                            <small class="text-danger">*{{ $message }}</small>
+                        @enderror
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label">Password:</label>
+                        <input type="password" class="form-control" name="password" id="pass1">
+                        @error('password')
+                            <small class="text-danger">*{{ $message }}</small>
+                        @enderror
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label">Repite Password:</label>
+                        <input type="password" class="form-control" id="pass2" name="password_confirmation">
+                        <div id="pass2message" class="d-none invalid">
+                            <small>*Los passwords no coinciden.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+            </div>
+        </form>
+    </main>
+@endsection
+```
+
+> Abrimos el archivo `web.php` de la carpeta `routes\web.php` y escribimos lo siguiente.
+
+```php
+Route::get('/forgot-password', function () {
+    return view('auth.forgot-password');
+})->middleware('guest')->name('password.request');
+
+Route::post('/forgot-password', function (Request $request) {
+    $request->validate(['email' => 'required|email']);
+
+    $status = Password::sendResetLink($request->only('email'));
+
+    return $status === Password::RESET_LINK_SENT
+        ? back()->with([
+            'status' => __($status),
+            'message' => [
+            'type' => 'success',
+            'title' => 'Éxito !'
+            ]
+            ])
+        : back()->withErrors(['email' => __($status)]);
+})->middleware('guest')->name('password.email');
+
+Route::get('/reset-password/{token}', function (
+    Request $request,
+    string $token
+) {
+    return view('auth.reset-password', [
+        'token' => $token,
+        'email' => (string) $request->query('email'),
+    ]);
+})->middleware('guest')->name('password.reset');
+
+Route::post('/reset-password', function (Request $request) {
+    $request->validate([
+        'token' => 'required',
+        'email' => 'required|email',
+        'password' => 'required|confirmed',
+    ]);
+    $status = Password::reset(
+        $request->only('email', 'password', 'password_confirmation', 'token'),
+        function (User $user, string $password) {
+            $user
+                ->forceFill([
+                    'password' => Hash::make($password),
+                ])
+                ->setRememberToken(Str::random(60));
+
+            $user->save();
+
+            event(new PasswordReset($user));
+        }
+    );
+
+    return $status === Password::PASSWORD_RESET
+        ? redirect()
+            ->route('login')
+            ->with('status', __($status))
+        : back()->withErrors(['email' => [__($status)]]);
+})->middleware('guest')->name('password.update');
+```
+
+>Y importamos las clases.
+
+```php
+use Illuminate\Support\Facades\Password;
+use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 ```
 
 [Subir](#top)
