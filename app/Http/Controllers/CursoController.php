@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCursoRequest;
 use Illuminate\Http\Request;
 use App\Models\Curso;
+use Illuminate\Support\Str;
 class CursoController extends Controller
 {
     public function index()
@@ -18,7 +19,7 @@ class CursoController extends Controller
     }
     public function store(StoreCursoRequest $request)
     {
-        $curso = Curso::create($request->all());
+        $curso = Curso::create($request->all() + ['slug' => Str::slug($request['name'], '-')]);
         return redirect()->route('cursos.show', $curso);
     }
     public function show(Curso $curso)
@@ -31,7 +32,7 @@ class CursoController extends Controller
     }
     public function update(StoreCursoRequest $request, Curso $curso)
     {
-        $curso->update($request->all());
+        $curso->update($request->all() + ['slug' => Str::slug($request['name'], '-')]);
         return redirect()->route('cursos.show', $curso);
     }
     public function destroy(Curso $curso)

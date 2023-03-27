@@ -1505,7 +1505,6 @@ return [
 **`Nota :` Importamos la clase `use Illuminate\Support\Str;`.**
 
 > Typee: en la Consola:
-
 ```console
 php artisan migrate:fresh --seed
 ```
@@ -1533,6 +1532,23 @@ php artisan migrate:fresh --seed
        return 'slug';
    }
 ```
+
+**`Nota :` Importante después de añadir `slug` la creación como la actualización del curso no se realizara, se tiene que modificar los métodos `store` y `update`.**
+
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y añadimos lo siguiente.
+
+>Y en el función `store` escribimos lo siguiente.
+
+```php
+$curso = Curso::create($request->all() + ['slug' => Str::slug($request['name'], '-')]);
+```
+>Y en el función `update` escribimos lo siguiente.
+
+```php
+$curso->update($request->all() + ['slug' => Str::slug($request['name'], '-')]);
+```
+
+>Y importamos la clase `use Illuminate\Support\Str;`.
 
 [Subir](#top)
 
@@ -2087,14 +2103,14 @@ use Illuminate\Pagination\Paginator;
         <div class="mb-0">
             <label class="form-label">Name:</label>
             <input type="text" class="form-control" placeholder="Html 5"
-                value="{{ Route::currentRouteName() == 'cursos.edit' ? old('name', $curso->name) : old('name') }}">
+                value="{{ Route::currentRouteName() == 'cursos.edit' ? old('name', $curso->name) : old('name') }}" name="name">
             @error('name')
                 <small class="text-danger">*{{ $message }}</small>
             @enderror
         </div>
         <div class="mb-0">
             <label class="form-label">Descripción:</label>
-            <textarea class="form-control" rows="3">{{ Route::currentRouteName() == 'cursos.edit' ? old('description', $curso->description) : old('description') }}</textarea>
+            <textarea class="form-control" rows="3" name="description"> {{ Route::currentRouteName() == 'cursos.edit' ? old('description', $curso->description) : old('description') }}</textarea>
             @error('description')
                 <small class="text-danger">*{{ $message }}</small>
             @enderror
@@ -2102,7 +2118,7 @@ use Illuminate\Pagination\Paginator;
         <div class="mb-0">
             <label class="form-label">Categoria:</label>
             <input type="text" class="form-control" placeholder="Desarrollo web"
-                value="{{ Route::currentRouteName() == 'cursos.edit' ? old('categoria', $curso->categoria) : old('categoria') }}">
+                value="{{ Route::currentRouteName() == 'cursos.edit' ? old('categoria', $curso->categoria) : old('categoria') }}" name="categoria">
             @error('categoria')
                 <small class="text-danger">*{{ $message }}</small>
             @enderror
