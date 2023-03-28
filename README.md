@@ -59,6 +59,7 @@
 - [Componentes Blade](#item22)
 - [Middleware](#item23)
 - [Autentificación](#item24)
+- [Notificaciones](#item25)
 
 <a name="item1"></a>
 
@@ -3063,6 +3064,48 @@ use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+```
+
+[Subir](#top)
+
+<a name="item1"></a>
+
+## Notificaciones
+
+###### Generación de notificaciones
+
+> Typee: en la Consola:
+```console
+php artisan make:notification NewRegistered
+```
+
+>Abrimos el archivo `NewRegistered.php` en la carpeta `app\Notifications\NewRegistered.php` en la función `` y escribimos lo siguiente.
+
+```php
+return (new MailMessage)
+    ->subject(Lang::get('Welcome'))
+    ->greeting(Lang::get('Hello!'))
+    ->line(Lang::get('The introduction to the notification.'))
+    ->action(Lang::get('Notification Action'), url('/'))
+    ->line(Lang::get('Thank you for using our application!'));
+```
+
+>Abrimos el archivo `es.json` en la carpeta `lang\es.json` en la función `` y añadimos lo siguiente.
+
+```json
+    "Welcome": "Bienvenido",
+    "The introduction to the notification.": "La introducción a la notificación.",
+    "Notification Action": "Acción de notificación",
+    "Thank you for using our application!": "¡Gracias por usar nuestra aplicación!"
+```
+
+>Abrimos el archivo `web.php` en la carpeta `routes\web.php` y añadimos lo siguiente.
+
+```php
+Route::get('notificacion', function () {
+    $user->notify(new NewRegistered());
+    return 'Mensaje enviado!';
+});
 ```
 
 [Subir](#top)

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\EmailVerificationRequest;
 use Illuminate\Support\Facades\Password;
 use App\Models\User;
+use App\Notifications\NewRegistered;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -157,3 +158,11 @@ Route::post('/reset-password', function (Request $request) {
             ->with('status', __($status))
         : back()->withErrors(['email' => [__($status)]]);
 })->middleware('guest')->name('password.update');
+
+// Rutas Notificaciones
+
+Route::get('notificacion', function () {
+    $user = User::find(1);
+    $user->notify(new NewRegistered($user));
+    return 'Mensaje enviado!';
+});
