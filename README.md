@@ -3083,11 +3083,15 @@ php artisan make:notification NewRegistered
 
 ```php
 return (new MailMessage)
+    ->view('plantilla.blade', ['datos' => 'paso de datos'])
     ->subject(Lang::get('Welcome'))
     ->greeting(Lang::get('Hello!'))
     ->line(Lang::get('The introduction to the notification.'))
     ->action(Lang::get('Notification Action'), url('/'))
-    ->line(Lang::get('Thank you for using our application!'));
+    ->line(Lang::get('Thank you for using our application!'))
+    ->lineIf($this->amount > 0, "Amount paid: {$this->amount}")
+    ->error()
+    ->from('barrett@example.com', 'Barrett Blair');
 ```
 
 >Abrimos el archivo `es.json` en la carpeta `lang\es.json` en la función `` y añadimos lo siguiente.
@@ -3107,5 +3111,25 @@ Route::get('notificacion', function () {
     return 'Mensaje enviado!';
 });
 ```
+
+###### Personalización de las plantillas
+
+> Typee: en la Consola:
+```console
+php artisan vendor:publish --tag=laravel-notifications
+```
+
+**`Nota :` Una vez ejecutado la instrucción de arriba, se nos habrá creado una carpeta y encontraremos un archivo llamado `email.blade.php` en la carpeta `resources\views\vendor\notifications\email.blade.php` en este archivo podremos modificar la plantilla entera si borramos todo su contenido y creamos el nuestro propio.**
+
+###### Personalización de los componentes
+
+> Typee: en la Consola:
+```console
+php artisan vendor:publish --tag=laravel-mail
+```
+
+**`Nota :` Una vez ejecutado la instrucción de arriba, se nos habrá creado una carpeta y encontraremos varios archivos en la carpeta `resources\views\vendor\mail\html\` en estos archivo podremos modificar los componentes de la plantilla anterior.**
+
+**`Nota :` Los cambios que realicemos afectaran a todos las notificaciones que enviemos por el método `toMail` siempre que no indiquemos una vista en la creación en `new MailMessage`.**
 
 [Subir](#top)
