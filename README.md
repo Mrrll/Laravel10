@@ -60,6 +60,7 @@
 - [Middleware](#item23)
 - [Autentificación](#item24)
 - [Notificaciones](#item25)
+- [Relación uno a uno (One To One)](#item26)
 
 <a name="item1"></a>
 
@@ -3131,5 +3132,75 @@ php artisan vendor:publish --tag=laravel-mail
 **`Nota :` Una vez ejecutado la instrucción de arriba, se nos habrá creado una carpeta y encontraremos varios archivos en la carpeta `resources\views\vendor\mail\html\` en estos archivo podremos modificar los componentes de la plantilla anterior.**
 
 **`Nota :` Los cambios que realicemos afectaran a todos las notificaciones que enviemos por el método `toMail` siempre que no indiquemos una vista en la creación en `new MailMessage`.**
+
+[Subir](#top)
+
+<a name="item26"></a>
+
+## Relación uno a uno (One To One)
+
+###### Creamos la tabla Profiles
+
+> Typee: en la Consola:
+```console
+php artisan make:migration create_profiles_table
+```
+
+###### Creamos el modelo Profile
+
+> Typee: en la Consola:
+```console
+php artisan make:model Profile
+```
+
+>Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_profiles_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_profiles_table.php` en la función `up` y escribimos lo siguiente.
+
+```php
+        Schema::create('profiles', function (Blueprint $table) {
+            $table->id();
+            $table->string('title', 45);
+            $table->text('biografia');
+            $table->string('website', 45);
+
+            $table->unsignedBigInteger('user_id')->unique();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+
+            $table->timestamps();
+        });
+```
+
+> Typee: en la Consola:
+```console
+php artisan migrate
+```
+
+>Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos lo siguiente.
+
+```php
+    // Relación uno a uno
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
+    }
+```
+
+>Abrimos el archivo `Profile.php` en la carpeta `app\Models\Profile.php` y añadimos lo siguiente.
+
+```php
+    // Relación uno a uno inverso
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+```
+
+>Para acceder a perfil y viceversa.
+
+```php
+$user = User::find(1); // Buscamos el usuario cuyo id sea 1
+$user->profile; // Y accedemos al perfil del usuario.
+$profile = Profile::find(1); // Buscamos el perfil cuyo id sea 1
+$profile->user; // Y accedemos al usuario del perfil.
+```
 
 [Subir](#top)

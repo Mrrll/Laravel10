@@ -48,4 +48,13 @@ class User extends Authenticatable implements MustVerifyEmail
             set:fn($value) => strtolower($value)
         );
     }
+    // Relación uno a uno
+    public function profile()
+    {
+        // $profile = Profile::where('user_id', $this->id)->first();
+        // return $profile;
+        // $profile = Profile::where('foreing_key', $this->local_key)->first();
+        // return $this->hasOne('App\Models\Profile', 'foreing_key', 'local_key' );
+        return $this->hasOne(Profile::class);
+    }
 }
