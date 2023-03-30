@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
             $table->string('title', 45);
-            $table->text('biografia');
+            $table->text('biography');
             $table->string('website', 45);
 
             $table->unsignedBigInteger('user_id')->unique();

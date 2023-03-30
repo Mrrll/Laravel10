@@ -61,6 +61,7 @@
 - [Autentificación](#item24)
 - [Notificaciones](#item25)
 - [Relación uno a uno (One To One)](#item26)
+- [Interfaz Perfil de usuario](#item27)
 
 <a name="item1"></a>
 
@@ -3159,7 +3160,7 @@ php artisan make:model Profile
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
             $table->string('title', 45);
-            $table->text('biografia');
+            $table->text('biography');
             $table->string('website', 45);
 
             $table->unsignedBigInteger('user_id')->unique();
@@ -3180,6 +3181,10 @@ php artisan migrate
     // Relación uno a uno
     public function profile()
     {
+        // $profile = Profile::where('user_id', $this->id)->first();
+        // return $profile;
+        // $profile = Profile::where('foreing_key', $this->local_key)->first();
+        // return $this->hasOne('App\Models\Profile', 'foreing_key', 'local_key' );
         return $this->hasOne(Profile::class);
     }
 ```
@@ -3201,6 +3206,303 @@ $user = User::find(1); // Buscamos el usuario cuyo id sea 1
 $user->profile; // Y accedemos al perfil del usuario.
 $profile = Profile::find(1); // Buscamos el perfil cuyo id sea 1
 $profile->user; // Y accedemos al usuario del perfil.
+```
+
+[Subir](#top)
+
+<a name="item27"></a>
+
+## Interfaz Perfil de usuario
+
+###### Creamos Controlador Profile
+
+> Typee: en la Consola:
+```console
+php artisan make:controller ProfileController
+```
+
+###### Creamos Request Profile
+
+> Typee: en la Consola:
+```console
+php artisan make:request ProfileRequest
+```
+
+> Abrimos el archivo `ProfileRequest` de la carpeta `app\Http\Requests\ProfileRequest.php` y en la función `authorize` cambiamos lo siguiente.
+
+```php
+return true;
+```
+
+> Y en la función `rules` escribimos lo siguiente.
+
+```php
+        return [
+            'title' => 'required|max:45' ,
+            'biography' => 'required|min:5',
+            'website' => 'required|max:45'
+        ];
+```
+
+> Creamos el archivo `profile.blade.php` en la carpeta `resources\views\users\profile.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+
+@section('title', 'Perfil de Usuario')
+
+@section('content')
+    <main class="container center_container flex-column">
+        @include('layouts.components.alert')
+        <form action="{{ request()->routeIs('profile.crate') ? route('profile.store') : route('profile.update')}}" method="post">
+            @csrf
+            @if (request()->routeIs('profile.edit'))
+                @method('put')
+            @endif
+            @include('users.partials.form_profile')
+        </form>
+    </main>
+@endsection
+```
+
+> Creamos el archivo `alert.blade.php` en la carpeta `resources\views\layouts\components\alert.blade.php` y escribimos lo siguiente.
+
+```php
+@if (session('message'))
+    <x-alert class="mb-2" type="{{ session('message')['type'] }}">
+        <x-slot name="title">
+            {{ session('message')['title'] }}
+        </x-slot>
+        {{ session('message')['message'] }}
+    </x-alert>
+@endif
+```
+
+> Creamos el archivo `form_profile.blade.php` en la carpeta `resources\views\users\partials\form_profile.blade.php` y escribimos lo siguiente.
+
+```php
+<div class="card" style="width: 18rem;">
+    <div class="card-header text-center">
+        <h5>
+            {{ Route::currentRouteName() == 'profile.edit' ? 'Editar perfil' : 'Crear perfil' }}
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="mb-0">
+            <label class="form-label">Titulo:</label>
+            <input type="text" class="form-control" placeholder="Diseñador"
+                value="{{ Route::currentRouteName() == 'profile.edit' ? old('title', $profile->title) : old('title') }}" name="title">
+            @error('title')
+                <small class="text-danger">*{{ $message }}</small>
+            @enderror
+        </div>
+        <div class="mb-0">
+            <label class="form-label">Biografia:</label>
+            <textarea class="form-control" rows="3" name="biography"> {{ Route::currentRouteName() == 'profile.edit' ? old('biography', $profile->biography) : old('biography') }}</textarea>
+            @error('biography')
+                <small class="text-danger">*{{ $message }}</small>
+            @enderror
+        </div>
+        <div class="mb-0">
+            <label class="form-label">Sitio web:</label>
+            <input type="text" class="form-control" placeholder="Desarrollo web"
+                value="{{ Route::currentRouteName() == 'profile.edit' ? old('website', $profile->website) : old('website') }}" name="website">
+            @error('website')
+                <small class="text-danger">*{{ $message }}</small>
+            @enderror
+        </div>
+    </div>
+    <div class="card-footer text-center">
+        <button type="submit"
+            class="btn btn-primary">{{ Route::currentRouteName() == 'profile.edit' ? 'Editar Perfil' : 'Crear Perfil' }}</button>
+    </div>
+</div>
+```
+
+> Abrimos el archivo `header.blade.php` en la carpeta `resources\views\layouts\partials\header.blade.php` y re-escribimos.
+
+```php
+@php
+    $links_pages = [
+        [
+            'name' => 'Home',
+            'route' => route('home'),
+            'active' => request()->routeIs('home') ? 'active disabled' : '',
+        ],
+        [
+            'name' => 'Cursos',
+            'route' => route('cursos.index'),
+            'active' => request()->routeIs('cursos.*') ? 'active' : '',
+        ],
+        [
+            'name' => 'Nosotros',
+            'route' => route('nosotros'),
+            'active' => request()->routeIs('nosotros') ? 'active disabled' : '',
+        ],
+        [
+            'name' => 'Contáctanos',
+            'route' => route('contactanos.index'),
+            'active' => request()->routeIs('contactanos.*') ? 'active disabled' : '',
+        ],
+    ];
+    $links_users = [
+        [
+            'name' => 'Perfil',
+            'route' => ! empty( auth()->user()->profile) ? route('profile.edit') : route('profile.create'),
+            'active' => request()->routeIs('profile.*') ? 'active disabled' : '',
+        ],
+        [
+            'name' => 'Cerrar Sesion',
+            'route' => route('logout'),
+            'active' => '',
+        ],
+    ];
+    $links_auths = [
+        [
+            'name' => 'Acceso',
+            'route' => route('login'),
+            'active' => request()->routeIs('login') ? 'active disabled' : '',
+        ],
+        [
+            'name' => 'Registrarse',
+            'route' => route('register.index'),
+            'active' => request()->routeIs('register.*') ? 'active disabled' : '',
+        ],
+    ];
+@endphp
+<header class="bg-light border-bottom">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand">Laravel 10</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse d-flex-lg justify-content-lg-between" id="navbarNav">
+                <ul class="navbar-nav">
+                    @foreach ($links_pages as $link_page)
+                        <li class="nav-item">
+                            <a class="nav-link {{ $link_page['active'] }}" aria-current="page"
+                                href="{{ $link_page['route'] }}">{{ $link_page['name'] }}</a>
+                        </li>
+                    @endforeach
+                </ul>
+                <hr class="hidden-lg">
+                @auth
+                    <ul class="navbar-nav">
+                        <li class="nav-link d-none d-lg-block">
+                            <a href="#" class="nav-link dropdown-toggle" data-bs-display="static"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ auth()->user()->name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                @foreach ($links_users as $link_user)
+                                    <li class="nav-item">
+                                        <a href="{{ $link_user['route'] }}"
+                                            class="nav-link dropdown-item {{ $link_user['active'] }}">{{ $link_user['name'] }}</a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </li>
+                        <ul class="navbar-nav d-lg-none">
+                            @foreach ($links_users as $link_user)
+                                <li class="nav-item">
+                                    <a class="nav-link {{ $link_user['active'] }}" aria-current="page"
+                                        href="{{ $link_user['route'] }}">{{ $link_user['name'] }}</a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </ul>
+                @else
+                    <ul class="navbar-nav">
+                        @foreach ($links_auths as $link_auth)
+                            <li class="nav-item">
+                                <a class="nav-link {{ $link_auth['active'] }}" aria-current="page"
+                                    href="{{ $link_auth['route'] }}">{{ $link_auth['name'] }}</a>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endauth
+            </div>
+        </div>
+    </nav>
+</header>
+```
+
+> Abrimos el archivo `Profile.php` en la carpeta `app\Models\Profile.php` y añadimos lo siguiente.
+
+```php
+    protected $fillable = [
+        'title',
+        'biography',
+        'website',
+    ];
+```
+
+> Abrimos el archivo `ProfileController.php` en la carpeta `app\Http\Controllers\ProfileController.php` y añadimos lo siguiente.
+
+```php
+    public function create()
+    {
+        return view('users.profile');
+    }
+    public function store(ProfileRequest $request)
+    {
+        try {
+            $user = User::find(auth()->user()->id);
+            $profile = new Profile($request->all());
+            $user->profile()->save($profile);
+            return redirect()
+                ->route('profile.edit')
+                ->with('message', [
+                    'type' => 'success',
+                    'title' => 'Éxito !',
+                    'message' => 'El perfil a sido guardado correctamente.',
+                ]);
+        } catch (\Throwable $th) {
+            return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
+    }
+    public function edit()
+    {
+        $profile = auth()->user()->profile;
+        return view('users.profile', compact('profile'));
+
+    }
+    public function update(ProfileRequest $request)
+    {
+        try {
+            $user = User::find(auth()->user()->id);
+            $profile = $user->profile;
+            $profile->update($request->all());
+            return back()->with('message', [
+                'type' => 'success',
+                'title' => 'Éxito !',
+                'message' => 'El perfil a sido actualizado correctamente.',
+            ]);
+        } catch (\Throwable $th) {
+            return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
+    }
+```
+
+> Abrimos el archivo `ProfileController.php` en la carpeta `app\Http\Controllers\ProfileController.php` y añadimos lo siguiente
+
+```php
+Route::controller(ProfileController::class)->group(function () {
+    Route::get('profile/create',  'create')->name('profile.create');
+    Route::post('profile/create', 'store')->name('profile.store');
+    Route::get('profile', 'edit')->name('profile.edit');
+    Route::put('profile', 'update')->name('profile.update');
+})->middleware(['auth', 'auth.session', 'verified']);
 ```
 
 [Subir](#top)

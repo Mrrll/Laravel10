@@ -6,6 +6,7 @@ use App\Http\Controllers\ContactanosController;
 use App\Http\Controllers\CursoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use App\Http\Requests\EmailVerificationRequest;
 use Illuminate\Support\Facades\Password;
@@ -121,10 +122,7 @@ Route::post('/forgot-password', function (Request $request) {
         : back()->withErrors(['email' => __($status)]);
 })->middleware('guest')->name('password.email');
 
-Route::get('/reset-password/{token}', function (
-    Request $request,
-    string $token
-) {
+Route::get('/reset-password/{token}', function (Request $request, string $token) {
     return view('auth.reset-password', [
         'token' => $token,
         'email' => (string) $request->query('email'),
@@ -166,3 +164,11 @@ Route::get('notificacion', function () {
     $user->notify(new NewRegistered($user));
     return 'Mensaje enviado!';
 });
+
+// Rutas Perfiles
+Route::controller(ProfileController::class)->group(function () {
+    Route::get('profile/create',  'create')->name('profile.create');
+    Route::post('profile/create', 'store')->name('profile.store');
+    Route::get('profile', 'edit')->name('profile.edit');
+    Route::put('profile', 'update')->name('profile.update');
+})->middleware(['auth', 'auth.session', 'verified']);
