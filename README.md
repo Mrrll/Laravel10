@@ -3494,7 +3494,7 @@ return true;
     }
 ```
 
-> Abrimos el archivo `ProfileController.php` en la carpeta `app\Http\Controllers\ProfileController.php` y añadimos lo siguiente
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y añadimos lo siguiente
 
 ```php
 Route::controller(ProfileController::class)->group(function () {
