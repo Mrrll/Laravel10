@@ -62,6 +62,7 @@
 - [Notificaciones](#item25)
 - [Relación uno a uno (One To One)](#item26)
 - [Interfaz Perfil de usuario](#item27)
+- [Relación uno a muchos (One To Many)](#item28)
 
 <a name="item1"></a>
 
@@ -3192,7 +3193,7 @@ php artisan migrate
 >Abrimos el archivo `Profile.php` en la carpeta `app\Models\Profile.php` y añadimos lo siguiente.
 
 ```php
-    // Relación uno a uno inverso
+    // Relación uno a uno (inversa)
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -3503,6 +3504,99 @@ Route::controller(ProfileController::class)->group(function () {
     Route::get('profile', 'edit')->name('profile.edit');
     Route::put('profile', 'update')->name('profile.update');
 })->middleware(['auth', 'auth.session', 'verified']);
+```
+
+[Subir](#top)
+
+<a name="item28"></a>
+
+## Relación uno a muchos (One To Many)
+
+###### Creación del modelo Category y la migración categories
+
+> Typee: en la Consola:
+```console
+php artisan make:model Category -m
+```
+
+**`Nota :` Podemos crear una Migración,Controlador,Seeder,Factory `-mcsf` y para crear todo `-a`.**
+
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_categories_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_categories_table.php` en la función `up` y añadimos lo siguiente.
+
+```php
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name',45)->unique();
+            $table->timestamps();
+        });
+```
+
+###### Creación del modelo Post y la migración Posts
+
+> Typee: en la Consola:
+```console
+php artisan make:model Post -m
+```
+
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_posts_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_posts_table.php` en la función `up` y añadimos lo siguiente.
+
+```php
+        Schema::create('posts', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('slug');
+            $table->text('body');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('category_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
+            $table->timestamps();
+        });
+```
+
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos lo siguiente.
+
+```php
+    // Relación uno a muchos
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+```
+
+> Abrimos el archivo `Post.php` en la carpeta `app\Models\Post.php` y añadimos lo siguiente.
+
+```php
+    // Relación uno a muchos (inversa)
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+```
+
+> Abrimos el archivo `Category.php` en la carpeta `app\Models\Category.php` y añadimos lo siguiente.
+
+```php
+    // Relación uno a muchos
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+```
+
+> Abrimos el archivo `Post.php` en la carpeta `app\Models\Post.php` y añadimos lo siguiente.
+
+```php
+    // Relación uno a muchos (inversa)
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+```
+
+> Typee: en la Consola:
+```console
+php artisan migrate
 ```
 
 [Subir](#top)

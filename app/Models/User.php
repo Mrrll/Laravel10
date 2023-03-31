@@ -57,4 +57,9 @@ class User extends Authenticatable implements MustVerifyEmail
         // return $this->hasOne('App\Models\Profile', 'foreing_key', 'local_key' );
         return $this->hasOne(Profile::class);
     }
+    // Relación uno a muchos
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 }

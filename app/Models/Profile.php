@@ -20,7 +20,7 @@ class Profile extends Model
         'website',
     ];
 
-    // Relación uno a uno inverso
+    // Relación uno a uno (inversa)
     public function user()
     {
         return $this->belongsTo(User::class);
