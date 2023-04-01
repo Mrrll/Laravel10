@@ -4,6 +4,7 @@
             {{ Route::currentRouteName() == 'profile.edit' ? 'Editar perfil' : 'Crear perfil' }}
         </h5>
     </div>
+    <input type="hidden" name="user_id" value="{{auth()->user()->id}}">
     <div class="card-body">
         <div class="mb-0">
             <label class="form-label">Titulo:</label>

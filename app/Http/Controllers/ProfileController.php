@@ -16,9 +16,7 @@ class ProfileController extends Controller
     public function store(ProfileRequest $request)
     {
         try {
-            $user = User::find(auth()->user()->id);
-            $profile = new Profile($request->all());
-            $user->profile()->save($profile);
+            Profile::create($request->all());
             return redirect()
                 ->route('profile.edit')
                 ->with('message', [
@@ -34,17 +32,13 @@ class ProfileController extends Controller
             ]);
         }
     }
-    public function edit()
+    public function edit(Profile $profile)
     {
-        $profile = auth()->user()->profile;
         return view('users.profile', compact('profile'));
-
     }
-    public function update(ProfileRequest $request)
+    public function update(ProfileRequest $request, Profile $profile)
     {
         try {
-            $user = User::find(auth()->user()->id);
-            $profile = $user->profile;
             $profile->update($request->all());
             return back()->with('message', [
                 'type' => 'success',

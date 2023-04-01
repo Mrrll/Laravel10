@@ -20,15 +20,20 @@
             'route' => route('contactanos.index'),
             'active' => request()->routeIs('contactanos.*') ? 'active disabled' : '',
         ],
+        [
+            'name' => 'Blog',
+            'route' => route('blog.index'),
+            'active' => request()->routeIs('blog.*') ? 'active' : '',
+        ],
     ];
     $links_users = [
         [
             'name' => 'Perfil',
-            'route' => ! empty( auth()->user()->profile) ? route('profile.edit') : route('profile.create'),
+            'route' => ! empty( auth()->user()->profile) ? route('profile.edit', auth()->user()->profile) : route('profile.create'),
             'active' => request()->routeIs('profile.*') ? 'active disabled' : '',
         ],
         [
-            'name' => 'Cerrar Sesion',
+            'name' => 'Cerrar Sesión',
             'route' => route('logout'),
             'active' => '',
         ],

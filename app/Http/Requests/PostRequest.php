@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProfileRequest extends FormRequest
+class PostRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,8 +27,15 @@ class ProfileRequest extends FormRequest
     {
         return [
             'title' => 'required|max:45' ,
-            'biography' => 'required|min:5',
-            'website' => 'required|max:45'
+            'body' => 'required|min:5',
+            'category_id' => 'required|integer',
+            'user_id' => 'required|integer'
+        ];
+    }
+    public function messages()
+    {
+        return [
+            'category_id.integer' => 'Debe de seleccionar una categoría.'
         ];
     }
 }

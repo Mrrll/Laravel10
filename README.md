@@ -63,6 +63,7 @@
 - [Relación uno a uno (One To One)](#item26)
 - [Interfaz Perfil de usuario](#item27)
 - [Relación uno a muchos (One To Many)](#item28)
+- [Interfaz Posts](#item29)
 
 <a name="item1"></a>
 
@@ -348,7 +349,8 @@ return view('cursos.index');
 <body>
     <h1>Bienvenido al curso <?php echo $curso; ?></h1>
 </body>
-</html>```
+</html>
+```
 
 > Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos dentro de la función `show`.
 
@@ -3232,7 +3234,11 @@ php artisan make:request ProfileRequest
 > Abrimos el archivo `ProfileRequest` de la carpeta `app\Http\Requests\ProfileRequest.php` y en la función `authorize` cambiamos lo siguiente.
 
 ```php
-return true;
+        if ($this->user_id == auth()->user()->id) {
+            return true;
+        } else {
+            return false;
+        }
 ```
 
 > Y en la función `rules` escribimos lo siguiente.
@@ -3255,7 +3261,12 @@ return true;
 @section('content')
     <main class="container center_container flex-column">
         @include('layouts.components.alert')
-        <form action="{{ request()->routeIs('profile.crate') ? route('profile.store') : route('profile.update')}}" method="post">
+         @php
+            if (empty($profile)) {
+                $profile = '';
+            }
+        @endphp
+        <form action="{{ request()->routeIs('profile.crate') ? route('profile.store') : route('profile.update', $profile)}}" method="post">
             @csrf
             @if (request()->routeIs('profile.edit'))
                 @method('put')
@@ -3288,6 +3299,7 @@ return true;
             {{ Route::currentRouteName() == 'profile.edit' ? 'Editar perfil' : 'Crear perfil' }}
         </h5>
     </div>
+    <input type="hidden" name="user_id" value="{{auth()->user()->id}}">
     <div class="card-body">
         <div class="mb-0">
             <label class="form-label">Titulo:</label>
@@ -3349,11 +3361,11 @@ return true;
     $links_users = [
         [
             'name' => 'Perfil',
-            'route' => ! empty( auth()->user()->profile) ? route('profile.edit') : route('profile.create'),
+            'route' => ! empty( auth()->user()->profile) ? route('profile.edit', auth()->user()->profile) : route('profile.create'),
             'active' => request()->routeIs('profile.*') ? 'active disabled' : '',
         ],
         [
-            'name' => 'Cerrar Sesion',
+            'name' => 'Cerrar Sesión',
             'route' => route('logout'),
             'active' => '',
         ],
@@ -3477,8 +3489,6 @@ return true;
     public function update(ProfileRequest $request)
     {
         try {
-            $user = User::find(auth()->user()->id);
-            $profile = $user->profile;
             $profile->update($request->all());
             return back()->with('message', [
                 'type' => 'success',
@@ -3495,15 +3505,10 @@ return true;
     }
 ```
 
-> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y añadimos lo siguiente
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` en la grupo de rutas protegidas `['middleware' => ['auth', 'auth.session', 'verified']]` y añadimos lo siguiente
 
 ```php
-Route::controller(ProfileController::class)->group(function () {
-    Route::get('profile/create',  'create')->name('profile.create');
-    Route::post('profile/create', 'store')->name('profile.store');
-    Route::get('profile', 'edit')->name('profile.edit');
-    Route::put('profile', 'update')->name('profile.update');
-})->middleware(['auth', 'auth.session', 'verified']);
+Route::resource('profile', ProfileController::class)->except(['index', 'show', 'destroy']);
 ```
 
 [Subir](#top)
@@ -3544,7 +3549,7 @@ php artisan make:model Post -m
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('slug');
+            $table->string('slug')->unique();
             $table->text('body');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('category_id')->nullable();
@@ -3594,9 +3599,381 @@ php artisan make:model Post -m
     }
 ```
 
+> Y añadimos lo siguiente.
+
+```php
+    protected $guarded = [];
+
+    // Buscar modelo por el campo slug
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+```
+
 > Typee: en la Consola:
 ```console
 php artisan migrate
 ```
+
+[Subir](#top)
+
+<a name="item29"></a>
+
+## Interfaz Posts
+
+###### Creamos seeder de categorías
+
+> Typee: en la Consola:
+```console
+php artisan make:seeder CategoriesSeeder
+```
+
+> Abrimos el archivo `CategoriesSeeder.php` en la carpeta `database\seeders\CategoriesSeeder.php` en la función `run` y escribimos lo siguiente.
+
+```php
+        DB::table('categories')->insert([
+            'name' => 'Desarrollador web',
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+        ]);
+        DB::table('categories')->insert([
+            'name' => 'Diseño web',
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+        ]);
+```
+
+> Y importamos las clases siguientes.
+
+```php
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+```
+
+> Abrimos el archivo `DatabaseSeeder.php` en la carpeta `database\seeders\DatabaseSeeder.php` en la función `run` y añadimos lo siguiente.
+
+```php
+$this->call(CategoriesSeeder::class);
+```
+
+> Typee: en la Consola:
+```console
+php artisan migrate:fresh --seed
+```
+
+###### Creamos el controlador de Post
+
+> Typee: en la Consola:
+```console
+php artisan make:controller PostController --resource
+```
+
+**`Nota :` Creamos el controlador con los métodos (index,create,store,show,edit,update,destroy) con la opción `--resource`.**
+
+> Abrimos el archivo `PostController.php` en la carpeta `app\Http\Controllers\PostController.php` y escribimos lo siguiente.
+
+```php
+    public function index()
+    {
+        $posts = Post::orderBy('id', 'desc')->paginate(10);
+        return view('blog.index', compact('posts'));
+    }
+    public function create()
+    {
+        $categories = Category::all();
+        return view('blog.create', compact('categories'));
+    }
+    public function store(PostRequest $request)
+    {
+        try {
+            $request->merge(['slug' => Str::slug($request['title'], '-')]);
+            Post::create($request->all());
+            return redirect()
+                ->route('blog.index')
+                ->with('message', [
+                    'type' => 'success',
+                    'title' => 'Éxito !',
+                    'message' => 'El post a sido guardado correctamente.',
+                ]);
+        } catch (\Throwable $th) {
+            return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
+    }
+    public function show(Post $post)
+    {
+        return view('blog.show', compact('post'));
+    }
+    public function edit(Post $post)
+    {
+        $categories = Category::all();
+        return view('blog.edit', compact(['post','categories']));
+    }
+    public function update(PostRequest $request, Post $post)
+    {
+        try {
+            $request->merge(['slug' => Str::slug($request['title'], '-')]);
+            $post->update($request->all());
+            return redirect()
+                ->route('blog.index')
+                ->with('message', [
+                    'type' => 'success',
+                    'title' => 'Éxito !',
+                    'message' => 'El post a sido actualizado correctamente.',
+                ]);
+        } catch (\Throwable $th) {
+            return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
+    }
+    public function destroy(Post $post)
+    {
+        try {
+            $post->delete();
+            return redirect()
+            ->route('blog.index')
+            ->with('message', [
+                    'type' => 'info',
+                    'title' => 'Éxito !',
+                    'message' => 'El post a sido eliminado correctamente.',
+                ]);
+        } catch (\Throwable $th) {
+             return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
+    }
+```
+
+###### Creamos el request de Post
+
+> Typee: en la Consola:
+```console
+php artisan make:request PostRequest
+```
+
+> Abrimos el archivo `PostRequest.php` en la carpeta `app\Http\Requests\PostRequest.php` en la función `authorize` y escribimos lo siguiente.
+
+```php
+        if ($this->user_id == auth()->user()->id) {
+            return true;
+        } else {
+            return false;
+        }
+```
+
+> Y en la función `rules` escribimos lo siguiente.
+
+```php
+        return [
+            'title' => 'required|max:45' ,
+            'body' => 'required|min:5',
+            'category_id' => 'required|integer',
+            'user_id' => 'required|integer'
+        ];
+```
+> Y en la función añadimos lo siguiente.
+
+```php
+    public function messages()
+    {
+        return [
+            'category_id.integer' => 'Debe de seleccionar una categoría.'
+        ];
+    }
+```
+
+**`Nota :` El método message es para indicar una frase de respuesta según la validación.**
+
+###### Creamos las vistas del Post
+
+> Abrimos el archivo `index.blade.php` en la carpeta `resources\views\blog\index.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+
+@section('title', 'Blog')
+
+@section('content')
+    <main class="container-lg">
+        @include('layouts.components.alert')
+        <h1>Bienvenido a los blogs</h1><a class="btn btn-success" href="{{ route('blog.create') }}">Crear Post</a>
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 d-flex justify-content-center">
+            @if (!empty($posts))
+                @foreach ($posts as $post)
+                    <div class="col m-2" style="padding-left: 0px;padding-right: 0px;">
+                        <div class="card" style="width: 100%">
+                            {{-- <img src="..." class="card-img-top" alt="..."> --}}
+                            <svg class="bd-placeholder-img card-img-top" width="100%" height="100"
+                                xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Capa de imagen"
+                                preserveAspectRatio="xMidYMid slice" focusable="false">
+                                <title>Placeholder</title>
+                                <rect width="100%" height="100%" fill="#868e96"></rect><text x="30%"
+                                    y="50%" fill="#dee2e6" dy=".3em">Falta imagen</text>
+                            </svg>
+                            <div class="card-body" style="max-width:400px">
+                                <h5 class="card-title">{{ $post->title }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{ $post->category->name }}</h6>
+                                <p class="card-text text-truncate">
+                                    {{ $post->body }}
+                                </p>
+                                <a href="{{ route('blog.show', $post) }}" class="btn btn-primary">Leer mas...</a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+                {{ $posts->links() }}
+            @else
+                <h2>No hay ningún post en estos momentos.</h2>
+            @endif
+        </div>
+    </main>
+@endsection
+```
+
+> Abrimos el archivo `form.blade.php` en la carpeta `resources\views\blog\partials\form.blade.php` y escribimos lo siguiente.
+
+```php
+<div class="card" style="width: 18rem;">
+    <div class="card-header text-center">
+        <h5>
+            {{ Route::currentRouteName() == 'blog.edit' ? 'Editar post' : 'Crear post' }}
+        </h5>
+    </div>
+    <div class="card-body">
+        <input type="hidden" name="user_id" value="{{auth()->user()->id}}">
+        <div class="mb-0">
+            <label class="form-label">Titulo:</label>
+            <input type="text" class="form-control" placeholder="Diseñador"
+                value="{{ Route::currentRouteName() == 'blog.edit' ? old('title', $post->title) : old('title') }}"
+                name="title">
+            @error('title')
+                <small class="text-danger">*{{ $message }}</small>
+            @enderror
+        </div>
+        <div class="mb-0">
+            <label class="form-label">Cuerpo:</label>
+            <textarea class="form-control" rows="3" name="body"> {{ Route::currentRouteName() == 'blog.edit' ? old('body', $post->body) : old('body') }}</textarea>
+            @error('body')
+                <small class="text-danger">*{{ $message }}</small>
+            @enderror
+        </div>
+        <div class="mb-0">
+            <label class="form-label">Categoria:</label>
+            <select class="form-select form-select-sm" aria-label="Ejemplo de .form-select-sm" name="category_id">
+                <option selected>Elige una categoría</option>
+                @foreach ($categories as $category)
+                    <option value="{{$category->id}}">{{$category->name}} </option>
+                @endforeach
+            </select>
+            @error('category_id')
+                <small class="text-danger">*{{ $message }}</small>
+            @enderror
+        </div>
+    </div>
+    <div class="card-footer text-center">
+        <button type="submit"
+            class="btn btn-primary">{{ Route::currentRouteName() == 'blog.edit' ? 'Editar blog' : 'Crear blog' }}</button>
+            <a class="btn btn-danger" href="{{  Route::currentRouteName() == 'blog.edit' ? route('blog.show', $post) : route('blog.index') }}">Cancelar</a>
+    </div>
+</div>
+```
+
+> Abrimos el archivo `create.blade.php` en la carpeta `resources\views\blog\create.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+
+@section('title', 'Crear Post')
+
+@section('content')
+    <main class="container center_container flex-column">
+        @include('layouts.components.alert')
+        <form action="{{ route('blog.create') }}" method="post">
+            @csrf
+            @include('blog.partials.form')
+        </form>
+    </main>
+@endsection
+```
+
+> Abrimos el archivo `show.blade.php` en la carpeta `resources\views\blog\show.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+
+@section('title', 'Post | ' . $post->title)
+@section('content')
+    <main class="container-lg">
+        @include('layouts.components.alert')
+        <div class="card">
+            <div class="card-header text-center">
+                Bienvenido al post {{ $post->title }}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ $post->category->name }}</h5>
+                <p class="card-text">{{ $post->body }} </p>
+            </div>
+            <div class="card-footer text-muted d-flex justify-content-between">
+                <div class="row row-cols-3">
+                    <a class="btn btn-warning" href="{{ route('blog.edit', $post) }}">Editar</a>
+                    <form action="{{ route('blog.destroy', $post) }}" method="post">
+                        @csrf
+                        @method('delete')
+                        <button class="btn btn-danger text-nowrap" type="submit">Eliminar Post</button>
+                    </form>
+                </div>
+                <a class="btn btn-primary" href="{{ route('blog.index', $post) }}">Volver</a>
+            </div>
+        </div>
+    </main>
+@endsection
+```
+
+> Abrimos el archivo `edit.blade.php` en la carpeta `resources\views\blog\edit.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.plantilla')
+
+@section('title', 'Editar Post')
+
+@section('content')
+    <main class="container center_container flex-column">
+        @include('layouts.components.alert')
+        <form action="{{ route('blog.update', $post) }}" method="post">
+            @csrf
+            @method('put')
+            @include('blog.partials.form')
+        </form>
+    </main>
+@endsection
+```
+
+> Abrimos el archivo `header.blade.php` en la carpeta `resources\views\layouts\partials\header.blade.php` en el array `$links_pages` y escribimos lo siguiente.
+
+```php
+        [
+            'name' => 'Blog',
+            'route' => route('blog.index'),
+            'active' => request()->routeIs('blog.*') ? 'active' : '',
+        ],
+```
+
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` en la grupo de rutas protegidas `['middleware' => ['auth', 'auth.session', 'verified']]` y escribimos lo siguiente.
+
+```php
+Route::resource('blog', PostController::class)->parameters(['blog' => 'post']);
+```
+
+**`Nota :` Indicamos el método `parameters` para indicar el nombre del modelo que queremos referenciar.**
 
 [Subir](#top)

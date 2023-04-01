@@ -5,7 +5,12 @@
 @section('content')
     <main class="container center_container flex-column">
         @include('layouts.components.alert')
-        <form action="{{ request()->routeIs('profile.crate') ? route('profile.store') : route('profile.update')}}" method="post">
+        @php
+            if (empty($profile)) {
+                $profile = '';
+            }
+        @endphp
+        <form action="{{ request()->routeIs('profile.crate') ? route('profile.store') : route('profile.update', $profile) }}" method="post">
             @csrf
             @if (request()->routeIs('profile.edit'))
                 @method('put')

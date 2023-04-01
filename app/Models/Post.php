@@ -9,6 +9,13 @@ class Post extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
+    // Buscar modelo por el campo slug
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
     // Relación uno a muchos (inversa)
     public function user()
     {

@@ -6,6 +6,7 @@ use App\Http\Controllers\ContactanosController;
 use App\Http\Controllers\CursoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use App\Http\Requests\EmailVerificationRequest;
@@ -59,13 +60,11 @@ Route::controller(LoginController::class)->group(function () {
 
 // Rutas Protegidas
 
-Route::group(
-    ['middleware' => ['auth', 'auth.session', 'verified']],
-    function () {
-        Route::get('logout', [LoginController::class, 'logout'])->name(
-            'logout'
-        );
+Route::group(['middleware' => ['auth', 'auth.session', 'verified']],function () {
+        Route::get('logout', [LoginController::class, 'logout'])->name('logout');
         Route::resource('cursos', CursoController::class);
+        Route::resource('profile', ProfileController::class)->except(['index', 'show', 'destroy']);
+        Route::resource('blog', PostController::class)->parameters(['blog' => 'post']);
     }
 );
 
@@ -166,9 +165,20 @@ Route::get('notificacion', function () {
 });
 
 // Rutas Perfiles
-Route::controller(ProfileController::class)->group(function () {
-    Route::get('profile/create',  'create')->name('profile.create');
-    Route::post('profile/create', 'store')->name('profile.store');
-    Route::get('profile', 'edit')->name('profile.edit');
-    Route::put('profile', 'update')->name('profile.update');
-})->middleware(['auth', 'auth.session', 'verified']);
+// Route::controller(ProfileController::class)->group(function () {
+//     Route::get('profile/create',  'create')->name('profile.create');
+//     Route::post('profile/create', 'store')->name('profile.store');
+//     Route::get('profile', 'edit')->name('profile.edit');
+//     Route::put('profile', 'update')->name('profile.update');
+// })->middleware(['auth', 'auth.session', 'verified']);
+
+// Rutas Blog
+// Route::controller(PostController::class)->group(function (){
+//     Route::get('blog', 'index')->name('blog.index');
+//     Route::get('blog/create', 'create')->name('blog.create');
+//     Route::post('blog/create', 'store')->name('blog.store');
+//     Route::get('blog/{post}', 'show')->name('blog.show');
+//     Route::get('blog/{post}/edit', 'edit')->name('blog.edit');
+//     Route::put('blog/{post}', 'update')->name('blog.update');
+//     Route::delete('blog/{post}', 'destroy')->name('blog.destroy');
+// });
