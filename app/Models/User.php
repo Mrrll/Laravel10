@@ -67,4 +67,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Video::class);
     }
+    // Relación muchos a muchos
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
 }

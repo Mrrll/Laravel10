@@ -64,6 +64,7 @@
 - [Interfaz Perfil de usuario](#item27)
 - [Relación uno a muchos (One To Many)](#item28)
 - [Interfaz Posts](#item29)
+- [Relación muchos a muchos (Many To Many)](#item30)
 
 <a name="item1"></a>
 
@@ -4027,5 +4028,72 @@ Route::resource('blog', PostController::class)->parameters(['blog' => 'post']);
 ```
 
 **`Nota :` Indicamos el método `parameters` para indicar el nombre del modelo que queremos referenciar.**
+
+[Subir](#top)
+
+<a name="item30"></a>
+
+## Relación muchos a muchos (Many To Many)
+
+###### Creación del modelo Rol y la migración Roles
+
+> Typee: en la Consola:
+```console
+php artisan make:model Role -m
+```
+
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_roles_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_roles_table.php` en la función `up` y añadimos lo siguiente.
+
+```php
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 45)->unique();
+            $table->timestamps();
+        });
+```
+
+###### Creación tabla pivote de la relación muchos a muchos.
+
+> Typee: en la Consola:
+```console
+php artisan make:migration create_role_user_table
+```
+
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_role_user_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_role_user_table.php` en la función `up` y añadimos lo siguiente.
+
+```php
+        Schema::create('role_user', function (Blueprint $table) {
+            $table->unsignedBigInteger('role_id');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        });
+```
+
+> Typee: en la Consola:
+```console
+php artisan migrate
+```
+
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos lo siguiente.
+
+```php
+    // Relación muchos a muchos
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+```
+
+> Abrimos el archivo `Role.php` en la carpeta `app\Models\Role.php` y añadimos lo siguiente.
+
+```php
+    protected $guarded = [];
+    // Relación muchos a muchos
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+```
 
 [Subir](#top)
