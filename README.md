@@ -3616,6 +3616,58 @@ php artisan make:model Post -m
 php artisan migrate
 ```
 
+###### Creación del modelo Vídeo y la migración Vídeos
+
+> Typee: en la Consola:
+```console
+php artisan make:model Video -m
+```
+
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_videos_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_videos_table.php` en la función `up` y escribimos lo siguiente.
+
+```php
+        Schema::create('videos', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 45);
+            $table->text('description');
+            $table->string('url',45);
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->timestamps();
+        });
+```
+
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos lo siguiente.
+
+```php
+    public function videos()
+    {
+        return $this->hasMany(Video::class);
+    }
+```
+
+> Abrimos el archivo `Video.php` en la carpeta `app\Models\Video.php` y añadimos lo siguiente.
+
+```php
+    protected $guarded = [];
+
+    // Buscar modelo por el campo slug
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+    // Relación uno a muchos (inversa)
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+```
+
+> Typee: en la Consola:
+```console
+php artisan migrate
+```
+
 [Subir](#top)
 
 <a name="item29"></a>
