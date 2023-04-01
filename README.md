@@ -65,6 +65,7 @@
 - [Relación uno a muchos (One To Many)](#item28)
 - [Interfaz Posts](#item29)
 - [Relación muchos a muchos (Many To Many)](#item30)
+- [Agregando iconos (Fontawesome)](#item31)
 
 <a name="item1"></a>
 
@@ -4095,5 +4096,35 @@ php artisan migrate
         return $this->belongsToMany(User::class);
     }
 ```
+
+[Subir](#top)
+
+<a name="item31"></a>
+
+## Agregando iconos (Fontawesome)
+
+> Typee: en la Consola:
+```console
+npm install --save @fortawesome/fontawesome-free
+```
+
+> Typee: en la Consola:
+```console
+npm install
+```
+
+> Abrimos el archivo `app.scss` en la carpeta `resources\scss\app.scss` y añadimos lo siguiente.
+
+```scss
+@import "@fortawesome/fontawesome-free/css/all.css";
+```
+
+> Utilizamos esta instrucción para mostrar los iconos.
+
+```php
+<i class="fa-solid fa-user"></i>
+```
+
+**`Nota :` Mas iconos [Lista de Iconos](https://fontawesome.com/search?o=r&m=free).**
 
 [Subir](#top)
