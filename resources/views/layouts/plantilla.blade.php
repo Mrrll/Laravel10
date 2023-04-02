@@ -7,7 +7,7 @@
     <title>@yield('title')</title>
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 </head>
-<body>
+<body class="body">
     @include('layouts.partials.header')
     @yield('content')
     @include('layouts.partials.footer')
