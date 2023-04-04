@@ -66,6 +66,7 @@
 - [Interfaz Posts](#item29)
 - [Relación muchos a muchos (Many To Many)](#item30)
 - [Agregando iconos (Fontawesome)](#item31)
+- [Dashboard simple](#item32)
 
 <a name="item1"></a>
 
@@ -2507,17 +2508,19 @@ let $password2 = document.getElementById("pass2")
 let $pass2message = document.getElementById("pass2message")
 let timeout
 
-$password2.addEventListener('keydown', () => {
-  clearTimeout(timeout)
-  timeout = setTimeout(() => {
-    if ($password1.value == $password2.value) {
-        $pass2message.classList.replace("d-block", "d-none")
-    } else {
-        $pass2message.classList.replace("d-none", "d-block")
-    }
-    clearTimeout(timeout)
-  },1000)
-})
+if ($password2 != null) {
+    $password2.addEventListener('keydown', () => {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        if ($password1.value == $password2.value) {
+            $pass2message.classList.replace("d-block", "d-none")
+        } else {
+            $pass2message.classList.replace("d-none", "d-block")
+        }
+        clearTimeout(timeout)
+      },1000)
+    })
+}
 ```
 
 > Abrimos el archivo `app.js` de la carpeta `resources\js\app.js` y escribimos lo siguiente.
@@ -4268,6 +4271,1076 @@ npm install
         </div>
     </nav>
 </header>
+```
+
+[Subir](#top)
+
+<a name="item32"></a>
+
+## Dashboard simple
+
+###### Creamos un Layout del Dashboard
+
+> Creamos el archivo `dashboard.blade.php` en la carpeta `resources\views\layouts\dashboard.blade.php` y escribimos lo siguiente.
+
+```php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title')</title>
+    @vite(['resources/scss/app.scss', 'resources/js/app.js'])
+</head>
+<body class="body-dashboard">
+    @include('layouts.partials.header')
+    @include('layouts.partials.aside')
+    @yield('content-dashboard')
+    @include('layouts.partials.footer')
+</body>
+</html>
+```
+
+###### Cambiamos y añadimos algunos estilos
+
+> Abrimos el archivo `app.css` en la carpeta `resources\css\app.css` y escribimos lo siguiente.
+
+> En la clase `Body` lo dejamos de esta manera.
+
+```css
+.body {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    'header'
+    'main'
+    'footer';
+  min-height: 100vh;
+}
+```
+
+> Y añadimos las siguientes clases.
+
+```css
+.body-dashboard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    'aside header'
+    'aside main '
+    'footer footer';
+  min-height: 100vh;
+}
+
+.header-dashboard {
+  grid-area: header;
+}
+
+.aside-dashboard {
+  grid-area: aside;
+}
+
+.main-dashboard {
+  grid-area: main;
+}
+
+.footer-dashboard {
+  grid-area: footer;
+}
+
+@media (max-width: 576px) {
+  .body-dashboard {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+  }
+}
+.aside-first-grid {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  grid-template-rows: auto;
+  grid-template-areas:
+    'inptsearch btnsearch btnclose';
+}
+.inptsearch {
+  grid-area: inptsearch;
+}
+.btnsearch {
+  grid-area: btnsearch;
+}
+.btnclose {
+  grid-area: btnclose;
+  align-self: center;
+  justify-self: center;
+}
+.hover-link:hover{
+    background-color: #6c757d !important;
+}
+.dropdown-item:hover, .dropdown-item:focus {
+    background-color: #6c757d !important;
+}
+.btn-circle {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    border: solid 1px #6c757d !important;
+}
+.btn-circle:hover{
+    background-color: #6c757d !important;
+}
+```
+
+###### Creamos algunos componentes
+
+> Typee: en la Consola:
+```console
+php artisan make:component Aside
+```
+
+> Abrimos el archivo `Aside.php` en la carpeta `app\View\Components\Aside.php` y lo dejamos de la siguiente manera.
+
+```php
+<?php
+
+namespace App\View\Components;
+
+use Closure;
+use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
+
+class Aside extends Component
+{
+    public $links;
+    /**
+     * Create a new component instance.
+     */
+    public function __construct()
+    {
+        $this->links = [
+        [
+            'name' => 'Cursos',
+            'active' =>  '',
+            'icono' => 'fa-solid fa-book fa-lg',
+            'icono_color' => '#27aa94',
+            'name_collapse' => 'collapseHeightCursos',
+            'items' => [
+                [
+                    'name' => 'Mis Cursos',
+                    'route' => route('cursos.mycursos'),
+                    'active' =>  '',
+                    'icono' => 'fa-solid fa-book fa-lg',
+                    'icono_color' => '#27aa94',
+                ],
+                [
+                    'name' => 'Crear Cursos',
+                    'route' => route('cursos.create'),
+                    'active' =>  '',
+                    'icono' => 'fa-solid fa-book fa-lg',
+                    'icono_color' => '#27aa94',
+                ]
+            ]
+        ],
+        [
+            'name' => 'Blogs',
+            'active' =>  '',
+            'icono' => 'fa-solid fa-blog fa-lg',
+            'icono_color' => '#0ac720',
+            'name_collapse' => 'collapseHeightBlogs',
+            'items' => [
+                [
+                    'name' => 'Mis Post',
+                    'route' => route('blog.mypost'),
+                    'active' =>  '',
+                    'icono' => 'fa-solid fa-blog fa-lg',
+                    'icono_color' => '#0ac720',
+                ],
+                [
+                    'name' => 'Crear Post',
+                    'route' => route('blog.create'),
+                    'active' =>  '',
+                    'icono' => 'fa-solid fa-blog fa-lg',
+                    'icono_color' => '#0ac720',
+                ],
+            ]
+        ],
+    ];
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     */
+    public function render(): View|Closure|string
+    {
+        return view('components.aside');
+    }
+}
+```
+
+**`Nota :` En este archivo lo utilizaremos para crear los links de navegación del menu dashboard.**
+
+> Abrimos el archivo `aside.blade.php` en la carpeta `resources\views\components\aside.blade.php` y escribimos lo siguiente.
+
+```php
+<aside class="aside-dashboard bg-dark text-light d-none d-lg-block" id="aside_dashboard" style="width:80px;">
+    <div class="container-fluid">
+        {{-- Boton Cierre y Campo Busqueda  --}}
+        <form id="content_aside_1" class="d-none">
+            <div class="aside-first-grid mt-3">
+                <input class="form-control me-2 inptsearch" type="search" placeholder="Search" aria-label="Search"
+                    style="max-width: 150px">
+                <button class="btn btn-outline-success btnsearch" type="submit">Search</button>
+                <button type="button" class="btn-close btn-close-white btnclose ms-2" aria-label="Close"
+                    id="btn_close_aside"></button>
+            </div>
+        </form>
+        {{-- Boton menu --}}
+        <nav class="navbar navbar-dark d-block" id="content-btn-nav">
+            <button class="navbar-toggler" type="button" id="btn_open_aside">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </nav>
+        <hr>
+        {{-- Lista de links  --}}
+        <ul class="navbar-nav list-group">
+            <li class="nav-item">
+                {{-- Boton del link --}}
+                <div id="btn_link_dashboard" class="d-none">
+                    @foreach ($links as $link)
+                        <button class="btn btn-outline-secondary text-start mb-1" style="width: 100%;" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#{{ $link['name_collapse'] }}"
+                            aria-expanded="false" aria-controls="{{ $link['name_collapse'] }}" id="btn_link_dashboard">
+                            <i class="{{ $link['icono'] }}" style="color:{{ $link['icono_color'] }};"></i>
+                            <span>{{ $link['name'] }}</span>
+                        </button>
+                        {{-- Lista del colapsos --}}
+                        <ul class="dropdown-menu collapse collapse-vertical bg-dark" id="{{ $link['name_collapse'] }}">
+                            @foreach ($link['items'] as $item)
+                                <li>
+                                    <a href="{{ $item['route'] }}" class="dropdown-item text-white" type="button">
+                                        <i class="{{ $item['icono'] }}" style="color:{{ $item['icono_color'] }};"></i>
+                                        {{ $item['name'] }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endforeach
+                </div>
+                {{-- Botones de los links en Iconos --}}
+                <div class="btn-group dropend d-block" id="btn_links_iconos_dashboard">
+                    @foreach ($links as $link)
+                        <button type="button" class="btn btn-circle dropdown-toggle mb-1"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="{{ $link['icono'] }}" style="color:{{ $link['icono_color'] }};"></i>
+                        </button>
+                        <ul class="dropdown-menu bg-dark">
+                            @foreach ($link['items'] as $item)
+                                <li>
+                                    <a href="{{ $item['route'] }}" class="dropdown-item text-white" type="button">
+                                        {{ $item['name'] }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endforeach
+                </div>
+            </li>
+        </ul>
+    </div>
+</aside>
+```
+
+> Creamos el archivo `aside.blade.php` en la carpeta `resources\views\layouts\partials\aside.blade.php` y escribimos lo siguiente.
+
+```php
+<x-aside></x-aside>
+```
+
+> Typee: en la Consola:
+```console
+php artisan make:component Header
+```
+
+> Abrimos el archivo `Header.php` en la carpeta `app\View\Components\Header.php` y lo dejamos de la siguiente manera.
+
+```php
+<?php
+
+namespace App\View\Components;
+
+use Closure;
+use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
+
+class Header extends Component
+{
+    public $links_pages, $links_users, $links_auths;
+    /**
+     * Create a new component instance.
+     */
+    public function __construct()
+    {
+    $this->links_pages = [
+            [
+                'name' => 'Home',
+                'route' => route('home'),
+                'active' => request()->routeIs('home') ? 'active disabled' : '',
+                'icono' => 'fa-solid fa-house fa-lg',
+                'icono_color' => '#1100ff'
+            ],
+            [
+                'name' => 'Cursos',
+                'route' => route('cursos.index'),
+                'active' => request()->routeIs('cursos.*') ? 'active' : '',
+                'icono' => 'fa-solid fa-book fa-lg',
+                'icono_color' => '#27aa94'
+            ],
+            [
+                'name' => 'Blog',
+                'route' => route('blog.index'),
+                'active' => request()->routeIs('blog.*') ? 'active' : '',
+                'icono' => 'fa-solid fa-blog fa-lg',
+                'icono_color' => '#0ac720'
+            ],
+            [
+                'name' => 'Contáctanos',
+                'route' => route('contactanos.index'),
+                'active' => request()->routeIs('contactanos.*') ? 'active disabled' : '',
+                'icono' => 'fa-solid fa-address-card fa-lg',
+                'icono_color' => '#ff9500'
+            ],
+            [
+                'name' => 'Nosotros',
+                'route' => route('nosotros'),
+                'active' => request()->routeIs('nosotros') ? 'active disabled' : '',
+                'icono' => 'fa-solid fa-circle-info fa-lg',
+                'icono_color' => '#ffde05'
+            ],
+    ];
+    $this->links_users = [
+        [
+            'name' => 'Perfil',
+            'route' => ! empty( auth()->user()->profile) ? route('profile.edit', auth()->user()->profile) : route('profile.create'),
+            'active' => request()->routeIs('profile.*') ? 'active disabled' : '',
+            'icono' => 'fa-solid fa-id-badge',
+            'icono_color' => '#b7c3d7'
+        ],
+        [
+            'name' => 'Dashboard',
+            'route' => route('dashboard'),
+            'active' => request()->routeIs('dashboard') ? 'active disabled' : '',
+            'icono' => 'fa-solid fa-gauge-high',
+            'icono_color' => '#218c55'
+        ],
+        [
+            'name' => 'Cerrar Sesión',
+            'route' => route('logout'),
+            'active' => '',
+            'icono' => 'fa-solid fa-arrow-right-from-bracket',
+            'icono_color' => '#e27474'
+        ],
+    ];
+    $this->links_auths = [
+        [
+            'name' => 'Acceso',
+            'route' => route('login'),
+            'active' => request()->routeIs('login') ? 'active disabled' : '',
+            'icono' => 'fa-solid fa-lock-open',
+            'icono_color' => '#932a6c'
+        ],
+        [
+            'name' => 'Registrarse',
+            'route' => route('register.index'),
+            'active' => request()->routeIs('register.*') ? 'active disabled' : '',
+            'icono' => 'fa-solid fa-right-to-bracket',
+            'icono_color' => '#36c44d'
+        ],
+    ];
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     */
+    public function render(): View|Closure|string
+    {
+        return view('components.header');
+    }
+}
+```
+
+**`Nota :` En este archivo lo utilizaremos para crear los links de navegación del menu principal.**
+
+> Abrimos el archivo `header.blade.php` en la carpeta `resources\views\components\header.blade.php` y escribimos lo siguiente.
+
+```php
+<header class="bg-light border-bottom header-dashboard">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <i class="fa-brands fa-laravel fa-2xl me-1" style="color: #ff0000;"></i>
+            <a class="navbar-brand">Laravel 10</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse d-flex-lg justify-content-lg-between" id="navbarNav">
+                <ul class="navbar-nav">
+                    @foreach ($links_pages as $link_page)
+                        <li class="nav-item">
+                            <a class="nav-link {{ $link_page['active'] }}" aria-current="page"
+                                href="{{ $link_page['route'] }}">
+                                <i class="{{ $link_page['icono'] }}" style="color: {{$link_page['icono_color']}};"></i> {{ $link_page['name'] }}</a>
+                        </li>
+                    @endforeach
+                </ul>
+                <hr class="hidden-lg">
+                @auth
+                    <ul class="navbar-nav">
+                        <li class="nav-link d-none d-lg-block">
+                            <a href="#" class="nav-link dropdown-toggle" data-bs-display="static"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-circle-user fa-2xl" style="color: #8a0000;"></i>
+                                {{ auth()->user()->name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                @foreach ($links_users as $link_user)
+                                    <li class="nav-item">
+                                        <a href="{{ $link_user['route'] }}"
+                                            class="nav-link dropdown-item {{ $link_user['active'] }}">
+                                            <i class="{{ $link_user['icono'] }}" style="color: {{$link_user['icono_color']}};"></i>
+                                            {{ $link_user['name'] }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </li>
+                        <ul class="navbar-nav d-lg-none">
+                            @foreach ($links_users as $link_user)
+                                <li class="nav-item">
+                                    <a class="nav-link {{ $link_user['active'] }}" aria-current="page"
+                                        href="{{ $link_user['route'] }}">
+                                        <i class="{{ $link_user['icono'] }}" style="color: {{$link_user['icono_color']}};"></i>
+                                        {{ $link_user['name'] }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </ul>
+                @else
+                    <ul class="navbar-nav">
+                        @foreach ($links_auths as $link_auth)
+                            <li class="nav-item">
+                                <a class="nav-link {{ $link_auth['active'] }}" aria-current="page"
+                                    href="{{ $link_auth['route'] }}">
+                                    <i class="{{ $link_auth['icono'] }}" style="color: {{$link_auth['icono_color']}};"></i>
+                                    {{ $link_auth['name'] }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endauth
+            </div>
+        </div>
+    </nav>
+</header>
+```
+
+> Abrimos el archivo `header.blade.php` en la carpeta `resources\views\layouts\partials\header.blade.php` y cambiamos por lo siguiente.
+
+```php
+<x-header></x-header>
+```
+
+###### Añadimos unas clases
+
+> Abrimos el archivo `footer.blade.php` en la carpeta `resources\views\layouts\partials\footer.blade.php` y añadimos la clase siguiente `footer-dashboard`.
+
+```php
+<footer class="bg-light text-center text-lg-start border-top footer-dashboard">
+  <div class="text-center p-3">
+    © 2023 Copyright:
+    <a class="text-dark" href="#">Un Footer</a>
+  </div>
+</footer>
+```
+
+**`Nota :` las clases `header-dashboard, aside-dashboard, main-dashboard, footer-dashboard` son las que posicionan los elementos en el grid de css.**
+
+###### Aplicamos funcionalidad al menu dashboard.
+
+> Abrimos el archivo `interface.js` en la carpeta `resources\js\interface.js` y añadimos lo siguiente.
+
+```js
+let $btncloseaside = document.getElementById('btn_close_aside')
+let $asidedashboard = document.getElementById('aside_dashboard')
+let $contentaside1 = document.getElementById('content_aside_1')
+let $contentbtnnav = document.getElementById('content-btn-nav')
+let $btnopenaside = document.getElementById('btn_open_aside')
+let $btnlinkdashboard = document.getElementById('btn_link_dashboard')
+let $btnlinksiconosdashboard = document.getElementById(
+  'btn_links_iconos_dashboard',
+)
+...
+// Cerrar menu dashboard
+if ($btncloseaside != null) {
+  $btncloseaside.addEventListener('click', () => {
+    $asidedashboard.style = 'width:80px'
+    $contentaside1.classList.add('d-none')
+    $contentbtnnav.classList.replace('d-none', 'd-block')
+    $btnlinkdashboard.classList.add('d-none')
+    $btnlinksiconosdashboard.classList.replace('d-none', 'd-block')
+  })
+}
+// Abrir menu dashboard
+if ($btnopenaside != null) {
+  $btnopenaside.addEventListener('click', () => {
+    $asidedashboard.style.removeProperty('width')
+    $contentaside1.classList.remove('d-none')
+    $contentbtnnav.classList.replace('d-block', 'd-none')
+    $btnlinkdashboard.classList.remove('d-none')
+    $btnlinksiconosdashboard.classList.replace('d-block', 'd-none')
+  })
+}
+```
+
+> Y también en la parte de la función de comparar password la envolvemos con lo siguiente para que no salte el error que no se encuentra dicho elemento.
+
+```js
+if ($password2 != null) {
+    ...
+}
+```
+
+###### Modificamos varias vistas para el dashboard.
+
+> Abrimos los archivos `create.blade.php y edit.blade.php` en la carpeta `resources\views\blog\` y cambiamos lo siguiente.
+
+```php
+@extends('layouts.dashboard')
+...
+@section('content-dashboard')
+    <main class="container center_container flex-column main-dashboard">
+    ...
+```
+
+> Abrimos el archivo `index.blade.php` en la carpeta `resources\views\blog\index.blade.php` y eliminamos lo siguiente.
+
+```php
+<a class="btn btn-success" href="{{ route('blog.create') }}">Crear Post</a>
+```
+
+> Abrimos el archivo `show.blade.php` en la carpeta `resources\views\blog\show.blade.php` y eliminamos lo siguiente.
+
+```php
+<div class="row row-cols-3">
+    <a class="btn btn-warning" href="{{ route('blog.edit', $post) }}">Editar</a>
+    <form action="{{ route('blog.destroy', $post) }}" method="post">
+        @csrf
+        @method('delete')
+        <button class="btn btn-danger text-nowrap" type="submit">Eliminar Post</button>
+    </form>
+</div>
+```
+
+> Y cambiamos lo siguiente.
+
+```php
+<a class="btn btn-primary" href="{{ route('blog.index', $post) }}">Volver</a>
+```
+
+> Por esto siguiente.
+
+```php
+<a class="btn btn-primary" href="{{ route('blog.index') }}">Volver</a>
+```
+
+> Abrimos los archivos `create.blade.php y edit.blade.php` en la carpeta `resources\views\cursos\` y cambiamos lo siguiente.
+
+```php
+@extends('layouts.dashboard')
+...
+@section('content-dashboard')
+    <main class="container center_container flex-column main-dashboard">
+    ...
+```
+
+>Y `create.blade.php` eliminamos lo siguiente.
+
+```php
+<a class="btn btn-success btn-float btn-position-top-0-left-0 m-2" href="{{ route('cursos.index') }}">Volver</a>
+```
+
+>Y `edit.blade.php` eliminamos lo siguiente.
+
+```php
+<a class="btn btn-success btn-float btn-position-top-0-left-0 m-2" href="{{route('cursos.show', $curso)}}">Volver</a>
+```
+
+> Abrimos el archivo `show.blade.php` en la carpeta `resources\views\cursos\show.blade.php` y eliminamos lo siguiente.
+
+```php
+<a class="btn btn-warning" href="{{route('cursos.edit', $curso)}}">Editar Cursos</a>
+<form action="{{route('cursos.destroy', $curso)}}" method="post">
+    @csrf
+    @method('delete')
+    <button class="btn btn-danger" type="submit">Eliminar Curso</button>
+</form>
+```
+
+> Y cambiamos lo siguiente.
+
+```php
+<a class="btn btn-success ml-2" href="{{route('cursos.index')}}">Volver a Cursos</a>
+```
+
+> Y esto otro.
+
+```php
+<a class="btn btn-success ml-2" href="{{url()->previous()}}">Volver a Cursos</a>
+```
+
+> Abrimos el archivo `index.blade.php` en la carpeta `resources\views\cursos\index.blade.php` y eliminamos lo siguiente.
+
+```php
+<a class="btn btn-success" href="{{ route('cursos.create') }}">Crear Curso</a>
+```
+
+> Abrimos el archivo `form.blade.php` en la carpeta `resources\views\blog\partials\form.blade.php` y modificamos lo siguiente.
+
+```php
+<a class="btn btn-danger" href="{{  Route::currentRouteName() == 'blog.edit' ? route('blog.show', $post) : route('blog.index') }}">Cancelar</a>
+```
+
+> Por lo siguiente.
+
+```php
+<a class="btn btn-danger" href="{{ url()->previous() }}">Cancelar</a>
+```
+
+> Abrimos el archivo `form.blade.php` en la carpeta `resources\views\cursos\partials\form.blade.php` y añadimos lo siguiente.
+
+```php
+<a class="btn btn-danger" href="{{ url()->previous() }}">Cancelar</a>
+```
+
+###### Añadimos y modificamos varias rutas para el dashboard.
+
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y modificamos lo siguiente.
+
+```php
+Route::resource('cursos', CursoController::class);
+```
+
+> Por lo siguiente.
+
+```php
+Route::resource('cursos', CursoController::class)->except(['create', 'edit']);
+```
+
+> Modificamos lo siguiente.
+
+```php
+Route::resource('blog', PostController::class)->parameters(['blog' => 'post']);
+```
+
+> Por lo siguiente.
+
+```php
+Route::resource('blog', PostController::class)->parameters(['blog' => 'post'])->except(['create', 'edit', 'destroy']);
+```
+
+> Y añadimos las siguientes.
+
+```php
+Route::get('dashboard/blog/create', [PostController::class, 'create'])->name('blog.create');
+Route::get('dashboard/blog/{post}/edit', [PostController::class, 'edit'])->name('blog.edit');
+Route::delete('dashboard/blog/{post}', [PostController::class, 'destroy'])->name('blog.destroy');
+Route::get('dashboard/blog/myposts', [PostController::class, 'showmypost'])->name('blog.mypost');
+Route::get('dashboard/cursos/create', [CursoController::class, 'create'])->name('cursos.create');
+Route::get('dashboard/cursos/mycursos', [CursoController::class, 'showmycursos'])->name('cursos.mycursos');
+Route::get('dashboard/cursos/{curso}/edit', [CursoController::class, 'edit'])->name('cursos.edit');
+Route::view('dashboard', 'dashboard')->name('dashboard');
+```
+
+###### Creamos unas vistas para el dashboard.
+
+> Creamos el archivo `dashboard.blade.php` en la carpeta `resources\views\dashboard.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.dashboard')
+
+@section('title', 'Dashboard')
+@section('content-dashboard')
+    <main class="main-dashboard">
+        <h1>Dashboard</h1>
+    </main>
+@endsection
+```
+
+> Creamos el archivo `mycursos.blade.php` en la carpeta `resources\views\cursos\mycursos.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.dashboard')
+
+@section('title', 'My Cursos')
+
+@section('content-dashboard')
+    <main class="container center_container flex-column main-dashboard">
+        <h1>MyCursos</h1>
+        {{-- Tabla --}}
+        <x-table :thead="$headName" class="table-striped table-hover table-responsive-sm" theadclass="table-dark">
+            @foreach ($cursos as $curso)
+                <tr>
+                    <th scope="col">{{ $curso->id }}</th>
+                    <td>
+                        <span class="d-inline-block text-truncate" style="max-width: 150px;">
+                            {{ $curso->name }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="d-inline-block text-truncate" style="max-width: 150px;">
+                            {{ $curso->slug }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="d-inline-block text-truncate" style="max-width: 250px;">
+                            {{ $curso->description }}
+                        </span>
+                    </td>
+                    <td>{{ $curso->categoria }}</td>
+                    <td>{{ $curso->updated_at->format('d-m-Y') }}</td>
+                    <td>
+                        <span class="d-inline-flex">
+                            <x-table.button type='link' class='btn-outline-warning me-1' :route="route('cursos.edit', $curso)">
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                                </x-slot>
+                            </x-table.button>
+                            <x-table.button type='submit' class='btn-outline-danger' :route="route('cursos.destroy', $curso)" method='delete'>
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                                </x-slot>
+                            </x-table.button>
+                        </span>
+                    </td>
+                </tr>
+            @endforeach
+        </x-table>
+        {{-- Tabla en Movil --}}
+        @foreach ($cursos as $curso)
+            <x-table class="table-striped" typetable="movil">
+                <x-slot name="head">
+                    <x-table.button type='link' class='btn-outline-warning me-1' :route="route('cursos.edit', $curso)">
+                        <x-slot name="icon">
+                            <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                        </x-slot>
+                    </x-table.button>
+                    <x-table.button type='submit' class='btn-outline-danger' :route="route('cursos.destroy', $curso)" method='delete'>
+                        <x-slot name="icon">
+                            <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                        </x-slot>
+                    </x-table.button>
+                </x-slot>
+                <tr>
+                    <th scope="col" class="d-flex flex-column">
+                        <strong># :</strong>
+                        {{ $curso->id }}
+                    </th>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Nombre :</strong>
+                        {{ $curso->name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Slug :</strong>
+                        {{ $curso->slug }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Description :</strong>
+                        <span class="d-inline-block text-truncate" style="max-width: 250px;">
+                            {{ $curso->description }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Category :</strong>
+                        {{ $curso->categoria }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Date :</strong>
+                        {{ $curso->updated_at->format('d-m-Y') }}
+                    </td>
+                </tr>
+            </x-table>
+        @endforeach
+        {{ $cursos->links() }}
+    </main>
+@endsection
+```
+
+> Creamos el archivo `mypost.blade.php` en la carpeta `resources\views\blog\mypost.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.dashboard')
+
+@section('title', 'My Posts')
+
+@section('content-dashboard')
+    <main class="container center_container flex-column main-dashboard">
+        <h1>Mypost</h1>
+        {{-- Tabla --}}
+        <x-table :thead="$headName" class="table-striped table-hover table-responsive-sm" theadclass="table-dark">
+            @foreach ($posts as $post)
+                <tr>
+                    <th scope="col">{{ $post->id }}</th>
+                    <td>{{ $post->title }}</td>
+                    <td>{{ $post->slug }}</td>
+                    <td>
+                        <span class="d-inline-block text-truncate" style="max-width: 250px;">
+                            {{ $post->body }}
+                        </span>
+                    </td>
+                    <td>{{ $post->category->name }}</td>
+                    <td>{{ $post->updated_at->format('d-m-Y') }}</td>
+                    <td>
+                        <span class="d-inline-flex">
+                            <x-table.button type='link' class='btn-outline-warning me-1' :route="route('blog.edit', $post)">
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                                </x-slot>
+                            </x-table.button>
+                            <x-table.button type='submit' class='btn-outline-danger' :route="route('blog.destroy', $post)" method='delete'>
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                                </x-slot>
+                            </x-table.button>
+                        </span>
+                    </td>
+                </tr>
+            @endforeach
+        </x-table>
+        {{-- Tabla en Movil --}}
+        @foreach ($posts as $post)
+            <x-table class="table-striped" typetable="movil">
+                <x-slot name="head">
+                    <x-table.button type='link' class='btn-outline-warning me-1' :route="route('blog.edit', $post)">
+                        <x-slot name="icon">
+                            <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                        </x-slot>
+                    </x-table.button>
+                    <x-table.button type='submit' class='btn-outline-danger' :route="route('blog.destroy', $post)" method='delete'>
+                        <x-slot name="icon">
+                            <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                        </x-slot>
+                    </x-table.button>
+                </x-slot>
+                <tr>
+                    <th scope="col" class="d-flex flex-column">
+                        <strong># :</strong>
+                        {{ $post->id }}
+                    </th>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Title :</strong>
+                        {{ $post->title }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Slug :</strong>
+                        {{ $post->slug }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Body :</strong>
+                        <span class="d-inline-block text-truncate" style="max-width: 250px;">
+                            {{ $post->body }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Category :</strong>
+                        {{ $post->category->name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Date :</strong>
+                        {{ $post->updated_at->format('d-m-Y') }}
+                    </td>
+                </tr>
+            </x-table>
+        @endforeach
+        {{ $posts->links() }}
+    </main>
+@endsection
+```
+
+> Abrimos el archivo `PostController.php` en la carpeta `app\Http\Controllers\PostController.php` y añadimos lo siguiente.
+
+```php
+    public function showmypost()
+    {
+        $headName = ['#', 'Title', 'Slug', 'Body', 'Category', 'Date', 'Options'];
+        $posts = Post::orderBy('id', 'desc')->where('user_id', auth()->user()->id)->paginate(10);
+        return view('blog.mypost', compact('posts', 'headName'));
+    }
+```
+
+> Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y añadimos lo siguiente.
+
+```php
+    public function showmycursos()
+    {
+        $headName = ['#', 'Name', 'Slug', 'Description', 'Category', 'Date', 'Options'];
+        $cursos = Curso::orderBy('id', 'desc')->paginate(5);
+        return view('cursos.mycursos', compact('cursos', 'headName'));
+    }
+```
+
+###### Creamos varios componentes para la visualización de los datos.
+
+> Typee: en la Consola:
+```console
+php artisan make:component Table
+```
+
+> Abrimos el archivo `Table.php` en la carpeta `app\View\Components\Table.php` y escribimos lo siguiente.
+
+```php
+<?php
+
+namespace App\View\Components;
+
+use Closure;
+use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
+
+class Table extends Component
+{
+    public $thead, $class, $theadclass, $typetable;
+    /**
+     * Create a new component instance.
+     */
+    public function __construct($thead = null, $class = null, $theadclass = null, $typetable = null)
+    {
+        $this->thead = $thead;
+        $this->class = $class;
+        $this->theadclass = $theadclass;
+        $this->typetable = $typetable;
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     */
+    public function render(): View|Closure|string
+    {
+        return view('components.table');
+    }
+}
+```
+
+> Abrimos el archivo `table.blade.php` en la carpeta `resources\views\components\table.blade.php` y escribimos lo siguiente.
+
+```php
+@if ($typetable == 'movil')
+    <table {{ $attributes->merge(['class' => "d-table d-lg-none table $class"]) }}>
+        <thead>
+            <tr>
+                <td class="text-end">
+                    <span class="d-inline-flex">
+                        {{$head}}
+                    </span>
+                </td>
+            </tr>
+        </thead>
+        <tbody>
+            {{ $slot }}
+        </tbody>
+    </table>
+@else
+    <table {{ $attributes->merge(['class' => "d-none d-lg-table table $class"]) }}>
+        <thead>
+            <tr class="{{ $theadclass }}">
+                @for ($i = 0; $i < count($thead); $i++)
+                    <th scope="col">{{ $thead[$i] }}</th>
+                @endfor
+            </tr>
+        </thead>
+        <tbody>
+            {{ $slot }}
+        </tbody>
+    </table>
+@endif
+```
+
+```console
+php artisan make:component Table/Button
+```
+
+> Abrimos el archivo `Button.php` en la carpeta `app\View\Components\Table\Button.php` y escribimos lo siguiente.
+
+```php
+<?php
+
+namespace App\View\Components\Table;
+
+use Closure;
+use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
+
+class Button extends Component
+{
+    public $type, $route, $class, $method;
+    /**
+     * Create a new component instance.
+     */
+    public function __construct($type, $route, $class, $method = null)
+    {
+        $this->type = $type;
+        $this->route = $route;
+        $this->class = $class;
+        $this->method = $method;
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     */
+    public function render(): View|Closure|string
+    {
+        return view('components.table.button');
+    }
+}
+```
+
+> Abrimos el archivo `button.blade.php` en la carpeta `resources\views\components\table\button.blade.php` y escribimos lo siguiente.
+
+```php
+@if ($type == 'link')
+    <a href="{{ $route ?? '#' }}" {{ $attributes->merge(['class' => "btn $class"]) }}>
+        {{ $icon }}
+    </a>
+@elseif ($type == 'submit')
+    <form action="{{ $route ?? '' }}" method="post">
+        @csrf
+        @method('{{$method}}')
+        <button type="submit" {{ $attributes->merge(['class' => "btn $class"]) }}>
+            {{ $icon }}
+        </button>
+    </form>
+@endif
 ```
 
 [Subir](#top)

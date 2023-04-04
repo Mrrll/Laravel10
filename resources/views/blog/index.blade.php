@@ -5,7 +5,7 @@
 @section('content')
     <main class="container-lg">
         @include('layouts.components.alert')
-        <h1>Bienvenido a los blogs</h1><a class="btn btn-success" href="{{ route('blog.create') }}">Crear Post</a>
+        <h1>Bienvenido a los blogs</h1>
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 d-flex justify-content-center">
             @if (!empty($posts))
                 @foreach ($posts as $post)

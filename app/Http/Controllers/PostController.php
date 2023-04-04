@@ -114,4 +114,10 @@ class PostController extends Controller
             ]);
         }
     }
+    public function showmypost()
+    {
+        $headName = ['#', 'Title', 'Slug', 'Body', 'Category', 'Date', 'Options'];
+        $posts = Post::orderBy('id', 'desc')->where('user_id', auth()->user()->id)->paginate(10);
+        return view('blog.mypost', compact('posts', 'headName'));
+    }
 }

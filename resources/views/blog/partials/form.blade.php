@@ -38,6 +38,6 @@
     <div class="card-footer text-center">
         <button type="submit"
             class="btn btn-primary">{{ Route::currentRouteName() == 'blog.edit' ? 'Editar blog' : 'Crear blog' }}</button>
-            <a class="btn btn-danger" href="{{  Route::currentRouteName() == 'blog.edit' ? route('blog.show', $post) : route('blog.index') }}">Cancelar</a>
+            <a class="btn btn-danger" href="{{ url()->previous() }}">Cancelar</a>
     </div>
 </div>

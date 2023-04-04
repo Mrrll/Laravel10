@@ -32,5 +32,6 @@
     <div class="card-footer text-center">
         <button type="submit"
             class="btn btn-primary">{{ Route::currentRouteName() == 'cursos.edit' ? 'Editar Curso' : 'Crear Curso' }}</button>
+            <a class="btn btn-danger" href="{{ url()->previous() }}">Cancelar</a>
     </div>
 </div>

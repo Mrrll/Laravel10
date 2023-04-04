@@ -40,4 +40,10 @@ class CursoController extends Controller
         $curso->delete();
         return redirect()->route('cursos.index');
     }
+    public function showmycursos()
+    {
+        $headName = ['#', 'Name', 'Slug', 'Description', 'Category', 'Date', 'Options'];
+        $cursos = Curso::orderBy('id', 'desc')->paginate(5);
+        return view('cursos.mycursos', compact('cursos', 'headName'));
+    }
 }

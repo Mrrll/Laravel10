@@ -1,10 +1,9 @@
-@extends('layouts.plantilla')
+@extends('layouts.dashboard')
 
 @section('title', 'Cursos create ')
 
-@section('content')
-    <main class="container center_container container-float">
-        <a class="btn btn-success btn-float btn-position-top-0-left-0 m-2" href="{{ route('cursos.index') }}">Volver</a>
+@section('content-dashboard')
+    <main class="container center_container container-float main-dashboard"> 
         <form action="{{route('cursos.store')}}" method="post">
             @csrf
             @include('cursos.partials.form')

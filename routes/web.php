@@ -62,9 +62,17 @@ Route::controller(LoginController::class)->group(function () {
 
 Route::group(['middleware' => ['auth', 'auth.session', 'verified']],function () {
         Route::get('logout', [LoginController::class, 'logout'])->name('logout');
-        Route::resource('cursos', CursoController::class);
+        Route::resource('cursos', CursoController::class)->except(['create', 'edit']);
         Route::resource('profile', ProfileController::class)->except(['index', 'show', 'destroy']);
-        Route::resource('blog', PostController::class)->parameters(['blog' => 'post']);
+        Route::resource('blog', PostController::class)->parameters(['blog' => 'post'])->except(['create', 'edit', 'destroy']);
+        Route::get('dashboard/blog/create', [PostController::class, 'create'])->name('blog.create');
+        Route::get('dashboard/blog/{post}/edit', [PostController::class, 'edit'])->name('blog.edit');
+        Route::delete('dashboard/blog/{post}', [PostController::class, 'destroy'])->name('blog.destroy');
+        Route::get('dashboard/blog/myposts', [PostController::class, 'showmypost'])->name('blog.mypost');
+        Route::get('dashboard/cursos/create', [CursoController::class, 'create'])->name('cursos.create');
+        Route::get('dashboard/cursos/mycursos', [CursoController::class, 'showmycursos'])->name('cursos.mycursos');
+        Route::get('dashboard/cursos/{curso}/edit', [CursoController::class, 'edit'])->name('cursos.edit');
+
     }
 );
 
@@ -164,21 +172,7 @@ Route::get('notificacion', function () {
     return 'Mensaje enviado!';
 });
 
-// Rutas Perfiles
-// Route::controller(ProfileController::class)->group(function () {
-//     Route::get('profile/create',  'create')->name('profile.create');
-//     Route::post('profile/create', 'store')->name('profile.store');
-//     Route::get('profile', 'edit')->name('profile.edit');
-//     Route::put('profile', 'update')->name('profile.update');
-// })->middleware(['auth', 'auth.session', 'verified']);
-
-// Rutas Blog
-// Route::controller(PostController::class)->group(function (){
-//     Route::get('blog', 'index')->name('blog.index');
-//     Route::get('blog/create', 'create')->name('blog.create');
-//     Route::post('blog/create', 'store')->name('blog.store');
-//     Route::get('blog/{post}', 'show')->name('blog.show');
-//     Route::get('blog/{post}/edit', 'edit')->name('blog.edit');
-//     Route::put('blog/{post}', 'update')->name('blog.update');
-//     Route::delete('blog/{post}', 'destroy')->name('blog.destroy');
+Route::view('dashboard', 'dashboard')->name('dashboard');
+// Route::get('dashboard/cursos/create', function () {
+//     return view('cursos.create');
 // });

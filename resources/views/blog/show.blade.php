@@ -13,15 +13,7 @@
                 <p class="card-text">{{ $post->body }} </p>
             </div>
             <div class="card-footer text-muted d-flex justify-content-between">
-                <div class="row row-cols-3">
-                    <a class="btn btn-warning" href="{{ route('blog.edit', $post) }}">Editar</a>
-                    <form action="{{ route('blog.destroy', $post) }}" method="post">
-                        @csrf
-                        @method('delete')
-                        <button class="btn btn-danger text-nowrap" type="submit">Eliminar Post</button>
-                    </form>
-                </div>
-                <a class="btn btn-primary" href="{{ route('blog.index', $post) }}">Volver</a>
+                <a class="btn btn-primary" href="{{ route('blog.index') }}">Volver</a>
             </div>
         </div>
     </main>
