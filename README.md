@@ -67,6 +67,8 @@
 - [Relación muchos a muchos (Many To Many)](#item30)
 - [Agregando iconos (Fontawesome)](#item31)
 - [Dashboard simple](#item32)
+- [Relación muchos a muchos (Many To Many) Parte 2](#item33)
+
 
 <a name="item1"></a>
 
@@ -352,8 +354,7 @@ return view('cursos.index');
 <body>
     <h1>Bienvenido al curso <?php echo $curso; ?></h1>
 </body>
-</html>
-```
+</html>```
 
 > Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos dentro de la función `show`.
 
@@ -1514,6 +1515,7 @@ return [
 **`Nota :` Importamos la clase `use Illuminate\Support\Str;`.**
 
 > Typee: en la Consola:
+
 ```console
 php artisan migrate:fresh --seed
 ```
@@ -1546,18 +1548,21 @@ php artisan migrate:fresh --seed
 
 > Abrimos el archivo `CursoController.php` en la carpeta `app\Http\Controllers\CursoController.php` y añadimos lo siguiente.
 
->Y en el función `store` escribimos lo siguiente.
+> Y en el función `store` escribimos lo siguiente.
 
 ```php
-$curso = Curso::create($request->all() + ['slug' => Str::slug($request['name'], '-')]);
+$curso = Curso::create(
+  $request->all() + ['slug' => Str::slug($request['name'], '-')]
+);
 ```
->Y en el función `update` escribimos lo siguiente.
+
+> Y en el función `update` escribimos lo siguiente.
 
 ```php
 $curso->update($request->all() + ['slug' => Str::slug($request['name'], '-')]);
 ```
 
->Y importamos la clase `use Illuminate\Support\Str;`.
+> Y importamos la clase `use Illuminate\Support\Str;`.
 
 [Subir](#top)
 
@@ -2422,6 +2427,7 @@ if ($request->age >= 18) {
 > Creamos el archivo `RegisterController.php`.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:controller Auth/RegisterController
 ```
@@ -2461,7 +2467,7 @@ php artisan make:controller Auth/RegisterController
     }
 ```
 
->Y importamos las clases
+> Y importamos las clases
 
 ```php
 use Illuminate\Auth\Events\Registered;
@@ -2474,6 +2480,7 @@ use Illuminate\Support\Facades\Auth;
 > Creamos el archivo `RegisterRequest.php`.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:request RegisterRequest
 ```
@@ -2484,14 +2491,14 @@ php artisan make:request RegisterRequest
 return true;
 ```
 
->Y dentro de la función `rules` escribimos lo siguiente.
+> Y dentro de la función `rules` escribimos lo siguiente.
 
 ```php
-        return [
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required'
-        ];
+return [
+  'name' => 'required',
+  'email' => 'required|email|unique:users,email',
+  'password' => 'required',
+];
 ```
 
 > Abrimos el archivo `web.php` de la carpeta `routes\web.php` y escribimos lo siguiente.
@@ -2503,37 +2510,37 @@ Route::resource('register', RegisterController::class);
 > Creamos el archivo `interface.js` de la carpeta `resources\js\interface.js` y escribimos lo siguiente.
 
 ```js
-let $password1 = document.getElementById("pass1")
-let $password2 = document.getElementById("pass2")
-let $pass2message = document.getElementById("pass2message")
+let $password1 = document.getElementById('pass1')
+let $password2 = document.getElementById('pass2')
+let $pass2message = document.getElementById('pass2message')
 let timeout
 
 if ($password2 != null) {
-    $password2.addEventListener('keydown', () => {
+  $password2.addEventListener('keydown', () => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => {
+      if ($password1.value == $password2.value) {
+        $pass2message.classList.replace('d-block', 'd-none')
+      } else {
+        $pass2message.classList.replace('d-none', 'd-block')
+      }
       clearTimeout(timeout)
-      timeout = setTimeout(() => {
-        if ($password1.value == $password2.value) {
-            $pass2message.classList.replace("d-block", "d-none")
-        } else {
-            $pass2message.classList.replace("d-none", "d-block")
-        }
-        clearTimeout(timeout)
-      },1000)
-    })
+    }, 1000)
+  })
 }
 ```
 
 > Abrimos el archivo `app.js` de la carpeta `resources\js\app.js` y escribimos lo siguiente.
 
 ```js
-import './interface';
+import './interface'
 ```
 
 > Abrimos o creamos el archivo `app.css` de la carpeta `resources\css\app.css` y escribimos lo siguiente.
 
 ```css
 .invalid {
-    color: red;
+  color: red;
 }
 ```
 
@@ -2596,6 +2603,7 @@ import './interface';
 > Creamos el archivo `LoginController.php`.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:controller Auth/LoginController
 ```
@@ -2633,7 +2641,7 @@ php artisan make:controller Auth/LoginController
     }
 ```
 
->Y importamos las clases
+> Y importamos las clases
 
 ```php
 use App\Http\Controllers\Controller;
@@ -2645,6 +2653,7 @@ use Illuminate\Support\Facades\Auth;
 > Creamos el archivo `LoginRequest.php`.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:request LoginRequest
 ```
@@ -2655,32 +2664,33 @@ php artisan make:request LoginRequest
 return true;
 ```
 
->Y dentro de la función `rules` escribimos lo siguiente.
+> Y dentro de la función `rules` escribimos lo siguiente.
 
 ```php
-        return [
-            'email' => 'required|email',
-            'password' => 'required'
-        ];
+return [
+  'email' => 'required|email',
+  'password' => 'required',
+];
 ```
 
 > Abrimos el archivo `web.php` de la carpeta `routes\web.php` y escribimos lo siguiente.
 
 ```php
 Route::controller(LoginController::class)->group(function () {
-    Route::get('login', 'index')->name('login');
-    Route::post('login', 'Authenticate')->name('login.authenticate');
+  Route::get('login', 'index')->name('login');
+  Route::post('login', 'Authenticate')->name('login.authenticate');
 });
 ```
 
->Y Protegemos las rutas que necesiten autentificación.
+> Y Protegemos las rutas que necesiten autentificación.
 
 ```php
-Route::group(['middleware' => ['auth', 'auth.session', 'verified']],
-    function () {
-        Route::get('logout', [LoginController::class, 'logout'])->name('logout');
-        Route::resource('cursos', CursoController::class);
-    }
+Route::group(
+  ['middleware' => ['auth', 'auth.session', 'verified']],
+  function () {
+    Route::get('logout', [LoginController::class, 'logout'])->name('logout');
+    Route::resource('cursos', CursoController::class);
+  }
 );
 ```
 
@@ -2771,36 +2781,42 @@ Route::group(['middleware' => ['auth', 'auth.session', 'verified']],
 
 ```php
 Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
+  return view('auth.verify-email');
+})
+  ->middleware('auth')
+  ->name('verification.notice');
 
 Route::get('/email/verification', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-    return redirect('cursos');
-})->middleware(['auth', 'signed'])->name('verification.verify');
+  $request->fulfill();
+  return redirect('cursos');
+})
+  ->middleware(['auth', 'signed'])
+  ->name('verification.verify');
 
 Route::post('/email/verification-notification', function (Request $request) {
-    try {
-        $request->user()->sendEmailVerificationNotification();
+  try {
+    $request->user()->sendEmailVerificationNotification();
 
-        return back()->with('message', [
-            'type' => 'success',
-            'title' => 'Éxito !',
-            'message' =>
-                'Enlace de verificación a sido enviado correctamente!!! Revise su bandeja de entrada.',
-        ]);
-    } catch (\Throwable $th) {
-        return back()->with('message', [
-            'type' => 'danger',
-            'title' => 'Error !',
-            'message' =>
-                'Ha ocurrido un error revise los datos y vuelva a intentarlo si no se soluciona contacte con su administrador.',
-        ]);
-    }
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+    return back()->with('message', [
+      'type' => 'success',
+      'title' => 'Éxito !',
+      'message' =>
+        'Enlace de verificación a sido enviado correctamente!!! Revise su bandeja de entrada.',
+    ]);
+  } catch (\Throwable $th) {
+    return back()->with('message', [
+      'type' => 'danger',
+      'title' => 'Error !',
+      'message' =>
+        'Ha ocurrido un error revise los datos y vuelva a intentarlo si no se soluciona contacte con su administrador.',
+    ]);
+  }
+})
+  ->middleware(['auth', 'throttle:6,1'])
+  ->name('verification.send');
 ```
 
->Y importamos las clases.
+> Y importamos las clases.
 
 ```php
 use Illuminate\Http\Request;
@@ -2809,7 +2825,8 @@ use App\Http\Requests\EmailVerificationRequest;
 
 > Creamos el archivo `EmailVerificationRequest.php`.
 
->Typee en consola:
+> Typee en consola:
+
 ```php
 php artisan make:request EmailVerificationRequest
 ```
@@ -2827,65 +2844,74 @@ use Illuminate\Validation\Validator;
 
 class EmailVerificationRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        if (! hash_equals((string) $this->user()->getKey(), (string) $this->query('id'))) {
-            return false;
-        }
-
-        if (! hash_equals(sha1($this->user()->getEmailForVerification()), (string)  $this->query('hash'))) {
-            return false;
-        }
-
-        return true;
+  /**
+   * Determine if the user is authorized to make this request.
+   *
+   * @return bool
+   */
+  public function authorize()
+  {
+    if (
+      !hash_equals(
+        (string) $this->user()->getKey(),
+        (string) $this->query('id')
+      )
+    ) {
+      return false;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
-    {
-        return [
-            //
-        ];
+    if (
+      !hash_equals(
+        sha1($this->user()->getEmailForVerification()),
+        (string) $this->query('hash')
+      )
+    ) {
+      return false;
     }
 
-    /**
-     * Fulfill the email verification request.
-     *
-     * @return void
-     */
-    public function fulfill()
-    {
-        if (! $this->user()->hasVerifiedEmail()) {
-            $this->user()->markEmailAsVerified();
+    return true;
+  }
 
-            event(new Verified($this->user()));
-        }
-    }
+  /**
+   * Get the validation rules that apply to the request.
+   *
+   * @return array
+   */
+  public function rules()
+  {
+    return [
+        //
+      ];
+  }
 
-    /**
-     * Configure the validator instance.
-     *
-     * @param  \Illuminate\Validation\Validator  $validator
-     * @return void
-     */
-    public function withValidator(Validator $validator)
-    {
-        return $validator;
+  /**
+   * Fulfill the email verification request.
+   *
+   * @return void
+   */
+  public function fulfill()
+  {
+    if (!$this->user()->hasVerifiedEmail()) {
+      $this->user()->markEmailAsVerified();
+
+      event(new Verified($this->user()));
     }
+  }
+
+  /**
+   * Configure the validator instance.
+   *
+   * @param  \Illuminate\Validation\Validator  $validator
+   * @return void
+   */
+  public function withValidator(Validator $validator)
+  {
+    return $validator;
+  }
 }
 ```
 
-**`Nota :` Este archivo no debería de haberlo ni creado ni  modificado pero la solicitud http que llegaba a la ruta no me reconocía los datos enviados por alguna forma que no logro entender ya que debería de funcionar sin tener que modificarlo.**
-
+**`Nota :` Este archivo no debería de haberlo ni creado ni modificado pero la solicitud http que llegaba a la ruta no me reconocía los datos enviados por alguna forma que no logro entender ya que debería de funcionar sin tener que modificarlo.**
 
 > Abrimos el archivo `User.php` de la carpeta `app\Models\User.php` en la función `authorize` y escribimos lo siguiente.
 
@@ -2899,7 +2925,7 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 ```
 
->Y importamos la clase.
+> Y importamos la clase.
 
 ```php
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -3008,65 +3034,73 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 ```php
 Route::get('/forgot-password', function () {
-    return view('auth.forgot-password');
-})->middleware('guest')->name('password.request');
+  return view('auth.forgot-password');
+})
+  ->middleware('guest')
+  ->name('password.request');
 
 Route::post('/forgot-password', function (Request $request) {
-    $request->validate(['email' => 'required|email']);
+  $request->validate(['email' => 'required|email']);
 
-    $status = Password::sendResetLink($request->only('email'));
+  $status = Password::sendResetLink($request->only('email'));
 
-    return $status === Password::RESET_LINK_SENT
-        ? back()->with([
-            'status' => __($status),
-            'message' => [
-            'type' => 'success',
-            'title' => 'Éxito !'
-            ]
-            ])
-        : back()->withErrors(['email' => __($status)]);
-})->middleware('guest')->name('password.email');
+  return $status === Password::RESET_LINK_SENT
+    ? back()->with([
+      'status' => __($status),
+      'message' => [
+        'type' => 'success',
+        'title' => 'Éxito !',
+      ],
+    ])
+    : back()->withErrors(['email' => __($status)]);
+})
+  ->middleware('guest')
+  ->name('password.email');
 
 Route::get('/reset-password/{token}', function (
-    Request $request,
-    string $token
+  Request $request,
+  string $token
 ) {
-    return view('auth.reset-password', [
-        'token' => $token,
-        'email' => (string) $request->query('email'),
-    ]);
-})->middleware('guest')->name('password.reset');
+  return view('auth.reset-password', [
+    'token' => $token,
+    'email' => (string) $request->query('email'),
+  ]);
+})
+  ->middleware('guest')
+  ->name('password.reset');
 
 Route::post('/reset-password', function (Request $request) {
-    $request->validate([
-        'token' => 'required',
-        'email' => 'required|email',
-        'password' => 'required|confirmed',
-    ]);
-    $status = Password::reset(
-        $request->only('email', 'password', 'password_confirmation', 'token'),
-        function (User $user, string $password) {
-            $user
-                ->forceFill([
-                    'password' => Hash::make($password),
-                ])
-                ->setRememberToken(Str::random(60));
+  $request->validate([
+    'token' => 'required',
+    'email' => 'required|email',
+    'password' => 'required|confirmed',
+  ]);
+  $status = Password::reset(
+    $request->only('email', 'password', 'password_confirmation', 'token'),
+    function (User $user, string $password) {
+      $user
+        ->forceFill([
+          'password' => Hash::make($password),
+        ])
+        ->setRememberToken(Str::random(60));
 
-            $user->save();
+      $user->save();
 
-            event(new PasswordReset($user));
-        }
-    );
+      event(new PasswordReset($user));
+    }
+  );
 
-    return $status === Password::PASSWORD_RESET
-        ? redirect()
-            ->route('login')
-            ->with('status', __($status))
-        : back()->withErrors(['email' => [__($status)]]);
-})->middleware('guest')->name('password.update');
+  return $status === Password::PASSWORD_RESET
+    ? redirect()
+      ->route('login')
+      ->with('status', __($status))
+    : back()->withErrors(['email' => [__($status)]]);
+})
+  ->middleware('guest')
+  ->name('password.update');
 ```
 
->Y importamos las clases.
+> Y importamos las clases.
 
 ```php
 use Illuminate\Support\Facades\Password;
@@ -3085,26 +3119,27 @@ use Illuminate\Support\Str;
 ###### Generación de notificaciones
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:notification NewRegistered
 ```
 
->Abrimos el archivo `NewRegistered.php` en la carpeta `app\Notifications\NewRegistered.php` en la función `` y escribimos lo siguiente.
+> Abrimos el archivo `NewRegistered.php` en la carpeta `app\Notifications\NewRegistered.php` en la función `` y escribimos lo siguiente.
 
 ```php
-return (new MailMessage)
-    ->view('plantilla.blade', ['datos' => 'paso de datos'])
-    ->subject(Lang::get('Welcome'))
-    ->greeting(Lang::get('Hello!'))
-    ->line(Lang::get('The introduction to the notification.'))
-    ->action(Lang::get('Notification Action'), url('/'))
-    ->line(Lang::get('Thank you for using our application!'))
-    ->lineIf($this->amount > 0, "Amount paid: {$this->amount}")
-    ->error()
-    ->from('barrett@example.com', 'Barrett Blair');
+return (new MailMessage())
+  ->view('plantilla.blade', ['datos' => 'paso de datos'])
+  ->subject(Lang::get('Welcome'))
+  ->greeting(Lang::get('Hello!'))
+  ->line(Lang::get('The introduction to the notification.'))
+  ->action(Lang::get('Notification Action'), url('/'))
+  ->line(Lang::get('Thank you for using our application!'))
+  ->lineIf($this->amount > 0, "Amount paid: {$this->amount}")
+  ->error()
+  ->from('barrett@example.com', 'Barrett Blair');
 ```
 
->Abrimos el archivo `es.json` en la carpeta `lang\es.json` en la función `` y añadimos lo siguiente.
+> Abrimos el archivo `es.json` en la carpeta `lang\es.json` en la función `` y añadimos lo siguiente.
 
 ```json
     "Welcome": "Bienvenido",
@@ -3113,18 +3148,19 @@ return (new MailMessage)
     "Thank you for using our application!": "¡Gracias por usar nuestra aplicación!"
 ```
 
->Abrimos el archivo `web.php` en la carpeta `routes\web.php` y añadimos lo siguiente.
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y añadimos lo siguiente.
 
 ```php
 Route::get('notificacion', function () {
-    $user->notify(new NewRegistered());
-    return 'Mensaje enviado!';
+  $user->notify(new NewRegistered());
+  return 'Mensaje enviado!';
 });
 ```
 
 ###### Personalización de las plantillas
 
 > Typee: en la Consola:
+
 ```console
 php artisan vendor:publish --tag=laravel-notifications
 ```
@@ -3134,6 +3170,7 @@ php artisan vendor:publish --tag=laravel-notifications
 ###### Personalización de los componentes
 
 > Typee: en la Consola:
+
 ```console
 php artisan vendor:publish --tag=laravel-mail
 ```
@@ -3151,6 +3188,7 @@ php artisan vendor:publish --tag=laravel-mail
 ###### Creamos la tabla Profiles
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:migration create_profiles_table
 ```
@@ -3158,32 +3196,39 @@ php artisan make:migration create_profiles_table
 ###### Creamos el modelo Profile
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:model Profile
 ```
 
->Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_profiles_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_profiles_table.php` en la función `up` y escribimos lo siguiente.
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_profiles_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_profiles_table.php` en la función `up` y escribimos lo siguiente.
 
 ```php
-        Schema::create('profiles', function (Blueprint $table) {
-            $table->id();
-            $table->string('title', 45);
-            $table->text('biography');
-            $table->string('website', 45);
+Schema::create('profiles', function (Blueprint $table) {
+  $table->id();
+  $table->string('title', 45);
+  $table->text('biography');
+  $table->string('website', 45);
 
-            $table->unsignedBigInteger('user_id')->unique();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+  $table->unsignedBigInteger('user_id')->unique();
+  $table
+    ->foreign('user_id')
+    ->references('id')
+    ->on('users')
+    ->onDelete('cascade')
+    ->onUpdate('cascade');
 
-            $table->timestamps();
-        });
+  $table->timestamps();
+});
 ```
 
 > Typee: en la Consola:
+
 ```console
 php artisan migrate
 ```
 
->Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos lo siguiente.
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos lo siguiente.
 
 ```php
     // Relación uno a uno
@@ -3197,7 +3242,7 @@ php artisan migrate
     }
 ```
 
->Abrimos el archivo `Profile.php` en la carpeta `app\Models\Profile.php` y añadimos lo siguiente.
+> Abrimos el archivo `Profile.php` en la carpeta `app\Models\Profile.php` y añadimos lo siguiente.
 
 ```php
     // Relación uno a uno (inversa)
@@ -3207,7 +3252,7 @@ php artisan migrate
     }
 ```
 
->Para acceder a perfil y viceversa.
+> Para acceder a perfil y viceversa.
 
 ```php
 $user = User::find(1); // Buscamos el usuario cuyo id sea 1
@@ -3225,6 +3270,7 @@ $profile->user; // Y accedemos al usuario del perfil.
 ###### Creamos Controlador Profile
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:controller ProfileController
 ```
@@ -3232,6 +3278,7 @@ php artisan make:controller ProfileController
 ###### Creamos Request Profile
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:request ProfileRequest
 ```
@@ -3239,21 +3286,21 @@ php artisan make:request ProfileRequest
 > Abrimos el archivo `ProfileRequest` de la carpeta `app\Http\Requests\ProfileRequest.php` y en la función `authorize` cambiamos lo siguiente.
 
 ```php
-        if ($this->user_id == auth()->user()->id) {
-            return true;
-        } else {
-            return false;
-        }
+if ($this->user_id == auth()->user()->id) {
+  return true;
+} else {
+  return false;
+}
 ```
 
 > Y en la función `rules` escribimos lo siguiente.
 
 ```php
-        return [
-            'title' => 'required|max:45' ,
-            'biography' => 'required|min:5',
-            'website' => 'required|max:45'
-        ];
+return [
+  'title' => 'required|max:45',
+  'biography' => 'required|min:5',
+  'website' => 'required|max:45',
+];
 ```
 
 > Creamos el archivo `profile.blade.php` en la carpeta `resources\views\users\profile.blade.php` y escribimos lo siguiente.
@@ -3513,7 +3560,11 @@ php artisan make:request ProfileRequest
 > Abrimos el archivo `web.php` en la carpeta `routes\web.php` en la grupo de rutas protegidas `['middleware' => ['auth', 'auth.session', 'verified']]` y añadimos lo siguiente
 
 ```php
-Route::resource('profile', ProfileController::class)->except(['index', 'show', 'destroy']);
+Route::resource('profile', ProfileController::class)->except([
+  'index',
+  'show',
+  'destroy',
+]);
 ```
 
 [Subir](#top)
@@ -3525,6 +3576,7 @@ Route::resource('profile', ProfileController::class)->except(['index', 'show', '
 ###### Creación del modelo Category y la migración categories
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:model Category -m
 ```
@@ -3534,16 +3586,17 @@ php artisan make:model Category -m
 > Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_categories_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_categories_table.php` en la función `up` y añadimos lo siguiente.
 
 ```php
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name',45)->unique();
-            $table->timestamps();
-        });
+Schema::create('categories', function (Blueprint $table) {
+  $table->id();
+  $table->string('name', 45)->unique();
+  $table->timestamps();
+});
 ```
 
 ###### Creación del modelo Post y la migración Posts
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:model Post -m
 ```
@@ -3551,17 +3604,25 @@ php artisan make:model Post -m
 > Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_posts_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_posts_table.php` en la función `up` y añadimos lo siguiente.
 
 ```php
-        Schema::create('posts', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('slug')->unique();
-            $table->text('body');
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('category_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
-            $table->timestamps();
-        });
+Schema::create('posts', function (Blueprint $table) {
+  $table->id();
+  $table->string('name');
+  $table->string('slug')->unique();
+  $table->text('body');
+  $table->unsignedBigInteger('user_id')->nullable();
+  $table->unsignedBigInteger('category_id')->nullable();
+  $table
+    ->foreign('user_id')
+    ->references('id')
+    ->on('users')
+    ->onDelete('set null');
+  $table
+    ->foreign('category_id')
+    ->references('id')
+    ->on('categories')
+    ->onDelete('set null');
+  $table->timestamps();
+});
 ```
 
 > Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos lo siguiente.
@@ -3617,6 +3678,7 @@ php artisan make:model Post -m
 ```
 
 > Typee: en la Consola:
+
 ```console
 php artisan migrate
 ```
@@ -3624,6 +3686,7 @@ php artisan migrate
 ###### Creación del modelo Vídeo y la migración Vídeos
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:model Video -m
 ```
@@ -3631,15 +3694,19 @@ php artisan make:model Video -m
 > Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_videos_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_videos_table.php` en la función `up` y escribimos lo siguiente.
 
 ```php
-        Schema::create('videos', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 45);
-            $table->text('description');
-            $table->string('url',45);
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
-            $table->timestamps();
-        });
+Schema::create('videos', function (Blueprint $table) {
+  $table->id();
+  $table->string('name', 45);
+  $table->text('description');
+  $table->string('url', 45);
+  $table->unsignedBigInteger('user_id')->nullable();
+  $table
+    ->foreign('user_id')
+    ->references('id')
+    ->on('users')
+    ->onDelete('set null');
+  $table->timestamps();
+});
 ```
 
 > Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos lo siguiente.
@@ -3669,6 +3736,7 @@ php artisan make:model Video -m
 ```
 
 > Typee: en la Consola:
+
 ```console
 php artisan migrate
 ```
@@ -3682,6 +3750,7 @@ php artisan migrate
 ###### Creamos seeder de categorías
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:seeder CategoriesSeeder
 ```
@@ -3689,16 +3758,16 @@ php artisan make:seeder CategoriesSeeder
 > Abrimos el archivo `CategoriesSeeder.php` en la carpeta `database\seeders\CategoriesSeeder.php` en la función `run` y escribimos lo siguiente.
 
 ```php
-        DB::table('categories')->insert([
-            'name' => 'Desarrollador web',
-            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-            'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
-        ]);
-        DB::table('categories')->insert([
-            'name' => 'Diseño web',
-            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-            'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
-        ]);
+DB::table('categories')->insert([
+  'name' => 'Desarrollador web',
+  'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+  'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+]);
+DB::table('categories')->insert([
+  'name' => 'Diseño web',
+  'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+  'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+]);
 ```
 
 > Y importamos las clases siguientes.
@@ -3715,6 +3784,7 @@ $this->call(CategoriesSeeder::class);
 ```
 
 > Typee: en la Consola:
+
 ```console
 php artisan migrate:fresh --seed
 ```
@@ -3722,6 +3792,7 @@ php artisan migrate:fresh --seed
 ###### Creamos el controlador de Post
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:controller PostController --resource
 ```
@@ -3814,6 +3885,7 @@ php artisan make:controller PostController --resource
 ###### Creamos el request de Post
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:request PostRequest
 ```
@@ -3821,23 +3893,24 @@ php artisan make:request PostRequest
 > Abrimos el archivo `PostRequest.php` en la carpeta `app\Http\Requests\PostRequest.php` en la función `authorize` y escribimos lo siguiente.
 
 ```php
-        if ($this->user_id == auth()->user()->id) {
-            return true;
-        } else {
-            return false;
-        }
+if ($this->user_id == auth()->user()->id) {
+  return true;
+} else {
+  return false;
+}
 ```
 
 > Y en la función `rules` escribimos lo siguiente.
 
 ```php
-        return [
-            'title' => 'required|max:45' ,
-            'body' => 'required|min:5',
-            'category_id' => 'required|integer',
-            'user_id' => 'required|integer'
-        ];
+return [
+  'title' => 'required|max:45',
+  'body' => 'required|min:5',
+  'category_id' => 'required|integer',
+  'user_id' => 'required|integer',
+];
 ```
+
 > Y en la función añadimos lo siguiente.
 
 ```php
@@ -4042,6 +4115,7 @@ Route::resource('blog', PostController::class)->parameters(['blog' => 'post']);
 ###### Creación del modelo Rol y la migración Roles
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:model Role -m
 ```
@@ -4049,16 +4123,17 @@ php artisan make:model Role -m
 > Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_roles_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_roles_table.php` en la función `up` y añadimos lo siguiente.
 
 ```php
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 45)->unique();
-            $table->timestamps();
-        });
+Schema::create('roles', function (Blueprint $table) {
+  $table->id();
+  $table->string('name', 45)->unique();
+  $table->timestamps();
+});
 ```
 
 ###### Creación tabla pivote de la relación muchos a muchos.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:migration create_role_user_table
 ```
@@ -4066,15 +4141,24 @@ php artisan make:migration create_role_user_table
 > Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_role_user_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_role_user_table.php` en la función `up` y añadimos lo siguiente.
 
 ```php
-        Schema::create('role_user', function (Blueprint $table) {
-            $table->unsignedBigInteger('role_id');
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-        });
+Schema::create('role_user', function (Blueprint $table) {
+  $table->unsignedBigInteger('role_id');
+  $table->unsignedBigInteger('user_id');
+  $table
+    ->foreign('role_id')
+    ->references('id')
+    ->on('roles')
+    ->onDelete('cascade');
+  $table
+    ->foreign('user_id')
+    ->references('id')
+    ->on('users')
+    ->onDelete('cascade');
+});
 ```
 
 > Typee: en la Consola:
+
 ```console
 php artisan migrate
 ```
@@ -4107,11 +4191,13 @@ php artisan migrate
 ## Agregando iconos (Fontawesome)
 
 > Typee: en la Consola:
+
 ```console
 npm install --save @fortawesome/fontawesome-free
 ```
 
 > Typee: en la Consola:
+
 ```console
 npm install
 ```
@@ -4119,7 +4205,7 @@ npm install
 > Abrimos el archivo `app.scss` en la carpeta `resources\scss\app.scss` y añadimos lo siguiente.
 
 ```scss
-@import "@fortawesome/fontawesome-free/css/all.css";
+@import '@fortawesome/fontawesome-free/css/all.css';
 ```
 
 > Utilizamos esta instrucción para mostrar los iconos.
@@ -4362,8 +4448,7 @@ npm install
   display: grid;
   grid-template-columns: 1fr auto auto;
   grid-template-rows: auto;
-  grid-template-areas:
-    'inptsearch btnsearch btnclose';
+  grid-template-areas: 'inptsearch btnsearch btnclose';
 }
 .inptsearch {
   grid-area: inptsearch;
@@ -4376,26 +4461,28 @@ npm install
   align-self: center;
   justify-self: center;
 }
-.hover-link:hover{
-    background-color: #6c757d !important;
+.hover-link:hover {
+  background-color: #6c757d !important;
 }
-.dropdown-item:hover, .dropdown-item:focus {
-    background-color: #6c757d !important;
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: #6c757d !important;
 }
 .btn-circle {
-    width: 48px !important;
-    height: 48px !important;
-    border-radius: 50% !important;
-    border: solid 1px #6c757d !important;
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  border: solid 1px #6c757d !important;
 }
-.btn-circle:hover{
-    background-color: #6c757d !important;
+.btn-circle:hover {
+  background-color: #6c757d !important;
 }
 ```
 
 ###### Creamos algunos componentes
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:component Aside
 ```
@@ -4486,7 +4573,7 @@ class Aside extends Component
 ```php
 <aside class="aside-dashboard bg-dark text-light d-none d-lg-block" id="aside_dashboard" style="width:80px;">
     <div class="container-fluid">
-        {{-- Boton Cierre y Campo Busqueda  --}}
+        {{-- Botón Cierre y Campo Búsqueda  --}}
         <form id="content_aside_1" class="d-none">
             <div class="aside-first-grid mt-3">
                 <input class="form-control me-2 inptsearch" type="search" placeholder="Search" aria-label="Search"
@@ -4496,7 +4583,7 @@ class Aside extends Component
                     id="btn_close_aside"></button>
             </div>
         </form>
-        {{-- Boton menu --}}
+        {{-- Botón menu --}}
         <nav class="navbar navbar-dark d-block" id="content-btn-nav">
             <button class="navbar-toggler" type="button" id="btn_open_aside">
                 <span class="navbar-toggler-icon"></span>
@@ -4506,7 +4593,7 @@ class Aside extends Component
         {{-- Lista de links  --}}
         <ul class="navbar-nav list-group">
             <li class="nav-item">
-                {{-- Boton del link --}}
+                {{-- Botón del link --}}
                 <div id="btn_link_dashboard" class="d-none">
                     @foreach ($links as $link)
                         <button class="btn btn-outline-secondary text-start mb-1" style="width: 100%;" type="button"
@@ -4515,7 +4602,7 @@ class Aside extends Component
                             <i class="{{ $link['icono'] }}" style="color:{{ $link['icono_color'] }};"></i>
                             <span>{{ $link['name'] }}</span>
                         </button>
-                        {{-- Lista del colapsos --}}
+                        {{-- Lista del colapses --}}
                         <ul class="dropdown-menu collapse collapse-vertical bg-dark" id="{{ $link['name_collapse'] }}">
                             @foreach ($link['items'] as $item)
                                 <li>
@@ -4559,6 +4646,7 @@ class Aside extends Component
 ```
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:component Header
 ```
@@ -4865,13 +4953,13 @@ if ($password2 != null) {
     ...
 ```
 
->Y `create.blade.php` eliminamos lo siguiente.
+> Y `create.blade.php` eliminamos lo siguiente.
 
 ```php
 <a class="btn btn-success btn-float btn-position-top-0-left-0 m-2" href="{{ route('cursos.index') }}">Volver</a>
 ```
 
->Y `edit.blade.php` eliminamos lo siguiente.
+> Y `edit.blade.php` eliminamos lo siguiente.
 
 ```php
 <a class="btn btn-success btn-float btn-position-top-0-left-0 m-2" href="{{route('cursos.show', $curso)}}">Volver</a>
@@ -4947,19 +5035,39 @@ Route::resource('blog', PostController::class)->parameters(['blog' => 'post']);
 > Por lo siguiente.
 
 ```php
-Route::resource('blog', PostController::class)->parameters(['blog' => 'post'])->except(['create', 'edit', 'destroy']);
+Route::resource('blog', PostController::class)
+  ->parameters(['blog' => 'post'])
+  ->except(['create', 'edit', 'destroy']);
 ```
 
 > Y añadimos las siguientes.
 
 ```php
-Route::get('dashboard/blog/create', [PostController::class, 'create'])->name('blog.create');
-Route::get('dashboard/blog/{post}/edit', [PostController::class, 'edit'])->name('blog.edit');
-Route::delete('dashboard/blog/{post}', [PostController::class, 'destroy'])->name('blog.destroy');
-Route::get('dashboard/blog/myposts', [PostController::class, 'showmypost'])->name('blog.mypost');
-Route::get('dashboard/cursos/create', [CursoController::class, 'create'])->name('cursos.create');
-Route::get('dashboard/cursos/mycursos', [CursoController::class, 'showmycursos'])->name('cursos.mycursos');
-Route::get('dashboard/cursos/{curso}/edit', [CursoController::class, 'edit'])->name('cursos.edit');
+Route::get('dashboard/blog/create', [PostController::class, 'create'])->name(
+  'blog.create'
+);
+Route::get('dashboard/blog/{post}/edit', [PostController::class, 'edit'])->name(
+  'blog.edit'
+);
+Route::delete('dashboard/blog/{post}', [
+  PostController::class,
+  'destroy',
+])->name('blog.destroy');
+Route::get('dashboard/blog/myposts', [
+  PostController::class,
+  'showmypost',
+])->name('blog.mypost');
+Route::get('dashboard/cursos/create', [CursoController::class, 'create'])->name(
+  'cursos.create'
+);
+Route::get('dashboard/cursos/mycursos', [
+  CursoController::class,
+  'showmycursos',
+])->name('cursos.mycursos');
+Route::get('dashboard/cursos/{curso}/edit', [
+  CursoController::class,
+  'edit',
+])->name('cursos.edit');
 Route::view('dashboard', 'dashboard')->name('dashboard');
 ```
 
@@ -5213,6 +5321,7 @@ Route::view('dashboard', 'dashboard')->name('dashboard');
 ###### Creamos varios componentes para la visualización de los datos.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:component Table
 ```
@@ -5341,6 +5450,251 @@ class Button extends Component
         </button>
     </form>
 @endif
+```
+
+[Subir](#top)
+
+<a name="item33"></a>
+
+## Relación muchos a muchos (Many To Many) Parte 2
+
+###### Creamos un seeder para los roles.
+
+> Typee: en la Consola:
+
+```console
+php artisan make:seeder RolesSeeder
+```
+
+> Abrimos el archivo `RolesSeeder.php` en la carpeta `database\seeders\RolesSeeder.php` y en la función `run` escribimos lo siguiente.
+
+```php
+DB::table('roles')->insert([
+  'name' => 'Administrador',
+  'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+  'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+]);
+DB::table('roles')->insert([
+  'name' => 'Editor',
+  'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+  'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+]);
+DB::table('roles')->insert([
+  'name' => 'User',
+  'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+  'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+]);
+```
+
+> Abrimos el archivo `DatabaseSeeder.php` en la carpeta `database\seeders\DatabaseSeeder.php` y en la función `run` añadimos lo siguiente.
+
+```php
+$this->call(RolesSeeder::class);
+```
+
+> Typee: en la Consola:
+
+```console
+php artisan migrate:fresh --seed
+```
+
+###### Modificamos el registro de usuarios.
+
+> Abrimos el archivo `RegisterController.php` en la carpeta `app\Http\Controllers\Auth\RegisterController.php` y en la función `store` hacemos algunos cambios y lo dejamos de esta manera.
+
+```php
+try {
+  // Buscamos si hay algún usuario y le definimos un rol
+  $role = count(User::all()) > 0 ? 3 : 1; // (3) Rol User, (1) Rol Administrador.
+
+  // Creamos el usuario
+  $user = new User();
+  $user->name = $request->name;
+  $user->email = $request->email;
+  $user->password = bcrypt($request->password);
+  $user->save();
+
+  // Adjuntamos el Rol al Usuario.
+  $user->roles()->attach($role);
+
+  // Enviamos el correo de verificación.
+  event(new Registered($user));
+
+  // Logueamos al usuario
+  Auth::login($user);
+
+  // Regeneramos la sesión.
+  $request->session()->regenerate();
+
+  // Y redirigimos a la vista de los cursos.
+  return redirect()->route('cursos.index');
+
+} catch (\Throwable $th) {
+
+  // Le de volvemos a la vista con un mensaje de error.
+  return back()->with('message', [
+    'type' => 'danger',
+    'title' => 'Error !',
+    'message' =>
+      'Ha ocurrido un error revise los datos y vuelva a intentarlo si no se soluciona contacte con su administrador.',
+  ]);
+}
+```
+
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` hacemos algunos cambios y lo dejamos de esta manera.
+
+```php
+Route::group(['middleware' => ['verified', 'auth', 'auth.session']],function () {
+    ...
+});
+```
+
+**`Nota :` Cambiamos de posición el middleware `Verified`.**
+
+###### Creamos la modelo permiso con la migración.
+
+> Typee: en la Consola:
+```console
+php artisan make:model Permission -m
+```
+
+> Abrimos el archivo `create_permissions_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_permissions_table.php` y en la función `up` añadimos lo siguiente.
+
+```php
+$table->string('name', 45)->unique();
+```
+
+###### Creamos tabla pivote de permisos y roles.
+
+> Typee: en la Consola:
+```console
+php artisan make:migration create_permission_role_table
+```
+
+> Abrimos el archivo `create_permission_role_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_permission_role_table.php` y en la función `up` añadimos lo siguiente.
+
+```php
+        Schema::create('permission_role', function (Blueprint $table) {
+            $table->unsignedBigInteger('permission_id');
+            $table->unsignedBigInteger('role_id');
+            $table->foreign('permission_id')->references('id')->on('permissions')->onDelete('cascade');
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+        });
+```
+
+> Typee: en la Consola:
+```console
+php artisan migrate
+```
+
+> Abrimos el archivo `Role.php` en la carpeta `app\Models\Role.php` y añadimos lo siguiente.
+
+```php
+    // Relación muchos a muchos
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class);
+    }
+```
+
+> Abrimos el archivo `Permission.php` en la carpeta `app\Models\Permission.php` y añadimos lo siguiente.
+
+```php
+    // Relación muchos a muchos
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+```
+
+###### Creamos un seeder para los Permissions.
+
+> Typee: en la Consola:
+```console
+php artisan make:seeder PermissionSeeder
+```
+
+> Abrimos el archivo `PermissionSeeder.php` en la carpeta `database\seeders\PermissionSeeder.php` y en la función `run` añadimos lo siguiente.
+
+```php
+        DB::table('permissions')->insert([
+            'name' => 'Create',
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+        ]);
+        DB::table('permissions')->insert([
+            'name' => 'Edit',
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+        ]);
+        DB::table('permissions')->insert([
+            'name' => 'Delete',
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+        ]);
+```
+
+> Typee: en la Consola:
+```console
+php artisan make:seeder PermissionRoleSeeder
+```
+
+> Abrimos el archivo `PermissionRoleSeeder.php` en la carpeta `database\seeders\PermissionRoleSeeder.php` y en la función `run` añadimos lo siguiente.
+
+```php
+        DB::table('permission_role')->insert([
+            'permission_id' => 1,
+            'role_id' => 1,
+        ]);
+        DB::table('permission_role')->insert([
+            'permission_id' => 2,
+            'role_id' => 1,
+        ]);
+        DB::table('permission_role')->insert([
+            'permission_id' => 3,
+            'role_id' => 1,
+        ]);
+        DB::table('permission_role')->insert([
+            'permission_id' => 4,
+            'role_id' => 1,
+        ]);
+        DB::table('permission_role')->insert([
+            'permission_id' => 1,
+            'role_id' => 2,
+        ]);
+        DB::table('permission_role')->insert([
+            'permission_id' => 2,
+            'role_id' => 2,
+        ]);
+        DB::table('permission_role')->insert([
+            'permission_id' => 4,
+            'role_id' => 2,
+        ]);
+        DB::table('permission_role')->insert([
+            'permission_id' => 4,
+            'role_id' => 3,
+        ]);
+```
+
+> Abrimos el archivo `DatabaseSeeder.php` en la carpeta `database\seeders\DatabaseSeeder.php` y en la función `run` modificamos lo siguiente.
+
+```php
+$this->call([
+    CategoriesSeeder::class,
+    RolesSeeder::class,
+    PermissionSeeder::class,
+    PermissionRoleSeeder::class,
+]);
+```
+
+> Typee: en la Consola:
+```console
+php artisan db:seed --class=PermissionSeeder
+```
+
+> Typee: en la Consola:
+```console
+php artisan db:seed --class=PermissionRoleSeeder
 ```
 
 [Subir](#top)

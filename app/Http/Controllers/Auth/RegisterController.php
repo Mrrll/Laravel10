@@ -17,20 +17,27 @@ class RegisterController extends Controller
     public function store(RegisterRequest $request)
     {
         try {
+
+            $role = count(User::all()) > 0 ? 3 : 1;
+            
             $user = new User();
             $user->name = $request->name;
             $user->email = $request->email;
             $user->password = bcrypt($request->password);
             $user->save();
 
-            event(new Registered($user));
-            $credentials = $request->only('email', 'password');
-            if (Auth::attempt($credentials)) {
-                $request->session()->regenerate();
+            $user->roles()->attach($role);
 
-                return redirect()->route('cursos.index');
-            }
+            event(new Registered($user));
+
+            Auth::login($user);
+
+            $request->session()->regenerate();
+
+            return redirect()->route('cursos.index');
+
         } catch (\Throwable $th) {
+
             return back()->with('message', [
                 'type' => 'danger',
                 'title' => 'Error !',

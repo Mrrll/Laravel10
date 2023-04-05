@@ -60,7 +60,7 @@ Route::controller(LoginController::class)->group(function () {
 
 // Rutas Protegidas
 
-Route::group(['middleware' => ['auth', 'auth.session', 'verified']],function () {
+Route::group(['middleware' => ['verified', 'auth', 'auth.session']],function () {
         Route::get('logout', [LoginController::class, 'logout'])->name('logout');
         Route::resource('cursos', CursoController::class)->except(['create', 'edit']);
         Route::resource('profile', ProfileController::class)->except(['index', 'show', 'destroy']);
