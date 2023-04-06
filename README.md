@@ -4126,6 +4126,7 @@ php artisan make:model Role -m
 Schema::create('roles', function (Blueprint $table) {
   $table->id();
   $table->string('name', 45)->unique();
+  $table->string('slug', 45)->unique();
   $table->timestamps();
 });
 ```
@@ -5470,7 +5471,7 @@ php artisan make:seeder RolesSeeder
 
 ```php
 DB::table('roles')->insert([
-  'name' => 'Administrador',
+  'name' => 'Admin',
   'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
   'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
 ]);
@@ -5605,96 +5606,6 @@ php artisan migrate
     {
         return $this->belongsToMany(Role::class);
     }
-```
-
-###### Creamos un seeder para los Permissions.
-
-> Typee: en la Consola:
-```console
-php artisan make:seeder PermissionSeeder
-```
-
-> Abrimos el archivo `PermissionSeeder.php` en la carpeta `database\seeders\PermissionSeeder.php` y en la función `run` añadimos lo siguiente.
-
-```php
-        DB::table('permissions')->insert([
-            'name' => 'Create',
-            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-            'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
-        ]);
-        DB::table('permissions')->insert([
-            'name' => 'Edit',
-            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-            'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
-        ]);
-        DB::table('permissions')->insert([
-            'name' => 'Delete',
-            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-            'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
-        ]);
-```
-
-> Typee: en la Consola:
-```console
-php artisan make:seeder PermissionRoleSeeder
-```
-
-> Abrimos el archivo `PermissionRoleSeeder.php` en la carpeta `database\seeders\PermissionRoleSeeder.php` y en la función `run` añadimos lo siguiente.
-
-```php
-        DB::table('permission_role')->insert([
-            'permission_id' => 1,
-            'role_id' => 1,
-        ]);
-        DB::table('permission_role')->insert([
-            'permission_id' => 2,
-            'role_id' => 1,
-        ]);
-        DB::table('permission_role')->insert([
-            'permission_id' => 3,
-            'role_id' => 1,
-        ]);
-        DB::table('permission_role')->insert([
-            'permission_id' => 4,
-            'role_id' => 1,
-        ]);
-        DB::table('permission_role')->insert([
-            'permission_id' => 1,
-            'role_id' => 2,
-        ]);
-        DB::table('permission_role')->insert([
-            'permission_id' => 2,
-            'role_id' => 2,
-        ]);
-        DB::table('permission_role')->insert([
-            'permission_id' => 4,
-            'role_id' => 2,
-        ]);
-        DB::table('permission_role')->insert([
-            'permission_id' => 4,
-            'role_id' => 3,
-        ]);
-```
-
-> Abrimos el archivo `DatabaseSeeder.php` en la carpeta `database\seeders\DatabaseSeeder.php` y en la función `run` modificamos lo siguiente.
-
-```php
-$this->call([
-    CategoriesSeeder::class,
-    RolesSeeder::class,
-    PermissionSeeder::class,
-    PermissionRoleSeeder::class,
-]);
-```
-
-> Typee: en la Consola:
-```console
-php artisan db:seed --class=PermissionSeeder
-```
-
-> Typee: en la Consola:
-```console
-php artisan db:seed --class=PermissionRoleSeeder
 ```
 
 [Subir](#top)
