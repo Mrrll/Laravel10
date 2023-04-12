@@ -68,6 +68,7 @@
 - [Agregando iconos (Fontawesome)](#item31)
 - [Dashboard simple](#item32)
 - [Relación muchos a muchos (Many To Many) Parte 2](#item33)
+- [Roles y Permissions Implementación](#item34)
 
 
 <a name="item1"></a>
@@ -5606,6 +5607,316 @@ php artisan migrate
     {
         return $this->belongsToMany(Role::class);
     }
+```
+
+[Subir](#top)
+
+<a name="item34"></a>
+
+## Roles y Permissions Implementación.
+
+###### Creamos controlador para lista de usuarios.
+
+> Typee: en la Consola:
+```console
+php artisan make:controller UsersController -m User -r
+```
+
+**`Nota :` con la instrucción `-m User` indicamos el modelo que queremos utilizar y con `-r (-resource)` es para que nos genere el controlador con los métodos del un (`crud`).**
+
+> Abrimos el archivo `UsersController.php` en la carpeta `app\Http\Controllers\UsersController.php` y añadimos lo siguiente.
+
+```php
+    public function index()
+    {
+        $headName = ['#','Name','Email','Roles','Verified','Date','Options'];
+        $users = User::orderBy('id')->paginate(10);
+        return view('admin.users.index', compact('users','headName'));
+    }
+    public function show(User $user)
+    {
+        return view('admin.users.show', compact('user'));
+    }
+```
+
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y añadimos lo siguiente.
+
+```php
+Route::resource('users', UsersController::class);
+```
+
+> Creamos y abrimos el archivo `index.blade.php` en la carpeta `resources\views\admin\users\index.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.dashboard')
+
+@section('title', 'List Users')
+
+@section('content-dashboard')
+    <main class="container center_container flex-column main-dashboard">
+        <h1>List Users</h1>
+        {{-- Tabla --}}
+        <x-table :thead="$headName" class="table-striped table-hover table-responsive-sm align-middle" theadclass="table-dark">
+            @foreach ($users as $user)
+                <tr class="{{($user->id == auth()->user()->id) ? 'table-active ' : ''}}">
+                    <th scope="col">{{ $user->id }}</th>
+                    <td>{{ $user->name }}</td>
+                    <td>
+                        <span class="d-inline-block text-truncate" style="max-width=332px;">
+                            {{ $user->email }}
+                        </span>
+                    </td>
+                    <td>
+                        @foreach ($user->roles as $role )
+                            <span class="badge bg-primary">
+                                {{ $role->name }}
+                            </span>
+                        @endforeach
+                    </td>
+                    <td>
+
+                            {{ $user->email_verified_at->format('d-m-Y') }}
+                    </td>
+                    <td>{{ $user->updated_at->format('d-m-Y') }}</td>
+                    <td class="text-center">
+                        <span class="d-inline-flex">
+                            <x-table.button type='link' class='btn-outline-success me-1' :route="route('users.show', $user)">
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-eye" style="color: #7cf884;"></i>
+                                </x-slot>
+                            </x-table.button>
+                            <x-table.button type='link' class='btn-outline-warning me-1' :route="route('users.edit', $user)">
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                                </x-slot>
+                            </x-table.button>
+                            <x-table.button type='submit' class='btn-outline-danger' :route="route('users.destroy', $user)" method='delete'>
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                                </x-slot>
+                            </x-table.button>
+                        </span>
+                    </td>
+                </tr>
+            @endforeach
+        </x-table>
+        {{-- Tabla en Movil --}}
+        @foreach ($users as $user)
+            <x-table class="table-striped {{($user->id == auth()->user()->id) ? 'table-active ' : ''}}"  typetable="movil">
+                <x-slot name="head">
+                    <x-table.button type='link' class='btn-outline-warning me-1' :route="route('blog.edit', $user)">
+                        <x-slot name="icon">
+                            <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                        </x-slot>
+                    </x-table.button>
+                    <x-table.button type='submit' class='btn-outline-danger' :route="route('blog.destroy', $user)" method='delete'>
+                        <x-slot name="icon">
+                            <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                        </x-slot>
+                    </x-table.button>
+                </x-slot>
+                <tr>
+                    <th scope="col" class="d-flex flex-column">
+                        <strong># :</strong>
+                        {{ $user->id }}
+                    </th>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Name :</strong>
+                        {{ $user->name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Email :</strong>
+                        {{ $user->email }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Role :</strong>
+                        @foreach ($user->roles as $role )
+                            <span class="badge bg-primary">
+                                {{ $role->name }}
+                            </span>
+                        @endforeach
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                         <strong>Verified :</strong>
+                            {{ $user->email_verified_at->format('d-m-Y') }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Date :</strong>
+                        {{ $user->updated_at->format('d-m-Y') }}
+                    </td>
+                </tr>
+            </x-table>
+        @endforeach
+        {{ $users->links() }}
+    </main>
+@endsection
+```
+
+> Creamos y abrimos el archivo `style.scss` en la carpeta `resources\scss\style.scss` y escribimos lo siguiente.
+
+```scss
+.table-striped > tbody > tr.table-active:nth-of-type(odd) > * {
+    --bs-table-accent-bg: var(--bs-table-active-bg);
+}
+.table-active {
+  --bs-table-accent-bg: rgba(6, 3, 3, 0.598) !important;
+  color: white;
+}
+.table {
+  --bs-table-color: var(--bs-body-color);
+  --bs-table-bg: transparent;
+  --bs-table-border-color: var(--bs-border-color);
+  --bs-table-accent-bg: transparent;
+  --bs-table-striped-color: none;
+  --bs-table-striped-bg: rgba(223, 218, 218, 0.598);
+  --bs-table-active-color: white;
+  --bs-table-active-bg: rgba(6, 3, 3, 0.598);
+  --bs-table-hover-color: white;
+  --bs-table-hover-bg: rgba(6, 3, 3, 0.598);
+  color: var(--bs-table-color);
+}
+```
+
+> Abrimos el archivo `app.scss` en la carpeta `resources\scss\app.scss` y añadimos lo siguiente.
+
+```scss
+@import "style.scss";
+```
+
+> Abrimos el archivo `app.css` en la carpeta `resources\css\app.css` y añadimos lo siguiente.
+
+```css
+.badge {
+    max-width: 150px;
+}
+```
+
+> Creamos y abrimos el archivo `show.blade.php` en la carpeta `resources\views\admin\users\show.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.dashboard')
+
+@section('title', 'User | '.$user->name)
+
+@section('content-dashboard')
+    <main class="container center_container flex-column main-dashboard">
+        <x-card style="width:100%;">
+            <x-slot name="card_header" classheader="text-start">
+                <h6><strong>Nombre : </strong> {{$user->name}} </h6>
+                <h6><strong>Email : </strong> {{$user->email}} </h6>
+                <h6><small>Number of Posts : .....</small></h6>
+            </x-slot>
+            <h5 class="card-title"><strong>Role :</strong></h5>
+            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <h5 class="card-title"><strong>Permissions :</strong></h5>
+            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <x-slot name="card_footer" classfooter="text-body-secondary">
+                <a href="{{ url()->previous() }}" class="btn btn-primary">Go Back</a>
+            </x-slot>
+        </x-card>
+    </main>
+@endsection
+```
+
+###### Creamos componente card.
+
+> Typee: en la Consola:
+```console
+php artisan make:component Card
+```
+
+> Abrimos el archivo `card.blade.php` en la carpeta `resources\views\components\card.blade.php` y escribimos lo siguiente.
+
+```php
+<div class="card {{ $attributes->merge(['class' => $class]) }}" {{ $attributes->style([$style]) }}>
+    @if (!empty($card_header))
+        <div class="card-header {{ $attributes->merge(['class' => $classheader]) }}">
+            {{ $card_header }}
+        </div>
+    @endif
+    <div class="card-body">
+        {{ $slot }}
+    </div>
+    @if (!empty($card_footer))
+        <div class="card-footer {{ $attributes->merge(['class' => $classfooter]) }}">
+            {{ $card_footer }}
+        </div>
+    @endif
+</div>
+```
+
+> Abrimos el archivo `Card.php` en la carpeta `app\View\Components\Card.php` y escribimos lo siguiente.
+
+```php
+<?php
+
+namespace App\View\Components;
+
+use Closure;
+use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
+
+class Card extends Component
+{
+    public $style, $class, $classheader, $classfooter;
+    /**
+     * Create a new component instance.
+     */
+    public function __construct($style = null, $class = null, $classheader = null, $classfooter = null)
+    {
+        $this->style = $style;
+        $this->class = $class;
+        $this->classheader = $classheader;
+        $this->classfooter = $classfooter;
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     */
+    public function render(): View|Closure|string
+    {
+        return view('components.card');
+    }
+}
+```
+
+> Abrimos el archivo `Aside.php` en la carpeta `app\View\Components\Aside.php` y dentro de `$this->links` añadimos lo siguiente.
+
+```php
+        [
+            'name' => 'Users',
+            'active' =>  '',
+            'icono' => 'fa-solid fa-users fa-lg',
+            'icono_color' => '#0045bd',
+            'name_collapse' => 'collapseHeightUsers',
+            'items' => [
+                [
+                    'name' => 'List Users',
+                    'route' => route('users.index'),
+                    'active' =>  '',
+                    'icono' => 'fa-solid fa-users fa-lg',
+                    'icono_color' => '#0045bd',
+                ],
+                [
+                    'name' => 'Crear Post',
+                    'route' => route('blog.create'),
+                    'active' =>  '',
+                    'icono' => 'fa-solid fa-users fa-lg',
+                    'icono_color' => '#0045bd',
+                ],
+            ]
+        ],
 ```
 
 [Subir](#top)

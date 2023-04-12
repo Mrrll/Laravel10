@@ -94,3 +94,6 @@
 .btn-circle:hover{
     background-color: #6c757d !important;
 }
+.badge{
+    max-width: 150px;
+}

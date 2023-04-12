@@ -1,0 +1,20 @@
+.table-striped > tbody > tr.table-active:nth-of-type(odd) > * {
+    --bs-table-accent-bg: var(--bs-table-active-bg);
+}
+.table-active {
+  --bs-table-accent-bg: rgba(6, 3, 3, 0.598) !important;
+  color: white;
+}
+.table {
+  --bs-table-color: var(--bs-body-color);
+  --bs-table-bg: transparent;
+  --bs-table-border-color: var(--bs-border-color);
+  --bs-table-accent-bg: transparent;
+  --bs-table-striped-color: none;
+  --bs-table-striped-bg: rgba(223, 218, 218, 0.598);
+  --bs-table-active-color: white;
+  --bs-table-active-bg: rgba(6, 3, 3, 0.598);
+  --bs-table-hover-color: white;
+  --bs-table-hover-bg: rgba(6, 3, 3, 0.598);
+  color: var(--bs-table-color);
+}

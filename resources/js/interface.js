@@ -1,6 +1,6 @@
-let $password1 = document.getElementById('pass1')
-let $password2 = document.getElementById('pass2')
-let $pass2message = document.getElementById('pass2message')
+let $password = document.getElementById('password')
+let $repeatpassword = document.getElementById('repeat_password')
+let $repeatpasswordmessage = document.getElementById('repeat_password_message')
 let $btncloseaside = document.getElementById('btn_close_aside')
 let $asidedashboard = document.getElementById('aside_dashboard')
 let $contentaside1 = document.getElementById('content_aside_1')
@@ -13,14 +13,14 @@ let $btnlinksiconosdashboard = document.getElementById(
 
 let timeout
 // Passwords iguales
-if ($password2 != null) {
-  $password2.addEventListener('keydown', () => {
+if ($repeatpassword != null) {
+  $repeatpassword.addEventListener('keydown', () => {
     clearTimeout(timeout)
     timeout = setTimeout(() => {
-      if ($password1.value == $password2.value) {
-        $pass2message.classList.replace('d-block', 'd-none')
+      if ($password.value == $repeatpassword.value) {
+        $repeatpasswordmessage.classList.replace('d-block', 'd-none')
       } else {
-        $pass2message.classList.replace('d-none', 'd-block')
+        $repeatpasswordmessage.classList.replace('d-none', 'd-block')
       }
       clearTimeout(timeout)
     }, 1000)

@@ -18,7 +18,7 @@
         <thead>
             <tr class="{{ $theadclass }}">
                 @for ($i = 0; $i < count($thead); $i++)
-                    <th scope="col">{{ $thead[$i] }}</th>
+                    <th class="{{($i == count($thead) -1) ? 'text-center' : ''}}" scope="col">{{ $thead[$i] }}</th>
                 @endfor
             </tr>
         </thead>

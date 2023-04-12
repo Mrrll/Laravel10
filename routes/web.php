@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
 use App\Http\Requests\EmailVerificationRequest;
 use Illuminate\Support\Facades\Password;
@@ -72,6 +73,7 @@ Route::group(['middleware' => ['verified', 'auth', 'auth.session']],function () 
         Route::get('dashboard/cursos/create', [CursoController::class, 'create'])->name('cursos.create');
         Route::get('dashboard/cursos/mycursos', [CursoController::class, 'showmycursos'])->name('cursos.mycursos');
         Route::get('dashboard/cursos/{curso}/edit', [CursoController::class, 'edit'])->name('cursos.edit');
+        Route::resource('users', UsersController::class);
 
     }
 );

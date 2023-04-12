@@ -36,15 +36,15 @@
                     </div>
                     <div class="mb-0">
                         <label class="form-label">Password:</label>
-                        <input type="password" class="form-control" name="password" id="pass1">
+                        <input type="password" class="form-control" name="password" id="password">
                         @error('password')
                             <small class="text-danger">*{{ $message }}</small>
                         @enderror
                     </div>
                     <div class="mb-0">
                         <label class="form-label">Repite Password:</label>
-                        <input type="password" class="form-control" id="pass2">
-                        <div id="pass2message" class="d-none invalid">
+                        <input type="password" class="form-control" id="repeat_password">
+                        <div id="repeat_password_message" class="d-none invalid">
                             <small>*Los passwords no coinciden.</small>
                         </div>
                     </div>

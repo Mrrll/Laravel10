@@ -61,6 +61,29 @@ class Aside extends Component
                 ],
             ]
         ],
+        [
+            'name' => 'Users',
+            'active' =>  '',
+            'icono' => 'fa-solid fa-users fa-lg',
+            'icono_color' => '#0045bd',
+            'name_collapse' => 'collapseHeightUsers',
+            'items' => [
+                [
+                    'name' => 'List Users',
+                    'route' => route('users.index'),
+                    'active' =>  '',
+                    'icono' => 'fa-solid fa-users fa-lg',
+                    'icono_color' => '#0045bd',
+                ],
+                [
+                    'name' => 'Crear Post',
+                    'route' => route('blog.create'),
+                    'active' =>  '',
+                    'icono' => 'fa-solid fa-users fa-lg',
+                    'icono_color' => '#0045bd',
+                ],
+            ]
+        ],
     ];
     }
 
