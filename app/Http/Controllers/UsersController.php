@@ -46,19 +46,21 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
-        $campos = [
+        $fields = [
             [
+                'id' => 'username',
                 'name' => 'name',
-                'label' => 'User name :',
+                'label' => 'Username :',
                 'type' => 'text',
-                'placeholder' => 'User name',
+                'placeholder' => 'Username',
                 'value' => old('name', $user->name)
             ],
             [
+                'id' => 'email',
                 'name' => 'email',
                 'label' => 'Email :',
                 'type' => 'email',
-                'placeholder' => 'test@example.com',
+                'placeholder' => 'email@example.com',
                 'value' => old('email', $user->email)
             ],
             [
@@ -73,15 +75,7 @@ class UsersController extends Controller
                 'type' => 'password',
             ]
         ];
-        $buttons = [
-            [
-                'title' => 'Editar Usuario',
-                'color' => 'primary',
-                'second_title'=> 'Volver',
-                'second_color'=> 'danger'
-            ]
-        ];
-        return view('admin.users.edit', compact('user','campos','buttons'));
+        return view('admin.users.edit', compact('user','fields'));
     }
 
     /**

@@ -36,5 +36,8 @@
     "Welcome": "Bienvenido",
     "The introduction to the notification.": "La introducción a la notificación.",
     "Notification Action": "Acción de notificación",
-    "Thank you for using our application!": "¡Gracias por usar nuestra aplicación!"
+    "Thank you for using our application!": "¡Gracias por usar nuestra aplicación!",
+    "The passwords do not match" : "Los passwords no coinciden",
+    "Update User" : "Actualizar Usuario",
+    "Go Back" : "Volver"
 }

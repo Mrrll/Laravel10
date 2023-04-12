@@ -5919,4 +5919,290 @@ class Card extends Component
         ],
 ```
 
+> Abrimos el archivo `UsersController.php` en la carpeta `app\Http\Controllers\UsersController.php` y añadimos lo siguiente.
+
+```php
+public function edit(User $user)
+    {
+        $fields = [
+            [
+                'id' => 'username',
+                'name' => 'name',
+                'label' => 'Username :',
+                'type' => 'text',
+                'placeholder' => 'Username',
+                'value' => old('name', $user->name)
+            ],
+            [
+                'id' => 'email',
+                'name' => 'email',
+                'label' => 'Email :',
+                'type' => 'email',
+                'placeholder' => 'email@example.com',
+                'value' => old('email', $user->email)
+            ],
+            [
+                'id' => 'password',
+                'name' => 'password',
+                'label' => 'Password :',
+                'type' => 'password',
+            ],
+            [
+                'id' => 'repeat_password',
+                'label' => 'Repeat password :',
+                'type' => 'password',
+            ]
+        ];
+        return view('admin.users.edit', compact('user','fields'));
+    }
+```
+
+> Creamos y abrimos el archivo `edit.blade.php` en la carpeta `resources\views\admin\users\edit.blade.php` y escribimos lo siguiente.
+
+```php
+@extends('layouts.dashboard')
+
+@section('title', 'Editar User')
+
+@section('content-dashboard')
+    <main class="container center_container flex-column main-dashboard">
+        <h1>Editar Users</h1>
+        <x-card style="width:100%">
+            <x-form :route="route('users.update', $user)" method="patch" style="width:100%">
+                <div class="grid" style="--bs-rows: 2; --bs-columns: 2; --bs-gap: 1rem;">
+                    @foreach ($fields as $field)
+                        <x-form.input
+                            type="{{ $field['type'] }}"
+                            id="{{ !empty($field['id']) ? $field['id'] : ''}}"
+                            placeholder="{{ !empty($field['placeholder']) ? $field['placeholder'] : '' }}"
+                            name="{{ !empty($field['name']) ? $field['name'] : '' }}"
+                            label="{{ $field['label'] }}"
+                            value="{{ !empty($field['value']) ? $field['value'] : ''}}"
+                            class="form-control-sm">
+                        </x-form.input>
+                    @endforeach
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                    <x-form.button type="submit" color="primary" class="me-2">
+                    @lang("Update User")
+                    </x-form.button>
+                    <x-form.button  color="danger" :route="url()->previous()">
+                        @lang("Go Back")
+                    </x-form.button>
+                </div>
+            </x-form>
+        </x-card>
+    </main>
+@endsection
+```
+
+###### Creamos los componentes form, input y button.
+
+> Typee: en la Consola:
+```console
+php artisan make:component Form
+php artisan make:component Form/Input
+php artisan make:component Form/Button
+```
+
+> Abrimos el archivo `Form.php` en la carpeta `app\View\Components\Form.php` y escribimos lo siguiente.
+
+```php
+<?php
+
+namespace App\View\Components;
+
+use Closure;
+use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
+
+class Form extends Component
+{
+    public
+    $route,
+    $method,
+    $class,
+    $style;
+    /**
+     * Create a new component instance.
+     */
+    public function __construct(
+        $route,
+        $method = "post",
+        $class = null,
+        $style = null
+        )
+    {
+        $this->route = $route;
+        $this->method = $method;
+        $this->class = $class;
+        $this->style = $style;
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     */
+    public function render(): View|Closure|string
+    {
+        return view('components.form');
+    }
+}
+```
+
+> Abrimos el archivo `form.blade.php` en la carpeta `resources\views\components\form.blade.php` y escribimos lo siguiente.
+
+```php
+<form action="{{$route}}" method="post" {{ $attributes->merge(['class' => "$class"]) }} {{ $attributes->style([$style]) }}>
+    @csrf
+    @method($method)
+    {{$slot}}
+</form>
+```
+
+> Abrimos el archivo `Input.php` en la carpeta `app\View\Components\Form\Input.php` y escribimos lo siguiente.
+
+```php
+<?php
+
+namespace App\View\Components\Form;
+
+use Closure;
+use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
+
+class Input extends Component
+{
+    public
+    $type,
+    $id,
+    $name,
+    $placeholder,
+    $label,
+    $class,
+    $value;
+    /**
+     * Create a new component instance.
+     */
+    public function __construct(
+        $type,
+        $id,
+        $name = null,
+        $placeholder = null,
+        $label = "Example",
+        $class = null,
+        $value = null
+        )
+    {
+        $this->type = $type;
+        $this->id = $id;
+        $this->name = $name;
+        $this->placeholder = $placeholder;
+        $this->label = $label;
+        $this->class = $class;
+        $this->value = $value;
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     */
+    public function render(): View|Closure|string
+    {
+        return view('components.form.input');
+    }
+}
+```
+
+> Abrimos el archivo `input.blade.php` en la carpeta `resources\views\components\form\input.blade.php` y escribimos lo siguiente.
+
+```php
+<div>
+    <label class="ms-1" for="{{ $id }}">{{ $label }}</label>
+    <input type="{{ $type }}" {{ $attributes->merge(['class' => "form-control $class "]) }} id="{{ $id }}" placeholder="{{ $placeholder }}" name="{{ $name }}" value="{{ $value }}">
+    @if ($id == 'repeat_password')
+        <div id="repeat_password_message" class="d-none invalid">
+            <small>*@lang("The passwords do not match").</small>
+        </div>
+    @else
+        @error('name')
+            <small class="text-danger invalid-feedback">*{{ $message }}</small>
+        @enderror
+    @endif
+</div>
+```
+
+> Abrimos el archivo `Button.php` en la carpeta `app\View\Components\Form\Button.php` y escribimos lo siguiente.
+
+```php
+<?php
+
+namespace App\View\Components\Form;
+
+use Closure;
+use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
+
+class Button extends Component
+{
+    public
+    $type,
+    $color,
+    $class,
+    $route;
+    /**
+     * Create a new component instance.
+     */
+    public function __construct(
+        $type = null,
+        $color = "primary",
+        $class = null,
+        $route = null
+        )
+    {
+        $this->type = $type;
+        $this->color = $color;
+        $this->class = $class;
+        $this->route = $route;
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     */
+    public function render(): View|Closure|string
+    {
+        return view('components.form.button');
+    }
+}
+```
+
+> Abrimos el archivo `button.blade.php` en la carpeta `resources\views\components\form\button.blade.php` y escribimos lo siguiente.
+
+```php
+@if ($type == "submit")
+    <button type="{{$type}}" {{ $attributes->merge(['class' => "btn btn-$color $class "]) }}>
+        {{$slot}}
+    </button>
+@else
+    <a {{ $attributes->merge(['class' => "btn btn-$color $class "]) }} href="{{ $route  }}">
+        {{$slot}}
+    </a>
+@endif
+```
+
+> Abrimos el archivo `es.json` en la carpeta `lang\es.json` y añadimos lo siguiente.
+
+```json
+    "The passwords do not match" : "Los passwords no coinciden",
+    "Update User" : "Actualizar Usuario",
+    "Go Back" : "Volver"
+```
+
+> Abrimos el archivo `_variables.scss` en la carpeta `node_modules\bootstrap\scss\_variables.scss` y cambiamos lo siguiente.
+
+```scss
+$enable-grid-classes = false
+$enable-cssgrid = true
+```
+
+**`Nota :` Realizamos el cambio para utilizar las clases de `grid` en bootstrap en vez de las clases `row y col`.**
+
 [Subir](#top)
