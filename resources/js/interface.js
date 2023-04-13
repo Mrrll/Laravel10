@@ -40,7 +40,7 @@ if ($btncloseaside != null) {
 // Abrir menu dashboard
 if ($btnopenaside != null) {
   $btnopenaside.addEventListener('click', () => {
-    $asidedashboard.style.removeProperty('width')
+    $asidedashboard.style = 'width:300px'
     $contentaside1.classList.remove('d-none')
     $contentbtnnav.classList.replace('d-block', 'd-none')
     $btnlinkdashboard.classList.remove('d-none')

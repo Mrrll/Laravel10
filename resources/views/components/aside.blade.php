@@ -4,7 +4,7 @@
         <form id="content_aside_1" class="d-none">
             <div class="aside-first-grid mt-3">
                 <input class="form-control me-2 inptsearch" type="search" placeholder="Search" aria-label="Search"
-                    style="max-width: 150px">
+                    style="width: 165px">
                 <button class="btn btn-outline-success btnsearch" type="submit">Search</button>
                 <button type="button" class="btn-close btn-close-white btnclose ms-2" aria-label="Close"
                     id="btn_close_aside"></button>

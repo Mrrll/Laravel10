@@ -8,7 +8,7 @@
         {{-- Tabla --}}
         <x-table :thead="$headName" class="table-striped table-hover table-responsive-sm align-middle" theadclass="table-dark">
             @foreach ($users as $user)
-                <tr class="{{($user->id == auth()->user()->id) ? 'table-active ' : ''}}">
+                <tr class="{{ $user->id == auth()->user()->id ? 'table-active ' : '' }}">
                     <th scope="col">{{ $user->id }}</th>
                     <td>{{ $user->name }}</td>
                     <td>
@@ -17,7 +17,7 @@
                         </span>
                     </td>
                     <td>
-                        @foreach ($user->roles as $role )
+                        @foreach ($user->roles as $role)
                             <span class="badge bg-primary">
                                 {{ $role->name }}
                             </span>
@@ -25,7 +25,7 @@
                     </td>
                     <td>
 
-                            {{ $user->email_verified_at->format('d-m-Y') }}
+                        {{ $user->email_verified_at->format('d-m-Y') }}
                     </td>
                     <td>{{ $user->updated_at->format('d-m-Y') }}</td>
                     <td class="text-center">
@@ -40,19 +40,32 @@
                                     <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
                                 </x-slot>
                             </x-table.button>
-                            <x-table.button type='submit' class='btn-outline-danger' :route="route('users.destroy', $user)" method='delete'>
-                                <x-slot name="icon">
-                                    <i class="fa-solid fa-trash" style="color: #f66661;"></i>
-                                </x-slot>
-                            </x-table.button>
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteuser{{$user->id}}">
+                                <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                            </button>
                         </span>
                     </td>
                 </tr>
+                <x-modal id="deleteuser{{$user->id}}" class="modal-dialog-centered">
+                    <x-slot name="title">
+                        @lang('Delete')
+                    </x-slot>
+                    <strong> @lang("You're sure ?")</strong> @lang('you want to delete the user <strong>:user</strong>, if you click continue, the user will be deleted and cannot be recovered.', ['user' => $user->name])
+                    <x-slot name="footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@lang('Do not continue')</button>
+                        <form action="{{ route('users.destroy', $user) }}" method="post">
+                            @csrf
+                            @method('delete')
+                            <button type="button" class="btn btn-danger">@lang('Continue')</button>
+                        </form>
+                    </x-slot>
+                </x-modal>
             @endforeach
         </x-table>
         {{-- Tabla en Movil --}}
         @foreach ($users as $user)
-            <x-table class="table-striped {{($user->id == auth()->user()->id) ? 'table-active ' : ''}}"  typetable="movil">
+            <x-table class="table-striped {{ $user->id == auth()->user()->id ? 'table-active ' : '' }}" typetable="movil">
                 <x-slot name="head">
                     <x-table.button type='link' class='btn-outline-warning me-1' :route="route('blog.edit', $user)">
                         <x-slot name="icon">
@@ -86,7 +99,7 @@
                 <tr>
                     <td class="d-flex flex-column">
                         <strong>Role :</strong>
-                        @foreach ($user->roles as $role )
+                        @foreach ($user->roles as $role)
                             <span class="badge bg-primary">
                                 {{ $role->name }}
                             </span>
@@ -95,8 +108,8 @@
                 </tr>
                 <tr>
                     <td class="d-flex flex-column">
-                         <strong>Verified :</strong>
-                            {{ $user->email_verified_at->format('d-m-Y') }}
+                        <strong>Verified :</strong>
+                        {{ $user->email_verified_at->format('d-m-Y') }}
                         </span>
                     </td>
                 </tr>
@@ -109,5 +122,6 @@
             </x-table>
         @endforeach
         {{ $users->links() }}
+
     </main>
 @endsection

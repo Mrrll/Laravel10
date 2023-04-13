@@ -6205,4 +6205,127 @@ $enable-cssgrid = true
 
 **`Nota :` Realizamos el cambio para utilizar las clases de `grid` en bootstrap en vez de las clases `row y col`.**
 
+###### Creamos componente modal.
+
+> Typee: en la Consola:
+```console
+php artisan make:component Modal
+```
+
+> Abrimos el archivo `Modal.php` en la carpeta `app\View\Components\Modal.php` y escribimos lo siguiente.
+
+```php
+<?php
+
+namespace App\View\Components;
+
+use Closure;
+use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
+
+class Modal extends Component
+{
+    public
+    $id,
+    $class;
+    /**
+     * Create a new component instance.
+     */
+    public function __construct(
+        $id,
+        $class = null
+        )
+    {
+        $this->id = $id;
+        $this->class = $class;
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     */
+    public function render(): View|Closure|string
+    {
+        return view('components.modal');
+    }
+}
+```
+
+> Abrimos el archivo `modal.blade.php` en la carpeta `resources\views\components\modal.blade.php` y escribimos lo siguiente.
+
+```php
+<div class="modal fade" id="{{$id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div {{ $attributes->merge(['class' => "modal-dialog $class"]) }}>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">
+            {{$title}}
+        </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {{$slot}}
+      </div>
+      <div class="modal-footer">
+        {{$footer}}
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+> Abrimos el archivo `index.blade.php` en la carpeta `resources\views\admin\users\index.blade.php` y cambiamos y añadimos lo siguiente.
+
+```php
+{{-- Tabla --}}
+@foreach ($users as $user)
+
+......
+
+<x-table.button type='submit' class='btn-outline-danger' :route="route('users.destroy', $user)" method='delete'>
+    <x-slot name="icon">
+        <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+    </x-slot>
+</x-table.button>
+```
+> Y lo cambiamos por lo siguiente.
+
+```php
+<button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteuser{{$user->id}}">
+    <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+</button>
+```
+
+> Y añadimos lo siguiente.
+
+```php
+
+.......
+
+<x-modal id="deleteuser{{$user->id}}" class="modal-dialog-centered">
+    <x-slot name="title">
+        @lang('Delete')
+    </x-slot>
+    <strong> @lang("You're sure ?")</strong> @lang('you want to delete the user <strong>:user</strong>, if you click continue, the user will be deleted and cannot be recovered.', ['user' => $user->name])
+    <x-slot name="footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@lang('Do not continue')</button>
+        <form action="{{ route('users.destroy', $user) }}" method="post">
+            @csrf
+            @method('delete')
+            <button type="button" class="btn btn-danger">@lang('Continue')</button>
+        </form>
+    </x-slot>
+</x-modal>
+ @endforeach
+```
+
+> Abrimos el archivo `es.json` en la carpeta `lang\es.json` y cambiamos y añadimos lo siguiente.
+
+```json
+"You're sure ?" : "Estas seguro ?",
+"you want to delete the user <strong>:user</strong>, if you click continue, the user will be deleted and cannot be recovered." : "que desea eliminar el usuario <strong>:user</strong>, si hace clic en continuar, el usuario se eliminará y no se podrá recuperar.",
+"Delete" : "Borrar",
+"Do not continue" : "No continuar",
+"Continue" : "Continuar"
+```
+
 [Subir](#top)

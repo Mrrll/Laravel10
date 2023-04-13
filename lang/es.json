@@ -39,5 +39,10 @@
     "Thank you for using our application!": "¡Gracias por usar nuestra aplicación!",
     "The passwords do not match" : "Los passwords no coinciden",
     "Update User" : "Actualizar Usuario",
-    "Go Back" : "Volver"
+    "Go Back" : "Volver",
+    "You're sure ?" : "Estas seguro ?",
+    "you want to delete the user <strong>:user</strong>, if you click continue, the user will be deleted and cannot be recovered." : "que desea eliminar el usuario <strong>:user</strong>, si hace clic en continuar, el usuario se eliminará y no se podrá recuperar.",
+    "Delete" : "Borrar",
+    "Do not continue" : "No continuar",
+    "Continue" : "Continuar"
 }
