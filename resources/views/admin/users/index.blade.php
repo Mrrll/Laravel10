@@ -40,43 +40,35 @@
                                     <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
                                 </x-slot>
                             </x-table.button>
-                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
-                                data-bs-target="#deleteuser{{$user->id}}">
-                                <i class="fa-solid fa-trash" style="color: #f66661;"></i>
-                            </button>
+                            <x-table.button type='modal' route="" class='btn-outline-danger' target="#deleteuser{{ $user->id }}">
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                                </x-slot>
+                            </x-table.button>
                         </span>
                     </td>
                 </tr>
-                <x-modal id="deleteuser{{$user->id}}" class="modal-dialog-centered">
-                    <x-slot name="title">
-                        @lang('Delete')
-                    </x-slot>
-                    <strong> @lang("You're sure ?")</strong> @lang('you want to delete the user <strong>:user</strong>, if you click continue, the user will be deleted and cannot be recovered.', ['user' => $user->name])
-                    <x-slot name="footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@lang('Do not continue')</button>
-                        <form action="{{ route('users.destroy', $user) }}" method="post">
-                            @csrf
-                            @method('delete')
-                            <button type="button" class="btn btn-danger">@lang('Continue')</button>
-                        </form>
-                    </x-slot>
-                </x-modal>
+                <x-modal id="deleteuser{{ $user->id }}" class="modal-dialog-centered" title="Delete" name="{{$user->name}}" model="user" btnactioncolor="btn-danger" :btnactionroute="route('users.destroy', $user)" btnactionmethod="delete"></x-modal>
             @endforeach
         </x-table>
         {{-- Tabla en Movil --}}
         @foreach ($users as $user)
             <x-table class="table-striped {{ $user->id == auth()->user()->id ? 'table-active ' : '' }}" typetable="movil">
                 <x-slot name="head">
-                    <x-table.button type='link' class='btn-outline-warning me-1' :route="route('blog.edit', $user)">
+                    <x-table.button type='link' class='btn-outline-success me-1' :route="route('users.show', $user)">
+                        <x-slot name="icon">
+                            <i class="fa-solid fa-eye" style="color: #7cf884;"></i>
+                        </x-slot>
+                    </x-table.button>
+                    <x-table.button type='link' class='btn-outline-warning me-1' :route="route('users.edit', $user)">
                         <x-slot name="icon">
                             <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
                         </x-slot>
                     </x-table.button>
-                    <x-table.button type='submit' class='btn-outline-danger' :route="route('blog.destroy', $user)" method='delete'>
-                        <x-slot name="icon">
-                            <i class="fa-solid fa-trash" style="color: #f66661;"></i>
-                        </x-slot>
-                    </x-table.button>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                        data-bs-target="#deleteuser{{ $user->id }}">
+                        <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                    </button>
                 </x-slot>
                 <tr>
                     <th scope="col" class="d-flex flex-column">
@@ -120,8 +112,8 @@
                     </td>
                 </tr>
             </x-table>
+            <x-modal id="deleteuser{{ $user->id }}" class="modal-dialog-centered" title="Delete" name="{{$user->name}}" model="user" btnactioncolor="btn-danger" :btnactionroute="route('users.destroy', $user)" btnactionmethod="delete"></x-modal>
         @endforeach
         {{ $users->links() }}
-
     </main>
 @endsection

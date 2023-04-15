@@ -22,7 +22,7 @@
                 </div>
                 <div class="d-flex justify-content-end mt-3">
                     <x-form.button type="submit" color="primary" class="me-2">
-                    @lang("Update User")
+                    @lang("Update :model", ['model' => "Usuario"])
                     </x-form.button>
                     <x-form.button  color="danger" :route="url()->previous()">
                         @lang("Go Back")

@@ -34,6 +34,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
+    public function getRouteKeyName()
+    {
+        return 'name';
+    }
+
     /**
      * The attributes that should be cast.
      *

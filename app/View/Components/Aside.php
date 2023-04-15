@@ -84,6 +84,29 @@ class Aside extends Component
                 ],
             ]
         ],
+        [
+            'name' => 'Roles',
+            'active' =>  '',
+            'icono' => 'fa-solid fa-users-gear fa-lg',
+            'icono_color' => '#c12115',
+            'name_collapse' => 'collapseHeightRoles',
+            'items' => [
+                [
+                    'name' => 'List roles',
+                    'route' => route('roles.index'),
+                    'active' =>  '',
+                    'icono' => 'fa-solid fa-users-gear fa-lg',
+                    'icono_color' => '#c12115',
+                ],
+                [
+                    'name' => 'Crear role',
+                    'route' => route('roles.create'),
+                    'active' =>  '',
+                    'icono' => 'fa-solid fa-users-gear fa-lg',
+                    'icono_color' => '#c12115',
+                ],
+            ]
+        ],
     ];
     }
 

@@ -10,17 +10,56 @@ class Modal extends Component
 {
     public
     $id,
-    $class;
+    $title,
+    $class,
+    $name,
+    $model,
+    $btndismiss,
+    $btndismisscolor,
+    $btnaction,
+    $btnactioncolor,
+    $btnactionroute,
+    $btnactionmethod,
+    $routeform,
+    $methodform,
+    $classform,
+    $styleform;
     /**
      * Create a new component instance.
      */
     public function __construct(
         $id,
-        $class = null
+        $title,
+        $class = null,
+        $name = null,
+        $model = null,
+        $btndismiss = "Do not continue",
+        $btndismisscolor = "btn-secondary",
+        $btnaction = "Continue",
+        $btnactioncolor = "btn-primary",
+        $btnactionroute = null,
+        $btnactionmethod = null,
+        $routeform = null,
+        $methodform = "post",
+        $classform = null,
+        $styleform = null,
         )
     {
         $this->id = $id;
+        $this->title = $title;
         $this->class = $class;
+        $this->name = $name;
+        $this->model = $model;
+        $this->btndismiss = $btndismiss;
+        $this->btndismisscolor = $btndismisscolor;
+        $this->btnaction = $btnaction;
+        $this->btnactioncolor = $btnactioncolor;
+        $this->btnactionroute = $btnactionroute;
+        $this->btnactionmethod = $btnactionmethod;
+        $this->routeform = $routeform;
+        $this->methodform = $methodform;
+        $this->classform = $classform;
+        $this->styleform = $styleform;
     }
 
     /**

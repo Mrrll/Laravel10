@@ -1,6 +1,6 @@
-<div class="card {{ $attributes->merge(['class' => $class]) }}" {{ $attributes->style([$style]) }}>
+<div {{ $attributes->merge(['class' => "card $class"]) }} {{ $attributes->style([$style]) }}>
     @if (!empty($card_header))
-        <div class="card-header {{ $attributes->merge(['class' => $classheader]) }}">
+        <div {{ $attributes->merge(['class' =>  "card-header $classheader"]) }}>
             {{ $card_header }}
         </div>
     @endif
@@ -8,7 +8,7 @@
         {{ $slot }}
     </div>
     @if (!empty($card_footer))
-        <div class="card-footer {{ $attributes->merge(['class' => $classfooter]) }}">
+        <div {{ $attributes->merge(['class' => "card-footer $classfooter"]) }}>
             {{ $card_footer }}
         </div>
     @endif

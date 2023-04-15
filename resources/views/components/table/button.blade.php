@@ -10,4 +10,9 @@
             {{ $icon }}
         </button>
     </form>
+@elseif ($type == 'modal')
+        <button type="button" {{ $attributes->merge(['class' => "btn $class"]) }} data-bs-toggle="modal" {{ $attributes->merge(['data-bs-target' => "$target"]) }}>
+            {{ $icon }}
+        </button>
+    </form>
 @endif

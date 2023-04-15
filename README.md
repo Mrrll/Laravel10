@@ -3334,7 +3334,7 @@ return [
 
 ```php
 @if (session('message'))
-    <x-alert class="mb-2" type="{{ session('message')['type'] }}">
+    <x-alert class="m-2" type="{{ session('message')['type'] }}">
         <x-slot name="title">
             {{ session('message')['title'] }}
         </x-slot>
@@ -5451,6 +5451,11 @@ class Button extends Component
             {{ $icon }}
         </button>
     </form>
+@elseif ($type == 'modal')
+        <button type="button" {{ $attributes->merge(['class' => "btn $class"]) }} data-bs-toggle="modal" {{ $attributes->merge(['data-bs-target' => "$target"]) }}>
+            {{ $icon }}
+        </button>
+    </form>
 @endif
 ```
 
@@ -5839,9 +5844,9 @@ php artisan make:component Card
 > Abrimos el archivo `card.blade.php` en la carpeta `resources\views\components\card.blade.php` y escribimos lo siguiente.
 
 ```php
-<div class="card {{ $attributes->merge(['class' => $class]) }}" {{ $attributes->style([$style]) }}>
+<div {{ $attributes->merge(['class' => "card $class"]) }} {{ $attributes->style([$style]) }}>
     @if (!empty($card_header))
-        <div class="card-header {{ $attributes->merge(['class' => $classheader]) }}">
+        <div {{ $attributes->merge(['class' =>  "card-header $classheader"]) }}>
             {{ $card_header }}
         </div>
     @endif
@@ -5849,7 +5854,7 @@ php artisan make:component Card
         {{ $slot }}
     </div>
     @if (!empty($card_footer))
-        <div class="card-footer {{ $attributes->merge(['class' => $classfooter]) }}">
+        <div {{ $attributes->merge(['class' => "card-footer $classfooter"]) }}>
             {{ $card_footer }}
         </div>
     @endif
@@ -5984,7 +5989,7 @@ public function edit(User $user)
                 </div>
                 <div class="d-flex justify-content-end mt-3">
                     <x-form.button type="submit" color="primary" class="me-2">
-                    @lang("Update User")
+                    @lang("Update :model", ['model' => "Usuario"])
                     </x-form.button>
                     <x-form.button  color="danger" :route="url()->previous()">
                         @lang("Go Back")
@@ -6117,15 +6122,22 @@ class Input extends Component
 ```php
 <div>
     <label class="ms-1" for="{{ $id }}">{{ $label }}</label>
-    <input type="{{ $type }}" {{ $attributes->merge(['class' => "form-control $class "]) }} id="{{ $id }}" placeholder="{{ $placeholder }}" name="{{ $name }}" value="{{ $value }}">
+    <input type="{{ $type }}" {{ $attributes->merge(['class' => "form-control $class "]) }}
+        id="{{ $id }}" placeholder="{{ $placeholder }}" name="{{ $name }}" value="{{ $value }}">
     @if ($id == 'repeat_password')
         <div id="repeat_password_message" class="d-none invalid">
-            <small>*@lang("The passwords do not match").</small>
+            <small>*@lang('The passwords do not match').</small>
         </div>
     @else
-        @error('name')
-            <small class="text-danger invalid-feedback">*{{ $message }}</small>
-        @enderror
+        @if ($errors->create->first($name))
+                <small class="text-danger">*{{ $errors->create->first($name) }}</small>
+        @elseif ($errors->edit->first($name))
+                <small class="text-danger">*{{ $errors->edit->first($name) }}</small>
+        @else
+            @error($name)
+                <small class="text-danger">*{{ $message }}</small>
+            @enderror
+        @endif
     @endif
 </div>
 ```
@@ -6192,7 +6204,7 @@ class Button extends Component
 
 ```json
     "The passwords do not match" : "Los passwords no coinciden",
-    "Update User" : "Actualizar Usuario",
+    "Update :model" : "Actualizar :model",
     "Go Back" : "Volver"
 ```
 
@@ -6227,17 +6239,56 @@ class Modal extends Component
 {
     public
     $id,
-    $class;
+    $title,
+    $class,
+    $name,
+    $model,
+    $btndismiss,
+    $btndismisscolor,
+    $btnaction,
+    $btnactioncolor,
+    $btnactionroute,
+    $btnactionmethod,
+    $routeform,
+    $methodform,
+    $classform,
+    $styleform;
     /**
      * Create a new component instance.
      */
     public function __construct(
         $id,
-        $class = null
+        $title,
+        $class = null,
+        $name = null,
+        $model = null,
+        $btndismiss = "Do not continue",
+        $btndismisscolor = "btn-secondary",
+        $btnaction = "Continue",
+        $btnactioncolor = "btn-primary",
+        $btnactionroute = null,
+        $btnactionmethod = null,
+        $routeform = null,
+        $methodform = "post",
+        $classform = null,
+        $styleform = null,
         )
     {
         $this->id = $id;
+        $this->title = $title;
         $this->class = $class;
+        $this->name = $name;
+        $this->model = $model;
+        $this->btndismiss = $btndismiss;
+        $this->btndismisscolor = $btndismisscolor;
+        $this->btnaction = $btnaction;
+        $this->btnactioncolor = $btnactioncolor;
+        $this->btnactionroute = $btnactionroute;
+        $this->btnactionmethod = $btnactionmethod;
+        $this->routeform = $routeform;
+        $this->methodform = $methodform;
+        $this->classform = $classform;
+        $this->styleform = $styleform;
     }
 
     /**
@@ -6253,79 +6304,818 @@ class Modal extends Component
 > Abrimos el archivo `modal.blade.php` en la carpeta `resources\views\components\modal.blade.php` y escribimos lo siguiente.
 
 ```php
-<div class="modal fade" id="{{$id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div {{ $attributes->merge(['class' => "modal-dialog $class"]) }}>
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="staticBackdropLabel">
-            {{$title}}
-        </h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        {{$slot}}
-      </div>
-      <div class="modal-footer">
-        {{$footer}}
-      </div>
+<div class="modal fade" id="{{ $id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div {{ $attributes->merge(['class' => "modal-dialog $class"]) }}>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                    {{ $title }}
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModalErrors()"></button>
+            </div>
+            @if ($title == 'Create' || $title == 'Edit')
+                <form action="{{ $routeform ?? '' }}" method="post" {{ $attributes->merge(['class' => "$classform"]) }}
+                    {{ $attributes->style([$styleform]) }}>
+                    @csrf
+                    @method($methodform)
+            @endif
+            <div class="modal-body">
+                @switch($title)
+                    @case('Delete')
+                        <strong> @lang("You're sure ?")</strong> @lang('you want to delete the :model <strong>:name</strong>, if you click continue, the :model will be deleted and cannot be recovered.', ['name' => $name, 'model' => $model])
+                    @break
+
+                    @default
+                        {{ $slot }}
+                @endswitch
+            </div>
+            <div class="modal-footer">
+                @switch($title)
+                    @case('Delete')
+                    @case('Create')
+                    @case('Edit')
+                        <button type="button" {{ $attributes->merge(['class' => "btn $btndismisscolor"]) }}
+                            data-bs-dismiss="modal" onclick="closeModalErrors()" >@lang("$btndismiss")</button>
+                        @if ($title == 'Create' || $title == 'Edit')
+                            <button type="submit"
+                                {{ $attributes->merge(['class' => "btn $btnactioncolor"]) }}>@lang("$btnaction")</button>
+                        @else
+                            <form action="{{ $btnactionroute }}" method="post">
+                                @csrf
+                                @method($btnactionmethod)
+                                <button
+                                    type="submit"{{ $attributes->merge(['class' => "btn $btnactioncolor"]) }}>@lang("$btnaction")</button>
+                            </form>
+                        @endif
+                    @break
+
+                    @default
+                        {{ $footer }}
+                @endswitch
+            </div>
+            @if ($title == 'Create' || $title == 'Edit')
+                </form>
+            @endif
+        </div>
     </div>
-  </div>
 </div>
+<script type="module">
+    function closeModalErrors() {
+        $('.text-danger').remove();
+    }
+    window.closeModalErrors = closeModalErrors;
+</script>
 ```
 
-> Abrimos el archivo `index.blade.php` en la carpeta `resources\views\admin\users\index.blade.php` y cambiamos y añadimos lo siguiente.
+> Abrimos el archivo `index.blade.php` en la carpeta `resources\views\admin\users\index.blade.php` y lo dejamos de esta manera.
 
 ```php
-{{-- Tabla --}}
-@foreach ($users as $user)
+@extends('layouts.dashboard')
 
-......
+@section('title', 'List Users')
 
-<x-table.button type='submit' class='btn-outline-danger' :route="route('users.destroy', $user)" method='delete'>
-    <x-slot name="icon">
-        <i class="fa-solid fa-trash" style="color: #f66661;"></i>
-    </x-slot>
-</x-table.button>
+@section('content-dashboard')
+    <main class="container center_container flex-column main-dashboard">
+        <h1>List Users</h1>
+        {{-- Tabla --}}
+        <x-table :thead="$headName" class="table-striped table-hover table-responsive-sm align-middle" theadclass="table-dark">
+            @foreach ($users as $user)
+                <tr class="{{ $user->id == auth()->user()->id ? 'table-active ' : '' }}">
+                    <th scope="col">{{ $user->id }}</th>
+                    <td>{{ $user->name }}</td>
+                    <td>
+                        <span class="d-inline-block text-truncate" style="max-width=332px;">
+                            {{ $user->email }}
+                        </span>
+                    </td>
+                    <td>
+                        @foreach ($user->roles as $role)
+                            <span class="badge bg-primary">
+                                {{ $role->name }}
+                            </span>
+                        @endforeach
+                    </td>
+                    <td>
+
+                        {{ $user->email_verified_at->format('d-m-Y') }}
+                    </td>
+                    <td>{{ $user->updated_at->format('d-m-Y') }}</td>
+                    <td class="text-center">
+                        <span class="d-inline-flex">
+                            <x-table.button type='link' class='btn-outline-success me-1' :route="route('users.show', $user)">
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-eye" style="color: #7cf884;"></i>
+                                </x-slot>
+                            </x-table.button>
+                            <x-table.button type='link' class='btn-outline-warning me-1' :route="route('users.edit', $user)">
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                                </x-slot>
+                            </x-table.button>
+                            <x-table.button type='modal' route="" class='btn-outline-danger' target="#deleteuser{{ $user->id }}">
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                                </x-slot>
+                            </x-table.button>
+                        </span>
+                    </td>
+                </tr>
+                <x-modal id="deleteuser{{ $user->id }}" class="modal-dialog-centered" title="Delete" name="{{$user->name}}" model="user" btnactioncolor="btn-danger" :btnactionroute="route('users.destroy', $user)" btnactionmethod="delete"></x-modal>
+            @endforeach
+        </x-table>
+        {{-- Tabla en Movil --}}
+        @foreach ($users as $user)
+            <x-table class="table-striped {{ $user->id == auth()->user()->id ? 'table-active ' : '' }}" typetable="movil">
+                <x-slot name="head">
+                    <x-table.button type='link' class='btn-outline-success me-1' :route="route('users.show', $user)">
+                        <x-slot name="icon">
+                            <i class="fa-solid fa-eye" style="color: #7cf884;"></i>
+                        </x-slot>
+                    </x-table.button>
+                    <x-table.button type='link' class='btn-outline-warning me-1' :route="route('users.edit', $user)">
+                        <x-slot name="icon">
+                            <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                        </x-slot>
+                    </x-table.button>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                        data-bs-target="#deleteuser{{ $user->id }}">
+                        <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                    </button>
+                </x-slot>
+                <tr>
+                    <th scope="col" class="d-flex flex-column">
+                        <strong># :</strong>
+                        {{ $user->id }}
+                    </th>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Name :</strong>
+                        {{ $user->name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Email :</strong>
+                        {{ $user->email }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Role :</strong>
+                        @foreach ($user->roles as $role)
+                            <span class="badge bg-primary">
+                                {{ $role->name }}
+                            </span>
+                        @endforeach
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Verified :</strong>
+                        {{ $user->email_verified_at->format('d-m-Y') }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Date :</strong>
+                        {{ $user->updated_at->format('d-m-Y') }}
+                    </td>
+                </tr>
+            </x-table>
+            <x-modal id="deleteuser{{ $user->id }}" class="modal-dialog-centered" title="Delete" name="{{$user->name}}" model="user" btnactioncolor="btn-danger" :btnactionroute="route('users.destroy', $user)" btnactionmethod="delete"></x-modal>
+        @endforeach
+        {{ $users->links() }}
+    </main>
+@endsection
 ```
-> Y lo cambiamos por lo siguiente.
 
-```php
-<button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteuser{{$user->id}}">
-    <i class="fa-solid fa-trash" style="color: #f66661;"></i>
-</button>
-```
 
-> Y añadimos lo siguiente.
-
-```php
-
-.......
-
-<x-modal id="deleteuser{{$user->id}}" class="modal-dialog-centered">
-    <x-slot name="title">
-        @lang('Delete')
-    </x-slot>
-    <strong> @lang("You're sure ?")</strong> @lang('you want to delete the user <strong>:user</strong>, if you click continue, the user will be deleted and cannot be recovered.', ['user' => $user->name])
-    <x-slot name="footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@lang('Do not continue')</button>
-        <form action="{{ route('users.destroy', $user) }}" method="post">
-            @csrf
-            @method('delete')
-            <button type="button" class="btn btn-danger">@lang('Continue')</button>
-        </form>
-    </x-slot>
-</x-modal>
- @endforeach
-```
-
-> Abrimos el archivo `es.json` en la carpeta `lang\es.json` y cambiamos y añadimos lo siguiente.
+> Abrimos el archivo `es.json` en la carpeta `lang\es.json` cambiamos y añadimos lo siguiente.
 
 ```json
 "You're sure ?" : "Estas seguro ?",
-"you want to delete the user <strong>:user</strong>, if you click continue, the user will be deleted and cannot be recovered." : "que desea eliminar el usuario <strong>:user</strong>, si hace clic en continuar, el usuario se eliminará y no se podrá recuperar.",
+"you want to delete the :model <strong>:name</strong>, if you click continue, the :model will be deleted and cannot be recovered." : "que desea eliminar el :model <strong>:name</strong>, si hace clic en continuar, el :model se eliminará y no se podrá recuperar.",
 "Delete" : "Borrar",
 "Do not continue" : "No continuar",
 "Continue" : "Continuar"
+```
+###### Creamos controlador para los roles.
+
+> Typee: en la Consola:
+```console
+php artisan make:controller RoleController -m Role -r -R
+```
+
+**`Nota :` con la instrucción `-R` creamos también los request.**
+
+> Abrimos el archivo `RoleController.php` en la carpeta `app\Http\Controllers\RoleController.php` y escribimos lo siguiente.
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Role;
+use App\Http\Requests\StoreRoleRequest;
+use App\Http\Requests\UpdateRoleRequest;
+use Illuminate\Support\Str;
+
+class RoleController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Role $role)
+    {
+        $headName = ['#', 'Name', 'Slug', 'Date', 'Options'];
+        $fields = [
+            [
+                'id' => 'name',
+                'name' => 'name',
+                'label' => 'Name :',
+                'type' => 'text',
+                'placeholder' => 'Name',
+                'value' => old('name', $role->name),
+            ],
+        ];
+        $roles = Role::orderBy('id')->paginate(10);
+        return view(
+            'admin.roles.index',
+            compact('roles', 'headName', 'fields')
+        );
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreRoleRequest $request)
+    {
+        try {
+            $request->merge(['slug' => Str::slug($request['name'], '-')]);
+            Role::create($request->all());
+            return back()->with('message', [
+                'type' => 'success',
+                'title' => 'Éxito !',
+                'message' => 'El Role a sido guardado correctamente.',
+            ]);
+        } catch (\Throwable $th) {
+            return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Role $role)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Role $role)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateRoleRequest $request, Role $role)
+    {
+        try {
+            $request->merge(['slug' => Str::slug($request['name'], '-')]);
+            $role->update($request->all());
+            return back()->with('message', [
+                'type' => 'info',
+                'title' => 'Éxito !',
+                'message' => 'El Role a sido actualizado correctamente.',
+            ]);
+        } catch (\Throwable $th) {
+            return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Role $role)
+    {
+        try {
+            $role->delete();
+            return back()->with('message', [
+                'type' => 'warning',
+                'title' => 'Éxito !',
+                'message' => 'El Role a sido eliminado correctamente.',
+            ]);
+        } catch (\Throwable $th) {
+            return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
+    }
+}
+```
+
+> Abrimos el archivo `StoreRoleRequest.php` en la carpeta `app\Http\Requests\StoreRoleRequest.php` y escribimos lo siguiente.
+
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreRoleRequest extends FormRequest
+{
+    protected $errorBag = 'create';
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|max:150',
+        ];
+    }
+}
+```
+
+> Abrimos el archivo `UpdateRoleRequest.php` en la carpeta `app\Http\Requests\UpdateRoleRequest.php` y escribimos lo siguiente.
+
+```php
+<?php
+
+namespace App\Http\Requests;
+
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+
+
+class UpdateRoleRequest extends FormRequest
+{
+    protected $errorBag = 'edit';
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|max:150',
+        ];
+    }
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            if ($validator->errors()->isNotEmpty()) {
+                $validator->errors()->add('id', $this->id);
+            }
+        });
+    }
+}
+```
+
+> Abrimos el archivo `Role.php` en la carpeta `app\Models\Role.php` y añadimos lo siguiente.
+
+```php
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+```
+
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos lo siguiente.
+
+```php
+    public function getRouteKeyName()
+    {
+        return 'name';
+    }
+```
+
+> Abrimos el archivo `Aside.php` en la carpeta `app\View\Components\Aside.php` y añadimos lo siguiente.
+
+```php
+        [
+            'name' => 'Roles',
+            'active' =>  '',
+            'icono' => 'fa-solid fa-users-gear fa-lg',
+            'icono_color' => '#c12115',
+            'name_collapse' => 'collapseHeightRoles',
+            'items' => [
+                [
+                    'name' => 'List roles',
+                    'route' => route('roles.index'),
+                    'active' =>  '',
+                    'icono' => 'fa-solid fa-users-gear fa-lg',
+                    'icono_color' => '#c12115',
+                ]
+            ]
+        ],
+```
+
+> Abrimos el archivo `Button.php` en la carpeta `app\View\Components\Table\Button.php` y lo dejamos de esta manera.
+
+```php
+<?php
+
+namespace App\View\Components\Table;
+
+use Closure;
+use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
+
+class Button extends Component
+{
+    public
+    $type,
+    $route,
+    $class,
+    $method,
+    $target;
+    /**
+     * Create a new component instance.
+     */
+    public function __construct(
+        $type,
+        $route,
+        $class,
+        $method = null,
+        $target = null
+        )
+    {
+        $this->type = $type;
+        $this->route = $route;
+        $this->class = $class;
+        $this->method = $method;
+        $this->target = $target;
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     */
+    public function render(): View|Closure|string
+    {
+        return view('components.table.button');
+    }
+}
+```
+
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y añadimos lo siguiente.
+
+```php
+use App\Http\Controllers\RoleController;
+
+.....
+
+Route::resource('roles', RoleController::class);
+```
+
+> Abrimos el archivo `index.blade.php` en la carpeta `resources\views\admin\users\index.blade.php` y lo dejamos de esta manera.
+
+```php
+@extends('layouts.dashboard')
+
+@section('title', 'List Users')
+
+@section('content-dashboard')
+    <main class="container center_container flex-column main-dashboard">
+        <h1>List Users</h1>
+        {{-- Tabla --}}
+        <x-table :thead="$headName" class="table-striped table-hover table-responsive-sm align-middle" theadclass="table-dark">
+            @foreach ($users as $user)
+                <tr class="{{ $user->id == auth()->user()->id ? 'table-active ' : '' }}">
+                    <th scope="col">{{ $user->id }}</th>
+                    <td>{{ $user->name }}</td>
+                    <td>
+                        <span class="d-inline-block text-truncate" style="max-width=332px;">
+                            {{ $user->email }}
+                        </span>
+                    </td>
+                    <td>
+                        @foreach ($user->roles as $role)
+                            <span class="badge bg-primary">
+                                {{ $role->name }}
+                            </span>
+                        @endforeach
+                    </td>
+                    <td>
+
+                        {{ $user->email_verified_at->format('d-m-Y') }}
+                    </td>
+                    <td>{{ $user->updated_at->format('d-m-Y') }}</td>
+                    <td class="text-center">
+                        <span class="d-inline-flex">
+                            <x-table.button type='link' class='btn-outline-success me-1' :route="route('users.show', $user)">
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-eye" style="color: #7cf884;"></i>
+                                </x-slot>
+                            </x-table.button>
+                            <x-table.button type='link' class='btn-outline-warning me-1' :route="route('users.edit', $user)">
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                                </x-slot>
+                            </x-table.button>
+                            <x-table.button type='modal' route="" class='btn-outline-danger' target="#deleteuser{{ $user->id }}">
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                                </x-slot>
+                            </x-table.button>
+                        </span>
+                    </td>
+                </tr>
+                <x-modal id="deleteuser{{ $user->id }}" class="modal-dialog-centered" title="Delete" name="{{$user->name}}" model="user" btnactioncolor="btn-danger" :btnactionroute="route('users.destroy', $user)" btnactionmethod="delete"></x-modal>
+            @endforeach
+        </x-table>
+        {{-- Tabla en Movil --}}
+        @foreach ($users as $user)
+            <x-table class="table-striped {{ $user->id == auth()->user()->id ? 'table-active ' : '' }}" typetable="movil">
+                <x-slot name="head">
+                    <x-table.button type='link' class='btn-outline-success me-1' :route="route('users.show', $user)">
+                        <x-slot name="icon">
+                            <i class="fa-solid fa-eye" style="color: #7cf884;"></i>
+                        </x-slot>
+                    </x-table.button>
+                    <x-table.button type='link' class='btn-outline-warning me-1' :route="route('users.edit', $user)">
+                        <x-slot name="icon">
+                            <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                        </x-slot>
+                    </x-table.button>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                        data-bs-target="#deleteuser{{ $user->id }}">
+                        <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                    </button>
+                </x-slot>
+                <tr>
+                    <th scope="col" class="d-flex flex-column">
+                        <strong># :</strong>
+                        {{ $user->id }}
+                    </th>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Name :</strong>
+                        {{ $user->name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Email :</strong>
+                        {{ $user->email }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Role :</strong>
+                        @foreach ($user->roles as $role)
+                            <span class="badge bg-primary">
+                                {{ $role->name }}
+                            </span>
+                        @endforeach
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Verified :</strong>
+                        {{ $user->email_verified_at->format('d-m-Y') }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="d-flex flex-column">
+                        <strong>Date :</strong>
+                        {{ $user->updated_at->format('d-m-Y') }}
+                    </td>
+                </tr>
+            </x-table>
+            <x-modal id="deleteuser{{ $user->id }}" class="modal-dialog-centered" title="Delete" name="{{$user->name}}" model="user" btnactioncolor="btn-danger" :btnactionroute="route('users.destroy', $user)" btnactionmethod="delete"></x-modal>
+        @endforeach
+        {{ $users->links() }}
+    </main>
+@endsection
+```
+
+> Creamos y abrimos el archivo `index.blade.php` en la carpeta `resources\views\admin\roles\index.blade.php` y lo dejamos de esta manera.
+
+```php
+@extends('layouts.dashboard')
+
+@section('title', 'List Roles')
+
+@section('content-dashboard')
+    <main class="container flex-column main-dashboard">
+        @include('layouts.components.alert')
+        <x-card class="mt-2" classheader="d-flex justify-content-between">
+            <x-slot name="card_header">
+                <h1>List Roles</h1>
+                <div class="align-self-center">
+                    <button id="btncreaterole" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#createrole"> Create Role</button>
+                </div>
+            </x-slot>
+            {{-- Tabla --}}
+            <x-table :thead="$headName" class="table-striped table-hover table-responsive-sm align-middle"
+                theadclass="table-dark">
+                @foreach ($roles as $role)
+                    <tr>
+                        <th scope="col">{{ $role->id }}</th>
+                        <td>{{ $role->name }}</td>
+                        <td>{{ $role->slug }}</td>
+                        {{-- <td>
+                            @foreach ($role->roles as $role)
+                                <span class="badge bg-primary">
+                                    {{ $role->name }}
+                                </span>
+                            @endforeach
+                        </td> --}}
+                        <td>{{ $role->updated_at->format('d-m-Y') }}</td>
+                        <td class="text-center">
+                            <span class="d-inline-flex">
+                                <x-table.button type='modal' route="" class='btn-outline-warning me-1'
+                                    target="#editrole{{ $role->id }}">
+                                    <x-slot name="icon">
+                                        <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                                    </x-slot>
+                                </x-table.button>
+                                <x-table.button type='modal' route="" class='btn-outline-danger'
+                                    target="#deleterole{{ $role->id }}">
+                                    <x-slot name="icon">
+                                        <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                                    </x-slot>
+                                </x-table.button>
+                            </span>
+                        </td>
+                    </tr>
+                @endforeach
+            </x-table>
+            {{-- Tabla en Movil --}}
+            @foreach ($roles as $role)
+                <x-table class="table-striped {{ $role->id == auth()->user()->id ? 'table-active ' : '' }}"
+                    typetable="movil">
+                    <x-slot name="head">
+                        <x-table.button type='modal' route="" class='btn-outline-warning me-1'
+                            target="#editrole{{ $role->id }}">
+                            <x-slot name="icon">
+                                <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                            </x-slot>
+                        </x-table.button>
+                        <x-table.button type='modal' route="" class='btn-outline-danger'
+                            target="#deleterole{{ $role->id }}">
+                            <x-slot name="icon">
+                                <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                            </x-slot>
+                        </x-table.button>
+                    </x-slot>
+                    <tr>
+                        <th scope="col" class="d-flex flex-column">
+                            <strong># :</strong>
+                            {{ $role->id }}
+                        </th>
+                    </tr>
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Name :</strong>
+                            {{ $role->name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Slug :</strong>
+                            {{ $role->slug }}
+                        </td>
+                    </tr>
+                    {{-- <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Role :</strong>
+                            @foreach ($role->roles as $role)
+                                <span class="badge bg-primary">
+                                    {{ $role->name }}
+                                </span>
+                            @endforeach
+                        </td>
+                    </tr> --}}
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Date :</strong>
+                            {{ $role->updated_at->format('d-m-Y') }}
+                        </td>
+                    </tr>
+                </x-table>
+                {{-- Modal Borrar --}}
+                <x-modal id="deleterole{{ $role->id }}" class="modal-dialog-centered" title="Delete"
+                    name="{{ $role->name }}" model="role" btnactioncolor="btn-danger" :btnactionroute="route('roles.destroy', $role)"
+                    btnactionmethod="delete"></x-modal>
+                {{-- Modal Editar --}}
+                <x-modal id="editrole{{ $role->id }}" class="modal-dialog-centered editrole" title="Edit"
+                    btnactioncolor="btn-success" btndismiss="Cancel" btnaction="Update" :routeform="route('roles.update', $role)" methodform="patch"
+                    styleform="width:100%">
+                    <div>
+                        @foreach ($fields as $field)
+                            <x-form.input type="{{ $field['type'] }}" id="{{ !empty($field['id']) ? $field['id'] : '' }}"
+                                placeholder="{{ !empty($field['placeholder']) ? $field['placeholder'] : '' }}"
+                                name="{{ !empty($field['name']) ? $field['name'] : '' }}" label="{{ $field['label'] }}"
+                                value="{{ $role->name }}" class="form-control-sm">
+                            </x-form.input>
+                        @endforeach
+                        <input type="hidden" value="{{ $role->id }}" name="id">
+                    </div>
+                </x-modal>
+            @endforeach
+            <x-slot name="card_footer">
+                {{ $roles->links() }}
+            </x-slot>
+        </x-card>
+        {{-- Modal Crear --}}
+        <x-modal id="createrole" class="modal-dialog-centered" title="Create" btnactioncolor="btn-success"
+            btndismiss="Cancel" btnaction="Save" :routeform="route('roles.store')" methodform="post" styleform="width:100%" modal="create">
+            <div>
+                @foreach ($fields as $field)
+                    <x-form.input type="{{ $field['type'] }}" id="{{ !empty($field['id']) ? $field['id'] : '' }}"
+                        placeholder="{{ !empty($field['placeholder']) ? $field['placeholder'] : '' }}"
+                        name="{{ !empty($field['name']) ? $field['name'] : '' }}" label="{{ $field['label'] }}"
+                        value="{{ !empty($field['value']) ? $field['value'] : '' }}" class="form-control-sm">
+                    </x-form.input>
+                @endforeach
+            </div>
+        </x-modal>
+    </main>
+    @if ($errors->create->any())
+        <script  type="module">
+             $('#createrole').modal('show');
+        </script>
+    @elseif ($errors->edit->any())
+        <script  type="module">
+            var id = {{$errors->edit->first('id')}}
+            $("#editrole" + id.toString()).modal('show');
+        </script>
+    @endif
+@endsection
+```
+
+> Creamos y abrimos el archivo `index.blade.php` en la carpeta `resources\views\admin\roles\index.blade.php` y lo dejamos de esta manera.
+
+###### Instalamos Jquery.
+
+> Typee: en la Consola:
+```console
+npm install jquery --save-dev
+npm i jquery-ui
+```
+
+> Abrimos el archivo `bootstrap.js` en la carpeta `resources\js\bootstrap.js` y añadimos lo siguiente.
+
+```js
+import $ from 'jquery';
+window.jQuery = window.$ = $;
+```
+
+> Abrimos el archivo `app.js` en la carpeta `resources\js\app.js` y añadimos lo siguiente.
+
+```js
+import 'jquery-ui/dist/jquery-ui';
 ```
 
 [Subir](#top)
