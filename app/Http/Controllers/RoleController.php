@@ -114,7 +114,8 @@ class RoleController extends Controller
     {
         try {
             $listOfPermissions = explode(',', $request->permissions);
-            // dump($role->permissions);
+            $role->permissions()->delete();
+            $role->permissions()->detach();
             $role->update($request->only(['name','slug']));
             foreach ($listOfPermissions as $permission) {
                 $slug = Str::slug($request['name'].' '.$permission, '-');
@@ -122,7 +123,7 @@ class RoleController extends Controller
                 $newPermission->name = $permission;
                 $newPermission->slug = $slug;
                 $newPermission->save();
-                $role->permissions()->sync($newPermission);
+                $role->permissions()->attach($newPermission);
             }
             return back()->with('message', [
                 'type' => 'info',

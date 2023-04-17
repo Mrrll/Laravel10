@@ -70,7 +70,6 @@
 - [Relación muchos a muchos (Many To Many) Parte 2](#item33)
 - [Roles y Permissions Implementación](#item34)
 
-
 <a name="item1"></a>
 
 ## Instalación
@@ -355,8 +354,7 @@ return view('cursos.index');
 <body>
     <h1>Bienvenido al curso <?php echo $curso; ?></h1>
 </body>
-</html>
-```
+</html>```
 
 > Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos dentro de la función `show`.
 
@@ -5536,9 +5534,7 @@ try {
 
   // Y redirigimos a la vista de los cursos.
   return redirect()->route('cursos.index');
-
 } catch (\Throwable $th) {
-
   // Le de volvemos a la vista con un mensaje de error.
   return back()->with('message', [
     'type' => 'danger',
@@ -5562,6 +5558,7 @@ Route::group(['middleware' => ['verified', 'auth', 'auth.session']],function () 
 ###### Creamos la modelo permiso con la migración.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:model Permission -m
 ```
@@ -5575,6 +5572,7 @@ $table->string('name', 45)->unique();
 ###### Creamos tabla pivote de permisos y roles.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:migration create_permission_role_table
 ```
@@ -5582,15 +5580,24 @@ php artisan make:migration create_permission_role_table
 > Abrimos el archivo `create_permission_role_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_permission_role_table.php` y en la función `up` añadimos lo siguiente.
 
 ```php
-        Schema::create('permission_role', function (Blueprint $table) {
-            $table->unsignedBigInteger('permission_id');
-            $table->unsignedBigInteger('role_id');
-            $table->foreign('permission_id')->references('id')->on('permissions')->onDelete('cascade');
-            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
-        });
+Schema::create('permission_role', function (Blueprint $table) {
+  $table->unsignedBigInteger('permission_id');
+  $table->unsignedBigInteger('role_id');
+  $table
+    ->foreign('permission_id')
+    ->references('id')
+    ->on('permissions')
+    ->onDelete('cascade');
+  $table
+    ->foreign('role_id')
+    ->references('id')
+    ->on('roles')
+    ->onDelete('cascade');
+});
 ```
 
 > Typee: en la Consola:
+
 ```console
 php artisan migrate
 ```
@@ -5624,6 +5631,7 @@ php artisan migrate
 ###### Creamos controlador para lista de usuarios.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:controller UsersController -m User -r
 ```
@@ -5773,7 +5781,7 @@ Route::resource('users', UsersController::class);
 
 ```scss
 .table-striped > tbody > tr.table-active:nth-of-type(odd) > * {
-    --bs-table-accent-bg: var(--bs-table-active-bg);
+  --bs-table-accent-bg: var(--bs-table-active-bg);
 }
 .table-active {
   --bs-table-accent-bg: rgba(6, 3, 3, 0.598) !important;
@@ -5797,14 +5805,14 @@ Route::resource('users', UsersController::class);
 > Abrimos el archivo `app.scss` en la carpeta `resources\scss\app.scss` y añadimos lo siguiente.
 
 ```scss
-@import "style.scss";
+@import 'style.scss';
 ```
 
 > Abrimos el archivo `app.css` en la carpeta `resources\css\app.css` y añadimos lo siguiente.
 
 ```css
 .badge {
-    max-width: 150px;
+  max-width: 150px;
 }
 ```
 
@@ -5838,6 +5846,7 @@ Route::resource('users', UsersController::class);
 ###### Creamos componente card.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:component Card
 ```
@@ -6005,6 +6014,7 @@ public function edit(User $user)
 ###### Creamos los componentes form, input y button.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:component Form
 php artisan make:component Form/Input
@@ -6227,6 +6237,7 @@ $enable-cssgrid = true
 ###### Creamos componente modal.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:component Modal
 ```
@@ -6499,7 +6510,6 @@ class Modal extends Component
 @endsection
 ```
 
-
 > Abrimos el archivo `es.json` en la carpeta `lang\es.json` cambiamos y añadimos lo siguiente.
 
 ```json
@@ -6509,9 +6519,11 @@ class Modal extends Component
 "Do not continue" : "No continuar",
 "Continue" : "Continuar"
 ```
+
 ###### Creamos controlador para los roles.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:controller RoleController -m Role -r -R
 ```
@@ -6532,117 +6544,114 @@ use Illuminate\Support\Str;
 
 class RoleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Role $role)
-    {
-        $headName = ['#', 'Name', 'Slug', 'Date', 'Options'];
-        $fields = [
-            [
-                'id' => 'name',
-                'name' => 'name',
-                'label' => 'Name :',
-                'type' => 'text',
-                'placeholder' => 'Name',
-                'value' => old('name', $role->name),
-            ],
-        ];
-        $roles = Role::orderBy('id')->paginate(10);
-        return view(
-            'admin.roles.index',
-            compact('roles', 'headName', 'fields')
-        );
-    }
+  /**
+   * Display a listing of the resource.
+   */
+  public function index(Role $role)
+  {
+    $headName = ['#', 'Name', 'Slug', 'Date', 'Options'];
+    $fields = [
+      [
+        'id' => 'name',
+        'name' => 'name',
+        'label' => 'Name :',
+        'type' => 'text',
+        'placeholder' => 'Name',
+        'value' => old('name', $role->name),
+      ],
+    ];
+    $roles = Role::orderBy('id')->paginate(10);
+    return view('admin.roles.index', compact('roles', 'headName', 'fields'));
+  }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+  /**
+   * Show the form for creating a new resource.
+   */
+  public function create()
+  {
+    //
+  }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreRoleRequest $request)
-    {
-        try {
-            $request->merge(['slug' => Str::slug($request['name'], '-')]);
-            Role::create($request->all());
-            return back()->with('message', [
-                'type' => 'success',
-                'title' => 'Éxito !',
-                'message' => 'El Role a sido guardado correctamente.',
-            ]);
-        } catch (\Throwable $th) {
-            return back()->with('message', [
-                'type' => 'danger',
-                'title' => 'Error !',
-                'message' => $th,
-            ]);
-        }
+  /**
+   * Store a newly created resource in storage.
+   */
+  public function store(StoreRoleRequest $request)
+  {
+    try {
+      $request->merge(['slug' => Str::slug($request['name'], '-')]);
+      Role::create($request->all());
+      return back()->with('message', [
+        'type' => 'success',
+        'title' => 'Éxito !',
+        'message' => 'El Role a sido guardado correctamente.',
+      ]);
+    } catch (\Throwable $th) {
+      return back()->with('message', [
+        'type' => 'danger',
+        'title' => 'Error !',
+        'message' => $th,
+      ]);
     }
+  }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Role $role)
-    {
-        //
-    }
+  /**
+   * Display the specified resource.
+   */
+  public function show(Role $role)
+  {
+    //
+  }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Role $role)
-    {
-        //
-    }
+  /**
+   * Show the form for editing the specified resource.
+   */
+  public function edit(Role $role)
+  {
+    //
+  }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateRoleRequest $request, Role $role)
-    {
-        try {
-            $request->merge(['slug' => Str::slug($request['name'], '-')]);
-            $role->update($request->all());
-            return back()->with('message', [
-                'type' => 'info',
-                'title' => 'Éxito !',
-                'message' => 'El Role a sido actualizado correctamente.',
-            ]);
-        } catch (\Throwable $th) {
-            return back()->with('message', [
-                'type' => 'danger',
-                'title' => 'Error !',
-                'message' => $th,
-            ]);
-        }
+  /**
+   * Update the specified resource in storage.
+   */
+  public function update(UpdateRoleRequest $request, Role $role)
+  {
+    try {
+      $request->merge(['slug' => Str::slug($request['name'], '-')]);
+      $role->update($request->all());
+      return back()->with('message', [
+        'type' => 'info',
+        'title' => 'Éxito !',
+        'message' => 'El Role a sido actualizado correctamente.',
+      ]);
+    } catch (\Throwable $th) {
+      return back()->with('message', [
+        'type' => 'danger',
+        'title' => 'Error !',
+        'message' => $th,
+      ]);
     }
+  }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Role $role)
-    {
-        try {
-            $role->delete();
-            return back()->with('message', [
-                'type' => 'warning',
-                'title' => 'Éxito !',
-                'message' => 'El Role a sido eliminado correctamente.',
-            ]);
-        } catch (\Throwable $th) {
-            return back()->with('message', [
-                'type' => 'danger',
-                'title' => 'Error !',
-                'message' => $th,
-            ]);
-        }
+  /**
+   * Remove the specified resource from storage.
+   */
+  public function destroy(Role $role)
+  {
+    try {
+      $role->delete();
+      return back()->with('message', [
+        'type' => 'warning',
+        'title' => 'Éxito !',
+        'message' => 'El Role a sido eliminado correctamente.',
+      ]);
+    } catch (\Throwable $th) {
+      return back()->with('message', [
+        'type' => 'danger',
+        'title' => 'Error !',
+        'message' => $th,
+      ]);
     }
+  }
 }
 ```
 
@@ -6657,28 +6666,28 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRoleRequest extends FormRequest
 {
-    protected $errorBag = 'create';
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
+  protected $errorBag = 'create';
+  /**
+   * Determine if the user is authorized to make this request.
+   */
+  public function authorize(): bool
+  {
+    return true;
+  }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
-     */
-    public function rules(): array
-    {
-        return [
-            'name' => 'required|unique:roles|max:45',
-            'slug' => 'required|unique:roles|max:45',
-            'permissions' => 'required|string',
-        ];
-    }
+  /**
+   * Get the validation rules that apply to the request.
+   *
+   * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
+   */
+  public function rules(): array
+  {
+    return [
+      'name' => 'required|unique:roles|max:45',
+      'slug' => 'required|unique:roles|max:45',
+      'permissions' => 'required|string',
+    ];
+  }
 }
 ```
 
@@ -6689,43 +6698,41 @@ class StoreRoleRequest extends FormRequest
 
 namespace App\Http\Requests;
 
-
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 
-
 class UpdateRoleRequest extends FormRequest
 {
-    protected $errorBag = 'edit';
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
+  protected $errorBag = 'edit';
+  /**
+   * Determine if the user is authorized to make this request.
+   */
+  public function authorize(): bool
+  {
+    return true;
+  }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
-     */
-    public function rules(): array
-    {
-        return [
-            'name' => 'required|max:150',
-            'slug' => 'required|max:150',
-            'permissions' => 'required|string',
-        ];
-    }
-    public function withValidator(Validator $validator): void
-    {
-        $validator->after(function (Validator $validator) {
-            if ($validator->errors()->isNotEmpty()) {
-                $validator->errors()->add('id', $this->id);
-            }
-        });
-    }
+  /**
+   * Get the validation rules that apply to the request.
+   *
+   * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
+   */
+  public function rules(): array
+  {
+    return [
+      'name' => 'required|max:150',
+      'slug' => 'required|max:150',
+      'permissions' => 'required|string',
+    ];
+  }
+  public function withValidator(Validator $validator): void
+  {
+    $validator->after(function (Validator $validator) {
+      if ($validator->errors()->isNotEmpty()) {
+        $validator->errors()->add('id', $this->id);
+      }
+    });
+  }
 }
 ```
 
@@ -7136,6 +7143,7 @@ Route::resource('roles', RoleController::class);
 ###### Instalamos Jquery.
 
 > Typee: en la Consola:
+
 ```console
 npm install jquery --save-dev
 npm i jquery-ui
@@ -7144,14 +7152,14 @@ npm i jquery-ui
 > Abrimos el archivo `bootstrap.js` en la carpeta `resources\js\bootstrap.js` y añadimos lo siguiente.
 
 ```js
-import $ from 'jquery';
-window.jQuery = window.$ = $;
+import $ from 'jquery'
+window.jQuery = window.$ = $
 ```
 
 > Abrimos el archivo `app.js` en la carpeta `resources\js\app.js` y añadimos lo siguiente.
 
 ```js
-import 'jquery-ui/dist/jquery-ui';
+import 'jquery-ui/dist/jquery-ui'
 ```
 
 ###### Implementamos Bootstrap Tags Inputs.
@@ -7186,16 +7194,16 @@ import 'jquery-ui/dist/jquery-ui';
     },
 ```
 
- > Abrimos el archivo `app.js` de la carpeta `resources\js\app.js` y añadimos lo siguiente.
+> Abrimos el archivo `app.js` de la carpeta `resources\js\app.js` y añadimos lo siguiente.
 
 ```js
-import './bootstrap-tagsinput';
+import './bootstrap-tagsinput'
 ```
 
- > Abrimos el archivo `app.scss` de la carpeta `resources\scss\app.scss` y añadimos lo siguiente.
+> Abrimos el archivo `app.scss` de la carpeta `resources\scss\app.scss` y añadimos lo siguiente.
 
 ```scss
-@import "/resources/css/bootstrap-tagsinput.css";
+@import '/resources/css/bootstrap-tagsinput.css';
 ```
 
 ###### Cambios en la migración y seeders.
@@ -7204,14 +7212,14 @@ import './bootstrap-tagsinput';
 
 ```php
 Schema::create('permissions', function (Blueprint $table) {
-    $table->id();
-    $table->string('name', 45);
-    $table->string('slug', 45)->unique();
-    $table->timestamps();
+  $table->id();
+  $table->string('name', 45);
+  $table->string('slug', 45)->unique();
+  $table->timestamps();
 });
 ```
 
-> Abrimos el archivo `RolesSeeder.php` de la carpeta  `database\seeders\RolesSeeder.php` y cambiamos lo siguiente.
+> Abrimos el archivo `RolesSeeder.php` de la carpeta `database\seeders\RolesSeeder.php` y cambiamos lo siguiente.
 
 ```php
 public function run(): void
@@ -7228,6 +7236,7 @@ public function run(): void
 ###### Creamos los seeders de PermissionSeeder y PermissionRoleSeeder.
 
 > Typee: en la Consola:
+
 ```console
 php artisan make:seeder PermissionSeeder
 php artisan make:seeder PermissionRoleSeeder
@@ -7271,16 +7280,100 @@ use Illuminate\Support\Carbon;
 
 ```php
 $this->call([
-    CategoriesSeeder::class,
-    RolesSeeder::class,
-    PermissionSeeder::class,
-    PermissionRoleSeeder::class
+  CategoriesSeeder::class,
+  RolesSeeder::class,
+  PermissionSeeder::class,
+  PermissionRoleSeeder::class,
 ]);
 ```
 
 > Typee: en la Consola:
+
 ```console
 php artisan migrate:fresh --seed
+```
+
+###### Create Update Delete Roles y Permisos.
+
+> Abrimos el archivo `RoleController.php` de la carpeta `app\Http\Controllers\RoleController.php` y en la función `store` escribimos lo siguiente.
+
+```php
+try {
+  $listOfPermissions = explode(',', $request->permissions);
+  $role = Role::create($request->only('name', 'slug'));
+  foreach ($listOfPermissions as $permission) {
+    $slug = Str::slug($request['name'] . ' ' . $permission, '-');
+    $newPermission = new Permission();
+    $newPermission->name = $permission;
+    $newPermission->slug = $slug;
+    $newPermission->save();
+    $role->permissions()->attach($newPermission);
+  }
+  return back()->with('message', [
+    'type' => 'success',
+    'title' => 'Éxito !',
+    'message' => 'El Role a sido guardado correctamente.',
+  ]);
+} catch (\Throwable $th) {
+  return back()->with('message', [
+    'type' => 'danger',
+    'title' => 'Error !',
+    'message' => $th,
+  ]);
+}
+```
+
+> Y  en la función `destroy` escribimos lo siguiente.
+
+```php
+public function destroy(Role $role)
+{
+    try {
+        $role->permissions()->delete();
+        $role->delete();
+        return back()->with('message', [
+            'type' => 'warning',
+            'title' => 'Éxito !',
+            'message' => 'El Role a sido eliminado correctamente.',
+        ]);
+    } catch (\Throwable $th) {
+        return back()->with('message', [
+            'type' => 'danger',
+            'title' => 'Error !',
+            'message' => $th,
+        ]);
+    }
+}
+```
+
+> Y  en la función `update` escribimos lo siguiente.
+
+```php
+try {
+    $listOfPermissions = explode(','$request->permissions);
+    $role->permissions()->delete();
+    $role->permissions()->detach();
+    $role->update($request->only(['name','slug']));
+    foreach ($listOfPermissions as $permission) {
+        $slug = Str::slug($request['name'].' '.$permission, '-');
+        $newPermission = new Permission();
+        $newPermission->name = $permission;
+        $newPermission->slug = $slug;
+        $newPermission->save();
+        $role->permissions()->attach($newPermission);
+    }
+    return back()->with('message', [
+        'type' => 'info',
+        'title' => 'Éxito !',
+        'message' => 'El Role a sido actualizado correctamente.',
+    ]);
+} catch (\Throwable $th) {
+    return back()->with('message', [
+        'type' => 'danger',
+        'title' => 'Error !',
+        'message' => $th,
+    ]);
+}
 ```
 
 [Subir](#top)
