@@ -24,7 +24,9 @@ class DatabaseSeeder extends Seeder
         Curso::factory(50)->create();
         $this->call([
             CategoriesSeeder::class,
-            RolesSeeder::class
+            RolesSeeder::class,
+            PermissionSeeder::class,
+            PermissionRoleSeeder::class
         ]);
     }
 }

@@ -27,6 +27,8 @@ class UpdateRoleRequest extends FormRequest
     {
         return [
             'name' => 'required|max:150',
+            'slug' => 'required|max:150',
+            'permissions' => 'required|string',
         ];
     }
     public function withValidator(Validator $validator): void

@@ -21,13 +21,13 @@
                         <th scope="col">{{ $role->id }}</th>
                         <td>{{ $role->name }}</td>
                         <td>{{ $role->slug }}</td>
-                        {{-- <td>
-                            @foreach ($role->roles as $role)
-                                <span class="badge bg-primary">
-                                    {{ $role->name }}
+                        <td>
+                            @foreach ($role->permissions as $permission)
+                                <span class="badge bg-dark bg-gradient">
+                                    {{ $permission->slug }}
                                 </span>
                             @endforeach
-                        </td> --}}
+                        </td>
                         <td>{{ $role->updated_at->format('d-m-Y') }}</td>
                         <td class="text-center">
                             <span class="d-inline-flex">
@@ -84,16 +84,15 @@
                             {{ $role->slug }}
                         </td>
                     </tr>
-                    {{-- <tr>
-                        <td class="d-flex flex-column">
-                            <strong>Role :</strong>
-                            @foreach ($role->roles as $role)
-                                <span class="badge bg-primary">
-                                    {{ $role->name }}
+                    <tr>
+                        <td>
+                            @foreach ($role->permissions as $permission)
+                                <span class="badge bg-dark bg-gradient">
+                                    {{ $permission->slug }}
                                 </span>
                             @endforeach
                         </td>
-                    </tr> --}}
+                    </tr>
                     <tr>
                         <td class="d-flex flex-column">
                             <strong>Date :</strong>
@@ -111,11 +110,28 @@
                     styleform="width:100%">
                     <div>
                         @foreach ($fields as $field)
+                            @if (is_object($role[$field['name']]) && $role[$field['name']] != '[]')
+                            @dump($role[$field['name']])
+                                @php
+                                     $permissions = "";
+                                     foreach ($role[$field['name']] as $permission) {
+                                         $permissions .= $permission->name.',';
+                                     }
+                                @endphp
+                                <x-form.input type="{{ $field['type'] }}" id="{{ !empty($field['id']) ? $field['id'] : '' }}"
+                                placeholder="{{ !empty($field['placeholder']) ? $field['placeholder'] : '' }}"
+                                name="{{ !empty($field['name']) ? $field['name'] : '' }}" label="{{ $field['label'] }}"
+                                value="{{$permissions}}" class="{{ !empty($field['class']) ? $field['class'] : 'form-control-sm' }}" data-role="{{ !empty($field['tags']) ? $field['tags'] : '' }}"
+                                :readyonly="!empty($field['readyonly']) ? $field['disable'] : false">
+                            </x-form.input>
+                            @else
                             <x-form.input type="{{ $field['type'] }}" id="{{ !empty($field['id']) ? $field['id'] : '' }}"
                                 placeholder="{{ !empty($field['placeholder']) ? $field['placeholder'] : '' }}"
                                 name="{{ !empty($field['name']) ? $field['name'] : '' }}" label="{{ $field['label'] }}"
-                                value="{{ $role->name }}" class="form-control-sm">
+                                value="{{($role[$field['name']] == '[]') ? '' : $role[$field['name']]}}" class="{{ !empty($field['class']) ? $field['class'] : 'form-control-sm' }}" data-role="{{ !empty($field['tags']) ? $field['tags'] : '' }}"
+                                :readyonly="!empty($field['readyonly']) ? $field['disable'] : false">
                             </x-form.input>
+                            @endif
                         @endforeach
                         <input type="hidden" value="{{ $role->id }}" name="id">
                     </div>
@@ -133,7 +149,7 @@
                     <x-form.input type="{{ $field['type'] }}" id="{{ !empty($field['id']) ? $field['id'] : '' }}"
                         placeholder="{{ !empty($field['placeholder']) ? $field['placeholder'] : '' }}"
                         name="{{ !empty($field['name']) ? $field['name'] : '' }}" label="{{ $field['label'] }}"
-                        value="{{ !empty($field['value']) ? $field['value'] : '' }}" class="form-control-sm">
+                        value="{{ !empty($field['value']) ? $field['value'] : '' }}" class="{{ !empty($field['class']) ? $field['class'] : 'form-control-sm' }}" data-role="{{ !empty($field['tags']) ? $field['tags'] : '' }}" :readyonly="!empty($field['readyonly']) ? $field['readyonly'] : false" >
                     </x-form.input>
                 @endforeach
             </div>
@@ -149,4 +165,15 @@
             $("#editrole" + id.toString()).modal('show');
         </script>
     @endif
+    <script type="module">
+        $(document).ready(function() {
+            $("input[name='name']").on('blur keyup keydown change paste',function() {
+                let inputslug = $(this).next().next();
+                var str = $(this).val();
+                str = str.replace(/\W+(?!$)/g, '-').toLowerCase();
+                $(inputslug).val(str);
+                $(inputslug).attr('placeholder', str);
+            })
+        })
+    </script>
 @endsection

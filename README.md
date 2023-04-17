@@ -355,7 +355,8 @@ return view('cursos.index');
 <body>
     <h1>Bienvenido al curso <?php echo $curso; ?></h1>
 </body>
-</html>```
+</html>
+```
 
 > Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos dentro de la función `show`.
 
@@ -6084,7 +6085,9 @@ class Input extends Component
     $placeholder,
     $label,
     $class,
-    $value;
+    $value,
+    $readyonly,
+    $disable;
     /**
      * Create a new component instance.
      */
@@ -6095,7 +6098,9 @@ class Input extends Component
         $placeholder = null,
         $label = "Example",
         $class = null,
-        $value = null
+        $value = null,
+        $readyonly = false,
+        $disable = false
         )
     {
         $this->type = $type;
@@ -6105,6 +6110,8 @@ class Input extends Component
         $this->label = $label;
         $this->class = $class;
         $this->value = $value;
+        $this->readyonly = $readyonly;
+        $this->disable = $disable;
     }
 
     /**
@@ -6123,7 +6130,7 @@ class Input extends Component
 <div>
     <label class="ms-1" for="{{ $id }}">{{ $label }}</label>
     <input type="{{ $type }}" {{ $attributes->merge(['class' => "form-control $class "]) }}
-        id="{{ $id }}" placeholder="{{ $placeholder }}" name="{{ $name }}" value="{{ $value }}">
+        id="{{ $id }}" placeholder="{{ $placeholder }}" name="{{ $name }}" value="{{ $value }}" {{ $readyonly ? $attributes->merge(['readonly' => true]) : '' }} {{ $disable ? $attributes->merge(['disabled' => true]) : '' }}>
     @if ($id == 'repeat_password')
         <div id="repeat_password_message" class="d-none invalid">
             <small>*@lang('The passwords do not match').</small>
@@ -6667,7 +6674,9 @@ class StoreRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|max:150',
+            'name' => 'required|unique:roles|max:45',
+            'slug' => 'required|unique:roles|max:45',
+            'permissions' => 'required|string',
         ];
     }
 }
@@ -6705,6 +6714,8 @@ class UpdateRoleRequest extends FormRequest
     {
         return [
             'name' => 'required|max:150',
+            'slug' => 'required|max:150',
+            'permissions' => 'required|string',
         ];
     }
     public function withValidator(Validator $validator): void
@@ -6964,13 +6975,13 @@ Route::resource('roles', RoleController::class);
                         <th scope="col">{{ $role->id }}</th>
                         <td>{{ $role->name }}</td>
                         <td>{{ $role->slug }}</td>
-                        {{-- <td>
-                            @foreach ($role->roles as $role)
-                                <span class="badge bg-primary">
-                                    {{ $role->name }}
+                        <td>
+                            @foreach ($role->permissions as $permission)
+                                <span class="badge bg-dark bg-gradient">
+                                    {{ $permission->slug }}
                                 </span>
                             @endforeach
-                        </td> --}}
+                        </td>
                         <td>{{ $role->updated_at->format('d-m-Y') }}</td>
                         <td class="text-center">
                             <span class="d-inline-flex">
@@ -7027,16 +7038,15 @@ Route::resource('roles', RoleController::class);
                             {{ $role->slug }}
                         </td>
                     </tr>
-                    {{-- <tr>
-                        <td class="d-flex flex-column">
-                            <strong>Role :</strong>
-                            @foreach ($role->roles as $role)
-                                <span class="badge bg-primary">
-                                    {{ $role->name }}
+                    <tr>
+                        <td>
+                            @foreach ($role->permissions as $permission)
+                                <span class="badge bg-dark bg-gradient">
+                                    {{ $permission->slug }}
                                 </span>
                             @endforeach
                         </td>
-                    </tr> --}}
+                    </tr>
                     <tr>
                         <td class="d-flex flex-column">
                             <strong>Date :</strong>
@@ -7054,11 +7064,28 @@ Route::resource('roles', RoleController::class);
                     styleform="width:100%">
                     <div>
                         @foreach ($fields as $field)
+                            @if (is_object($role[$field['name']]) && $role[$field['name']] != '[]')
+                            @dump($role[$field['name']])
+                                @php
+                                     $permissions = "";
+                                     foreach ($role[$field['name']] as $permission) {
+                                         $permissions .= $permission->name.',';
+                                     }
+                                @endphp
+                                <x-form.input type="{{ $field['type'] }}" id="{{ !empty($field['id']) ? $field['id'] : '' }}"
+                                placeholder="{{ !empty($field['placeholder']) ? $field['placeholder'] : '' }}"
+                                name="{{ !empty($field['name']) ? $field['name'] : '' }}" label="{{ $field['label'] }}"
+                                value="{{$permissions}}" class="{{ !empty($field['class']) ? $field['class'] : 'form-control-sm' }}" data-role="{{ !empty($field['tags']) ? $field['tags'] : '' }}"
+                                :readyonly="!empty($field['readyonly']) ? $field['disable'] : false">
+                            </x-form.input>
+                            @else
                             <x-form.input type="{{ $field['type'] }}" id="{{ !empty($field['id']) ? $field['id'] : '' }}"
                                 placeholder="{{ !empty($field['placeholder']) ? $field['placeholder'] : '' }}"
                                 name="{{ !empty($field['name']) ? $field['name'] : '' }}" label="{{ $field['label'] }}"
-                                value="{{ $role->name }}" class="form-control-sm">
+                                value="{{($role[$field['name']] == '[]') ? '' : $role[$field['name']]}}" class="{{ !empty($field['class']) ? $field['class'] : 'form-control-sm' }}" data-role="{{ !empty($field['tags']) ? $field['tags'] : '' }}"
+                                :readyonly="!empty($field['readyonly']) ? $field['disable'] : false">
                             </x-form.input>
+                            @endif
                         @endforeach
                         <input type="hidden" value="{{ $role->id }}" name="id">
                     </div>
@@ -7076,7 +7103,7 @@ Route::resource('roles', RoleController::class);
                     <x-form.input type="{{ $field['type'] }}" id="{{ !empty($field['id']) ? $field['id'] : '' }}"
                         placeholder="{{ !empty($field['placeholder']) ? $field['placeholder'] : '' }}"
                         name="{{ !empty($field['name']) ? $field['name'] : '' }}" label="{{ $field['label'] }}"
-                        value="{{ !empty($field['value']) ? $field['value'] : '' }}" class="form-control-sm">
+                        value="{{ !empty($field['value']) ? $field['value'] : '' }}" class="{{ !empty($field['class']) ? $field['class'] : 'form-control-sm' }}" data-role="{{ !empty($field['tags']) ? $field['tags'] : '' }}" :readyonly="!empty($field['readyonly']) ? $field['readyonly'] : false" >
                     </x-form.input>
                 @endforeach
             </div>
@@ -7092,10 +7119,19 @@ Route::resource('roles', RoleController::class);
             $("#editrole" + id.toString()).modal('show');
         </script>
     @endif
+    <script type="module">
+        $(document).ready(function() {
+            $("input[name='name']").on('blur keyup keydown change paste',function() {
+                let inputslug = $(this).next().next();
+                var str = $(this).val();
+                str = str.replace(/\W+(?!$)/g, '-').toLowerCase();
+                $(inputslug).val(str);
+                $(inputslug).attr('placeholder', str);
+            })
+        })
+    </script>
 @endsection
 ```
-
-> Creamos y abrimos el archivo `index.blade.php` en la carpeta `resources\views\admin\roles\index.blade.php` y lo dejamos de esta manera.
 
 ###### Instalamos Jquery.
 
@@ -7116,6 +7152,135 @@ window.jQuery = window.$ = $;
 
 ```js
 import 'jquery-ui/dist/jquery-ui';
+```
+
+###### Implementamos Bootstrap Tags Inputs.
+
+> Lo descargamos desde [Bootstrap Tags Inputs](https://bootstrap-tagsinput.github.io/bootstrap-tagsinput/examples/)
+
+**`Nota :` Descargamos y añadimos el archivo `bootstrap-tagsinput.css` en la carpeta `resources\css\bootstrap-tagsinput.css` y añadimos el archivo `bootstrap-tagsinput.js` en la carpeta `resources\js\bootstrap-tagsinput.js`.**
+
+> Abrimos el archivo `bootstrap-tagsinput.css` de la carpeta `resources\css\bootstrap-tagsinput.css` y cambiamos lo siguiente.
+
+```css
+.bootstrap-tagsinput {
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  /* box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); */
+  display: inline-block;
+  padding: 4px 6px;
+  color: #555;
+  vertical-align: middle;
+  border-radius: 4px;
+  width: 100%;
+  /* line-height: 22px; */
+  cursor: text;
+}
+```
+
+> Abrimos el archivo `bootstrap-tagsinput.js` de la carpeta `resources\js\bootstrap-tagsinput.js` y cambiamos lo siguiente.
+
+```js
+    tagClass: function(item) {
+        return 'badge bg-dark bg-gradient';
+    },
+```
+
+ > Abrimos el archivo `app.js` de la carpeta `resources\js\app.js` y añadimos lo siguiente.
+
+```js
+import './bootstrap-tagsinput';
+```
+
+ > Abrimos el archivo `app.scss` de la carpeta `resources\scss\app.scss` y añadimos lo siguiente.
+
+```scss
+@import "/resources/css/bootstrap-tagsinput.css";
+```
+
+###### Cambios en la migración y seeders.
+
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_permissions_table.php` de la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_permissions_table.php` y cambiamos lo siguiente.
+
+```php
+Schema::create('permissions', function (Blueprint $table) {
+    $table->id();
+    $table->string('name', 45);
+    $table->string('slug', 45)->unique();
+    $table->timestamps();
+});
+```
+
+> Abrimos el archivo `RolesSeeder.php` de la carpeta  `database\seeders\RolesSeeder.php` y cambiamos lo siguiente.
+
+```php
+public function run(): void
+{
+    DB::table('roles')->insert([
+        'name' => 'Admin',
+        'slug' => Str::slug('Admin', '-'),
+        'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+    ]);
+}
+```
+
+###### Creamos los seeders de PermissionSeeder y PermissionRoleSeeder.
+
+> Typee: en la Consola:
+```console
+php artisan make:seeder PermissionSeeder
+php artisan make:seeder PermissionRoleSeeder
+```
+
+> Abrimos el archivo `PermissionSeeder.php` de la carpeta `database\seeders\PermissionSeeder.php` y añadimos lo siguiente.
+
+```php
+public function run(): void
+{
+    DB::table('permissions')->insert([
+        'name' => 'All',
+        'slug' => Str::slug('Admin All', '-'),
+        'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+    ]);
+}
+```
+
+> Abrimos el archivo `PermissionRoleSeeder.php` de la carpeta `database\seeders\PermissionRoleSeeder.php` y añadimos lo siguiente.
+
+```php
+public function run(): void
+{
+    DB::table('permission_role')->insert([
+        'permission_id' => 1,
+        'role_id' => 1,
+    ]);
+}
+```
+
+> Importamos las siguientes clases.
+
+```php
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
+```
+
+> Abrimos el archivo `DatabaseSeeder.php` de la carpeta `database\seeders\DatabaseSeeder.php` y añadimos lo siguiente.
+
+```php
+$this->call([
+    CategoriesSeeder::class,
+    RolesSeeder::class,
+    PermissionSeeder::class,
+    PermissionRoleSeeder::class
+]);
+```
+
+> Typee: en la Consola:
+```console
+php artisan migrate:fresh --seed
 ```
 
 [Subir](#top)

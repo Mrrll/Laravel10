@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
+use App\Models\Permission;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class RoleController extends Controller
@@ -14,7 +16,7 @@ class RoleController extends Controller
      */
     public function index(Role $role)
     {
-        $headName = ['#', 'Name', 'Slug', 'Date', 'Options'];
+        $headName = ['#', 'Name', 'Slug', 'Permissions', 'Date', 'Options'];
         $fields = [
             [
                 'id' => 'name',
@@ -22,7 +24,26 @@ class RoleController extends Controller
                 'label' => 'Name :',
                 'type' => 'text',
                 'placeholder' => 'Name',
-                'value' => old('name', $role->name),
+                'value' => old('name'),
+            ],
+            [
+                'id' => 'slug',
+                'name' => 'slug',
+                'label' => 'Slug :',
+                'type' => 'text',
+                'placeholder' => 'Slug-example',
+                'value' => old('slug'),
+                'readyonly' => true,
+                'disable' => true
+            ],
+            [
+                'id' => 'permissions',
+                'name' => 'permissions',
+                'label' => 'Permissions :',
+                'type' => 'text',
+                'placeholder' => 'Permission-1, Permissions-2',
+                'tags' => 'tagsinput',
+                'value' => old('permissions'),
             ],
         ];
         $roles = Role::orderBy('id')->paginate(10);
@@ -46,8 +67,16 @@ class RoleController extends Controller
     public function store(StoreRoleRequest $request)
     {
         try {
-            $request->merge(['slug' => Str::slug($request['name'], '-')]);
-            Role::create($request->all());
+            $listOfPermissions = explode(',', $request->permissions);
+            $role = Role::create($request->only('name','slug'));
+            foreach ($listOfPermissions as $permission) {
+                $slug = Str::slug($request['name'].' '.$permission, '-');
+                $newPermission = new Permission();
+                $newPermission->name = $permission;
+                $newPermission->slug = $slug;
+                $newPermission->save();
+                $role->permissions()->attach($newPermission);
+            }
             return back()->with('message', [
                 'type' => 'success',
                 'title' => 'Éxito !',
@@ -84,8 +113,17 @@ class RoleController extends Controller
     public function update(UpdateRoleRequest $request, Role $role)
     {
         try {
-            $request->merge(['slug' => Str::slug($request['name'], '-')]);
-            $role->update($request->all());
+            $listOfPermissions = explode(',', $request->permissions);
+            // dump($role->permissions);
+            $role->update($request->only(['name','slug']));
+            foreach ($listOfPermissions as $permission) {
+                $slug = Str::slug($request['name'].' '.$permission, '-');
+                $newPermission = new Permission();
+                $newPermission->name = $permission;
+                $newPermission->slug = $slug;
+                $newPermission->save();
+                $role->permissions()->sync($newPermission);
+            }
             return back()->with('message', [
                 'type' => 'info',
                 'title' => 'Éxito !',
@@ -106,6 +144,7 @@ class RoleController extends Controller
     public function destroy(Role $role)
     {
         try {
+            $role->permissions()->delete();
             $role->delete();
             return back()->with('message', [
                 'type' => 'warning',

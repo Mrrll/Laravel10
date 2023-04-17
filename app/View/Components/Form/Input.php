@@ -15,7 +15,9 @@ class Input extends Component
     $placeholder,
     $label,
     $class,
-    $value;
+    $value,
+    $readyonly,
+    $disable;
     /**
      * Create a new component instance.
      */
@@ -26,7 +28,9 @@ class Input extends Component
         $placeholder = null,
         $label = "Example",
         $class = null,
-        $value = null
+        $value = null,
+        $readyonly = false,
+        $disable = false
         )
     {
         $this->type = $type;
@@ -36,6 +40,8 @@ class Input extends Component
         $this->label = $label;
         $this->class = $class;
         $this->value = $value;
+        $this->readyonly = $readyonly;
+        $this->disable = $disable;
     }
 
     /**
