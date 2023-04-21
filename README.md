@@ -4155,6 +4155,7 @@ Schema::create('role_user', function (Blueprint $table) {
     ->references('id')
     ->on('users')
     ->onDelete('cascade');
+    $table->primary(['role_id','user_id']);
 });
 ```
 
@@ -5596,6 +5597,26 @@ Schema::create('permission_role', function (Blueprint $table) {
 });
 ```
 
+###### Creamos tabla pivote de permisos y usuarios.
+
+> Typee: en la Consola:
+
+```console
+php artisan make:migration create_permission_user_table
+```
+
+> Abrimos el archivo `create_permission_user_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_permission_user_table.php` y en la función `up` añadimos lo siguiente.
+
+```php
+Schema::create('permission_user', function (Blueprint $table) {
+    $table->unsignedBigInteger('permission_id');
+    $table->unsignedBigInteger('user_id');
+    $table->foreign('permission_id')->references('id')->on('permissions')->onDelete('cascade');
+    $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+    $table->primary(['permission_id','user_id']);
+});
+```
+
 > Typee: en la Consola:
 
 ```console
@@ -5603,6 +5624,16 @@ php artisan migrate
 ```
 
 > Abrimos el archivo `Role.php` en la carpeta `app\Models\Role.php` y añadimos lo siguiente.
+
+```php
+    // Relación muchos a muchos
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class);
+    }
+```
+
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos lo siguiente.
 
 ```php
     // Relación muchos a muchos
@@ -5939,7 +5970,7 @@ class Card extends Component
 ```php
 public function edit(User $user)
     {
-        $fields = [
+       $fields = [
             [
                 'id' => 'username',
                 'name' => 'name',
@@ -5968,7 +5999,10 @@ public function edit(User $user)
                 'type' => 'password',
             ]
         ];
-        return view('admin.users.edit', compact('user','fields'));
+        $roles = Role::all();
+        $roleuser = $user->roles->first();
+        $permissionsuser = $user->permissions;
+        return view('admin.users.edit', compact('user','fields','roles','roleuser','permissionsuser'));
     }
 ```
 
@@ -7293,9 +7327,11 @@ $this->call([
 php artisan migrate:fresh --seed
 ```
 
-###### Create Update Delete Roles y Permisos.
+###### Create Update Delete de Roles y Permisos.
+
 
 > Abrimos el archivo `RoleController.php` de la carpeta `app\Http\Controllers\RoleController.php` y en la función `store` escribimos lo siguiente.
+
 
 ```php
 try {
@@ -7374,6 +7410,836 @@ try {
         'message' => $th,
     ]);
 }
+```
+
+###### Create Update Delete de Usuarios para los Roles y Permisos mas los Request de Store y Update.
+
+> Typee: en la Consola:
+```console
+php artisan make:request Users\StoreUsersRequest
+```
+
+> Abrimos el archivo `StoreUsersRequest.php` en la carpeta `app\Http\Requests\Users\StoreUsersRequest.php` y lo dejamos de esta manera.
+
+```php
+<?php
+
+namespace App\Http\Requests\Users;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreUsersRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
+     */
+    public function rules(): array
+    {
+        $validation = [
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required'
+        ];
+        if ($this->role != '') {
+            $validationRole = [
+                'role' => 'required|integer',
+            ];
+            $validation = array_merge($validationRole, $validation);
+        }
+        if ($this->permissions != '') {
+            $validationPermissions = [
+                'permissions' => 'required|array'
+            ];
+            $validation = array_merge($validationPermissions, $validation);
+        }
+        return $validation;
+    }
+}
+```
+
+> Typee: en la Consola:
+```console
+php artisan make:request Users\UpdateUsersRequest
+```
+
+> Abrimos el archivo `UpdateUsersRequest.php` en la carpeta `app\Http\Requests\Users\UpdateUsersRequest.php` y lo dejamos de esta manera.
+
+```php
+<?php
+
+namespace App\Http\Requests\Users;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdateUsersRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
+     */
+    public function rules(): array
+    {
+        $validation = [
+            'name' => 'required',
+            'email' => 'required|email',
+        ];
+        if ($this->password != '') {
+            $validationPasswords = [
+                'password' => 'required'
+            ];
+            $validation = array_merge($validationPasswords, $validation);
+        }
+        if ($this->role != '') {
+            $validationRole = [
+                'role' => 'required|integer',
+            ];
+            $validation = array_merge($validationRole, $validation);
+        }
+        if ($this->permissions != '') {
+            $validationPermissions = [
+                'permissions' => 'required|array'
+            ];
+            $validation = array_merge($validationPermissions, $validation);
+        }
+        return $validation;
+    }
+
+}
+```
+
+> Abrimos el archivo `UsersController.php` en la carpeta `app\Http\Controllers\UsersController.php` y en la función `store` escribimos lo siguiente.
+
+```php
+    public function store(StoreUsersRequest $request)
+    {
+        try {
+
+            $user = User::create($request->validated());
+
+            if ($request->role != null) {
+                $user->roles()->attach($request->validated()['role']);
+            }
+
+            if ($request->permissions != null) {
+                foreach ($request->validated()['permissions'] as $permission) {
+                    $user->permissions()->attach($permission);
+                }
+            }
+
+            return redirect()->route('users.index')->with('message', [
+                'type' => 'success',
+                'title' => 'Éxito !',
+                'message' => 'El Usuario a sido guardado correctamente.',
+            ]);
+        } catch (\Throwable $th) {
+             return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
+    }
+```
+
+> Abrimos el archivo `UsersController.php` en la carpeta `app\Http\Controllers\UsersController.php` y en la función `update` escribimos lo siguiente.
+
+```php
+    public function update(UpdateUsersRequest $request, User $user)
+    {
+        try {
+
+            $user->update($request->validated());
+
+            if ($request->permissions != null) {
+
+                $user->permissions()->sync($request->validated()['permissions']);
+            } else {
+                $user->permissions()->detach();
+            }
+
+            if ($request->role != null) {
+                $user->roles()->sync($request->validated()['role']);
+            } else {
+                $user->roles()->detach();
+            }
+
+            return redirect()->route('users.index')->with('message', [
+                'type' => 'info',
+                'title' => 'Éxito !',
+                'message' => 'El Usuario a sido actualizado correctamente.',
+            ]);
+        } catch (\Throwable $th) {
+             return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
+    }
+```
+
+> Abrimos el archivo `UsersController.php` en la carpeta `app\Http\Controllers\UsersController.php` y en la función `destroy` escribimos lo siguiente.
+
+```php
+    public function destroy(User $user)
+    {
+       try {
+            $user->permissions()->detach();
+            $user->roles()->detach();
+            $user->delete();
+            return redirect()->route('users.index')->with('message', [
+                'type' => 'warning',
+                'title' => 'Éxito !',
+                'message' => 'El Usuario a sido eliminado correctamente.',
+            ]);
+        } catch (\Throwable $th) {
+             return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
+    }
+```
+
+> Abrimos el archivo `UsersController.php` en la carpeta `app\Http\Controllers\UsersController.php` y en la función `create` escribimos lo siguiente.
+
+```php
+    public function create(Request $request)
+    {
+        $fields = [
+            [
+                'id' => 'username',
+                'name' => 'name',
+                'label' => 'Username :',
+                'type' => 'text',
+                'placeholder' => 'Username',
+                'value' => old('name')
+            ],
+            [
+                'id' => 'email',
+                'name' => 'email',
+                'label' => 'Email :',
+                'type' => 'email',
+                'placeholder' => 'email@example.com',
+                'value' => old('email')
+            ],
+            [
+                'id' => 'password',
+                'name' => 'password',
+                'label' => 'Password :',
+                'type' => 'password',
+            ],
+            [
+                'id' => 'repeat_password',
+                'label' => 'Repeat password :',
+                'type' => 'password',
+            ]
+        ];
+        if ($request->ajax()) {
+            $role = Role::where('id', $request->role_id)->first();
+            $permissions = $role->permissions;
+            return $permissions;
+        }
+        $roles = Role::all();
+        return view('admin.users.create', compact('fields','roles'));
+    }
+```
+
+> Abrimos el archivo `UsersController.php` en la carpeta `app\Http\Controllers\UsersController.php` y en la función `edit` escribimos lo siguiente.
+
+```php
+    public function edit(Request $request, User $user)
+    {
+        $fields = [
+            [
+                'id' => 'username',
+                'name' => 'name',
+                'label' => 'Username :',
+                'type' => 'text',
+                'placeholder' => 'Username',
+                'value' => old('name', $user->name)
+            ],
+            [
+                'id' => 'email',
+                'name' => 'email',
+                'label' => 'Email :',
+                'type' => 'email',
+                'placeholder' => 'email@example.com',
+                'value' => old('email', $user->email)
+            ],
+            [
+                'id' => 'password',
+                'name' => 'password',
+                'label' => 'Password :',
+                'type' => 'password',
+            ],
+            [
+                'id' => 'repeat_password',
+                'label' => 'Repeat password :',
+                'type' => 'password',
+            ]
+        ];
+        if ($request->ajax()) {
+            $role = Role::where('id', $request->role_id)->first();
+            $permissions = $role->permissions;
+            return $permissions;
+        }
+        $roles = Role::all();
+        return view('admin.users.edit', compact('user','fields','roles'));
+    }
+```
+
+###### Modificamos el modo en que pasamos el dato de la password.
+
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos a lo siguiente.
+
+```php
+    protected function password(): Attribute {
+        return new Attribute(
+            set:function($value){
+                return bcrypt($value);
+            }
+        );
+    }
+```
+
+> Abrimos el archivo `RegisterController.php` en la carpeta `app\Http\Controllers\Auth\RegisterController.php` y cambiamos a lo siguiente.
+
+```php
+$user = new User();
+$user->name = $request->name;
+$user->email = $request->email;
+$user->password = bcrypt($request->password);
+$user->save();
+```
+
+> Por esto otro.
+
+```php
+....
+
+$roles = Role::find($role);
+
+....
+
+$user = User::create($request->validated());
+foreach ($roles->permissions as $permission) {
+    $user->permissions()->attach($permission);
+}
+
+....
+
+```
+
+**`Nota :` De esta manera conseguimos a parte de asignar el role al usuario asignamos los permisos y podemos utilizar el método `create` directamente.**
+
+###### Realizamos el diseño de Crear usuarios y Editar con los Roles y Permisos.
+
+> Abrimos el archivo `index.blade.php` en la carpeta `resources\views\admin\users\index.blade.php` y cambiamos a lo siguiente.
+
+```php
+@extends('layouts.dashboard')
+
+@section('title', 'List Users')
+
+@section('content-dashboard')
+    <main class="container flex-column main-dashboard">
+        @include('layouts.components.alert')
+        <x-card class="mt-2" classheader="d-flex justify-content-between">
+            <x-slot name="card_header">
+                <h1>List Users</h1>
+                <div class="align-self-center">
+                    <a href="{{ route('users.create') }}" class="btn btn-primary"> Create User</a>
+                </div>
+            </x-slot>
+            {{-- Tabla --}}
+            <x-table :thead="$headName" class="table-striped table-hover table-responsive-sm align-middle"
+                theadclass="table-dark">
+                @foreach ($users as $user)
+                    <tr class="{{ $user->id == auth()->user()->id ? 'table-active ' : '' }}">
+                        <th scope="col">{{ $user->id }}</th>
+                        <td>{{ $user->name }}</td>
+                        <td>
+                            <span class="d-inline-block text-truncate" style="max-width=332px;">
+                                {{ $user->email }}
+                            </span>
+                        </td>
+                        <td>
+                            @if ($user->roles)
+                                @foreach ($user->roles as $role)
+                                    <span class="badge bg-primary">
+                                        {{ $role->name }}
+                                    </span>
+                                @endforeach
+                            @endif
+                        </td>
+                        <td>
+                            @if ($user->permissions)
+                                @foreach ($user->permissions as $permission)
+                                    <span class="badge bg-dark bg-gradient">
+                                        {{ $permission->slug }}
+                                    </span>
+                                @endforeach
+                            @endif
+                        </td>
+                        <td>
+                            @if ($user->email_verified_at)
+                                {{ $user->email_verified_at->format('d-m-Y') }}
+                            @endif
+                        </td>
+                        <td>{{ $user->updated_at->format('d-m-Y') }}</td>
+                        <td class="text-center">
+                            <span class="d-inline-flex">
+                                <x-table.button type='link' class='btn-outline-success me-1' :route="route('users.show', $user)">
+                                    <x-slot name="icon">
+                                        <i class="fa-solid fa-eye" style="color: #7cf884;"></i>
+                                    </x-slot>
+                                </x-table.button>
+                                <x-table.button type='link' class='btn-outline-warning me-1' :route="route('users.edit', $user)">
+                                    <x-slot name="icon">
+                                        <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                                    </x-slot>
+                                </x-table.button>
+                                <x-table.button type='modal' route="" class='btn-outline-danger'
+                                    target="#deleteuser{{ $user->id }}">
+                                    <x-slot name="icon">
+                                        <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                                    </x-slot>
+                                </x-table.button>
+                            </span>
+                        </td>
+                    </tr>
+                    <x-modal id="deleteuser{{ $user->id }}" class="modal-dialog-centered" title="Delete"
+                        name="{{ $user->name }}" model="user" btnactioncolor="btn-danger" :btnactionroute="route('users.destroy', $user)"
+                        btnactionmethod="delete"></x-modal>
+                @endforeach
+            </x-table>
+            {{-- Tabla en Movil --}}
+            @foreach ($users as $user)
+                <x-table class="table-striped {{ $user->id == auth()->user()->id ? 'table-active ' : '' }}"
+                    typetable="movil">
+                    <x-slot name="head">
+                        <x-table.button type='link' class='btn-outline-success me-1' :route="route('users.show', $user)">
+                            <x-slot name="icon">
+                                <i class="fa-solid fa-eye" style="color: #7cf884;"></i>
+                            </x-slot>
+                        </x-table.button>
+                        <x-table.button type='link' class='btn-outline-warning me-1' :route="route('users.edit', $user)">
+                            <x-slot name="icon">
+                                <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                            </x-slot>
+                        </x-table.button>
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                            data-bs-target="#deleteuser{{ $user->id }}">
+                            <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                        </button>
+                    </x-slot>
+                    <tr>
+                        <th scope="col" class="d-flex flex-column">
+                            <strong># :</strong>
+                            {{ $user->id }}
+                        </th>
+                    </tr>
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Name :</strong>
+                            {{ $user->name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Email :</strong>
+                            {{ $user->email }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Role :</strong>
+                            @if ($user->roles)
+                                <div class="grid" style="--bs-columns: 3; --bs-gap: 1rem;">
+                                    @foreach ($user->roles as $role)
+                                        <span class="badge bg-primary">
+                                            {{ $role->name }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Permissions :</strong>
+                            @if ($user->permissions)
+                                <div class="grid" style="--bs-columns: 3; --bs-gap: 1rem;">
+                                    @foreach ($user->permissions as $permission)
+                                        <span class="badge bg-dark bg-gradient">
+                                            {{ $permission->slug }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Verified :</strong>
+                            @if ($user->email_verified_at)
+                                {{ $user->email_verified_at->format('d-m-Y') }}
+                            @endif
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Date :</strong>
+                            {{ $user->updated_at->format('d-m-Y') }}
+                        </td>
+                    </tr>
+                </x-table>
+                <x-modal id="deleteuser{{ $user->id }}" class="modal-dialog-centered" title="Delete"
+                    name="{{ $user->name }}" model="user" btnactioncolor="btn-danger" :btnactionroute="route('users.destroy', $user)"
+                    btnactionmethod="delete"></x-modal>
+            @endforeach
+            <x-slot name="card_footer">
+                {{ $users->links() }}
+            </x-slot>
+        </x-card>
+    </main>
+@endsection
+```
+
+> Abrimos el archivo `show.blade.php` en la carpeta `resources\views\admin\users\show.blade.php` y escribimos a lo siguiente.
+
+```php
+@extends('layouts.dashboard')
+
+@section('title', 'User | ' . $user->name)
+
+@section('content-dashboard')
+    <main class="container center_container flex-column main-dashboard">
+        <x-card style="width:100%;">
+            <x-slot name="card_header" classheader="text-start">
+                <h6><strong>Nombre : </strong> {{ $user->name }} </h6>
+                <h6><strong>Email : </strong> {{ $user->email }} </h6>
+                <h6><small>Number of Posts : .....</small></h6>
+            </x-slot>
+            <h5 class="card-title"><strong>Role :</strong></h5>
+            @if ($user->roles)
+                @foreach ($user->roles as $role)
+                    <span class="badge bg-primary">
+                        {{ $role->name }}
+                    </span>
+                @endforeach
+            @endif
+            <hr>
+            <h5 class="card-title"><strong>Permissions :</strong></h5>
+            @if ($user->permissions)
+                @foreach ($user->permissions as $permission)
+                    <span class="badge bg-dark bg-gradient">
+                        {{ $permission->slug }}
+                    </span>
+                @endforeach
+            @endif
+            <x-slot name="card_footer" classfooter="text-body-secondary">
+                <a href="{{ url()->previous() }}" class="btn btn-primary">Go Back</a>
+            </x-slot>
+        </x-card>
+    </main>
+@endsection
+```
+
+> Creamos y abrimos el archivo `create.blade.php` en la carpeta `resources\views\admin\users\create.blade.php` y escribimos a lo siguiente.
+
+```php
+@extends('layouts.dashboard')
+
+@section('title', 'List Users')
+
+@section('content-dashboard')
+    <main class="container flex-column main-dashboard">
+        <x-form :route="route('users.store')" style="width:100%">
+            <x-card class="mt-2" style="width:100%" classfooter="d-flex justify-content-end">
+                <x-slot name="card_header">
+                    <h1>Create User</h1>
+                </x-slot>
+                <div class="grid" style="--bs-columns: 2; --bs-gap: 1rem;">
+                    @foreach ($fields as $field)
+                        <div class="form-group">
+                            <x-form.input type="{{ $field['type'] }}" id="{{ !empty($field['id']) ? $field['id'] : '' }}"
+                                placeholder="{{ !empty($field['placeholder']) ? $field['placeholder'] : '' }}"
+                                name="{{ !empty($field['name']) ? $field['name'] : '' }}" label="{{ $field['label'] }}"
+                                value="{{ !empty($field['value']) ? $field['value'] : '' }}" class="form-control-sm">
+                            </x-form.input>
+                        </div>
+                    @endforeach
+                    <div class="form-group">
+                        <label for="role">Select Role</label>
+                        <select class="role form-control" name="role" id="role">
+                            <option value="">Select Role...</option>
+                            @foreach ($roles as $role)
+                                <option data-role-id="{{ $role->id }}" data-role-slug="{{ $role->slug }}"
+                                    value="{{ $role->id }}">{{ $role->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div id="permissions_box" class="form-group">
+                        <label for="roles">Select Permissions</label>
+                        <div id="permissions_checkbox_list" class="d-flex">
+
+                        </div>
+                    </div>
+                </div>
+                <x-slot name="card_footer">
+                    <x-form.button type="submit" color="primary" class="me-2">
+                        @lang('Create :model', ['model' => 'Usuario'])
+                    </x-form.button>
+                    <x-form.button color="danger" :route="url()->previous()">
+                        @lang('Go Back')
+                    </x-form.button>
+                </x-slot>
+                <div class="d-flex justify-content-end mt-3">
+                </div>
+            </x-card>
+        </x-form>
+    </main>
+    <script type="module">
+        $(document).ready(function() {
+            let permissions_box = $('#permissions_box')
+            let permissions_checkbox_list = $('#permissions_checkbox_list')
+
+            permissions_box.hide()
+
+             if ($('#role').find(':selected').val().length != 0) {
+                let role = $('#role').find(':selected')
+                let role_id = role.data('role-id')
+                let role_slug = role.data('role-slug')
+                        peticion(role_id,role_slug)
+             }
+
+            $('#role').on('change', function() {
+                let role = $(this).find(':selected')
+                let role_id = role.data('role-id')
+                let role_slug = role.data('role-slug')
+                    console.log( $('#role').find(':selected').val().length);
+
+                    permissions_checkbox_list.empty()
+                    if ($('#role').find(':selected').val().length != 0) {
+
+                        peticion(role_id,role_slug)
+                    }
+            })
+            function peticion(role_id,role_slug) {
+                $.ajax({
+                            url: '/users/crear',
+                            method: 'get',
+                            dataType: 'json',
+                            data: {
+                                role_id: role_id,
+                                role_slug: role_slug
+                            }
+                        }).done(function(data) {
+
+                            permissions_box.show()
+
+                            $.each(data, function(index, element){
+                                $(permissions_checkbox_list).append(
+                                    '<div class="custom-control custom-checkbox me-1">'+
+                                        '<input class="btn-check" type="checkbox" id="'+element.slug+'" name="permissions[]" value="'+element.id+'">'+
+                                        '<label class="btn btn-outline-success" for="'+ element.slug +'">'+ element.name +'</label>'+
+                                    '</div>'
+                                )
+                            })
+                        })
+            }
+
+        })
+    </script>
+@endsection
+```
+
+> Abrimos el archivo `edit.blade.php` en la carpeta `resources\views\admin\users\edit.blade.php` y cambiamos a lo siguiente.
+
+```php
+@extends('layouts.dashboard')
+
+@section('title', 'Editar User')
+
+@section('content-dashboard')
+    <main class="container flex-column main-dashboard">
+        <x-form :route="route('users.update', $user)" method="patch" style="width:100%">
+            <x-card class="mt-2" style="width:100%" classfooter="d-flex justify-content-end">
+                <x-slot name="card_header">
+                    <h1>Editar User</h1>
+                </x-slot>
+                <div class="grid" style="--bs-columns: 2; --bs-gap: 1rem;">
+                    @foreach ($fields as $field)
+                        <div>
+                            <x-form.input type="{{ $field['type'] }}" id="{{ !empty($field['id']) ? $field['id'] : '' }}"
+                                placeholder="{{ !empty($field['placeholder']) ? $field['placeholder'] : '' }}"
+                                name="{{ !empty($field['name']) ? $field['name'] : '' }}" label="{{ $field['label'] }}"
+                                value="{{ !empty($field['value']) ? $field['value'] : '' }}" class="form-control-sm">
+                            </x-form.input>
+                        </div>
+                    @endforeach
+                    <div class="form-group">
+                        <label for="role">Select Role</label>
+                        <select class="role form-control" name="role" id="role">
+                            <option value="">Select Role...</option>
+                            @foreach ($roles as $role)
+                                <option data-role-id="{{ $role->id }}" data-role-slug="{{ $role->slug }}"
+                                    data-select-role="{{ !empty($roleuser) || $roleuser != null ? $roleuser->id : '' }}"
+                                    value="{{ $role->id }}"
+                                    @if ($roleuser != null || !empty($roleuser->id)) @selected(old('role', $role->id) ==  $roleuser->id ) @endif>
+                                    {{ $role->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div id="permissions_box" class="form-group">
+                        <label for="roles">Select Permissions</label>
+                        <div id="permissions_checkbox_list" class="d-flex">
+
+                        </div>
+                    </div>
+
+                    @if ($user->permissions->isNotEmpty() && $roleuser != null)
+                        <div id="user_permissions_box" class="form-group">
+                            <label for="roles">Select Permissions</label>
+                            <div id="user_permissions_checkbox_list" class="d-flex">
+                                @foreach ($roleuser->permissions as $permission)
+                                    <div class="custom-control custom-checkbox me-1" id="checkboxuser">
+                                        <input class="btn-check" type="checkbox" id="{{ $permission->slug }}"
+                                            name="permissions[]" value="{{ $permission->id }}"
+                                            @foreach ($permissionsuser as $permissionuser) @if ($permissionuser->id == $permission->id) checked @endif @endforeach>
+                                        <label class="btn btn-outline-success"
+                                            for="{{ $permission->slug }}">{{ $permission->name }}</label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                </div>
+                <x-slot name="card_footer">
+                    <x-form.button type="submit" color="primary" class="me-2">
+                        @lang('Update :model', ['model' => 'Usuario'])
+                    </x-form.button>
+                    <x-form.button color="danger" :route="url()->previous()">
+                        @lang('Go Back')
+                    </x-form.button>
+                </x-slot>
+                <div class="d-flex justify-content-end mt-3">
+                </div>
+            </x-card>
+        </x-form>
+    </main>
+    <script type="module">
+        $(document).ready(function() {
+            let permissions_box = $('#permissions_box')
+            let permissions_checkbox_list = $('#permissions_checkbox_list')
+            let user_permissions_box = $('#user_permissions_box')
+
+            permissions_box.hide()
+
+
+
+             if ($('#role').find(':selected').val().length != 0) {
+
+                let role = $('#role').find(':selected')
+                let role_id = role.data('role-id')
+                let role_slug = role.data('role-slug')
+
+                if ($('#role').find(':selected').val() == $('#role').find(':selected').data('select-role')) {
+
+                         user_permissions_box.show()
+
+                } else {
+
+                        peticion(role_id,role_slug)
+                        user_permissions_box.hide()
+
+                }
+             }
+
+
+            $('#role').on('change', function() {
+                let role = $(this).find(':selected')
+                let role_id = role.data('role-id')
+                let role_slug = role.data('role-slug')
+                let role_select = role.data('select-role')
+
+                    permissions_checkbox_list.empty()
+
+                    if ($('#role').find(':selected').val().length != 0) {
+
+                        if ($('#role').find(':selected').val() == $('#role').find(':selected').data('select-role')) {
+
+                         user_permissions_box.show()
+                         permissions_box.hide()
+
+                        } else {
+
+                        peticion(role_id,role_slug)
+                        user_permissions_box.hide()
+
+                        }
+
+                    }
+            })
+            function clickcheckbox() {
+               console.log($("#user_permissions_checkbox_list :checkbox:checked"));
+               let inputCheck = $("#user_permissions_checkbox_list :checkbox:checked")
+               $.each(inputCheck, function(index, element) {
+                element.removeAttribute('checked');
+               })
+                console.log($("#user_permissions_checkbox_list :checkbox:checked"));
+            }
+            window.clickcheckbox = clickcheckbox;
+            function peticion(role_id,role_slug) {
+                $.ajax({
+                            url: '/users/crear',
+                            method: 'get',
+                            dataType: 'json',
+                            data: {
+                                role_id: role_id,
+                                role_slug: role_slug
+                            }
+                        }).done(function(data) {
+
+                            permissions_box.show()
+
+                            $.each(data, function(index, element){
+                                $(permissions_checkbox_list).append(
+                                '<div class="custom-control custom-checkbox me-1" id="checkboxajax">'+
+                                        '<input class="btn-check" type="checkbox" id="'+element.slug+'" name="permissions[]" value="'+element.id+'" onclick="clickcheckbox()">'+
+                                        '<label class="btn btn-outline-success" for="'+ element.slug +'">'+ element.name +'</label>'+
+                                    '</div>'
+                                )
+                            })
+                        })
+            }
+
+        })
+    </script>
+@endsection
 ```
 
 [Subir](#top)

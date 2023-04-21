@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Auth\Events\Registered;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,14 +20,15 @@ class RegisterController extends Controller
         try {
 
             $role = count(User::all()) > 0 ? 3 : 1;
-            
-            $user = new User();
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->password = bcrypt($request->password);
-            $user->save();
+            $roles = Role::find($role);
+
+            $user = User::create($request->validated());
 
             $user->roles()->attach($role);
+
+            foreach ($roles->permissions as $permission) {
+                $user->permissions()->attach($permission);
+            }
 
             event(new Registered($user));
 

@@ -77,4 +77,19 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsToMany(Role::class);
     }
+    protected function password(): Attribute {
+        return new Attribute(
+            set:function($value){
+                return bcrypt($value);
+            }
+        );
+    }
+    /**
+     * @return mixed
+     */
+    // Relación muchos a muchos
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class);
+    }
 }
