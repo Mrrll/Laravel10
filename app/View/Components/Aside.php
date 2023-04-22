@@ -67,6 +67,7 @@ class Aside extends Component
             'icono' => 'fa-solid fa-users fa-lg',
             'icono_color' => '#0045bd',
             'name_collapse' => 'collapseHeightUsers',
+            'can' => ['isAdmin','isManager'],
             'items' => [
                 [
                     'name' => 'List Users',
@@ -90,6 +91,7 @@ class Aside extends Component
             'icono' => 'fa-solid fa-users-gear fa-lg',
             'icono_color' => '#c12115',
             'name_collapse' => 'collapseHeightRoles',
+            'can' => 'isAdmin',
             'items' => [
                 [
                     'name' => 'List roles',

@@ -16,6 +16,7 @@
             <x-table :thead="$headName" class="table-striped table-hover table-responsive-sm align-middle"
                 theadclass="table-dark">
                 @foreach ($users as $user)
+                    @if (!Auth::user()->hasRole('admin') && $user->hasRole('admin')) @continue @endif
                     <tr class="{{ $user->id == auth()->user()->id ? 'table-active ' : '' }}">
                         <th scope="col">{{ $user->id }}</th>
                         <td>{{ $user->name }}</td>
@@ -76,6 +77,7 @@
             </x-table>
             {{-- Tabla en Movil --}}
             @foreach ($users as $user)
+                @if (!Auth::user()->hasRole('admin') && $user->hasRole('admin')) @continue @endif
                 <x-table class="table-striped {{ $user->id == auth()->user()->id ? 'table-active ' : '' }}"
                     typetable="movil">
                     <x-slot name="head">

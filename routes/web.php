@@ -74,8 +74,8 @@ Route::group(['middleware' => ['verified', 'auth', 'auth.session']],function () 
         Route::get('dashboard/cursos/create', [CursoController::class, 'create'])->name('cursos.create');
         Route::get('dashboard/cursos/mycursos', [CursoController::class, 'showmycursos'])->name('cursos.mycursos');
         Route::get('dashboard/cursos/{curso}/edit', [CursoController::class, 'edit'])->name('cursos.edit');
-        Route::resource('users', UsersController::class);
-        Route::resource('roles', RoleController::class);
+        Route::resource('users', UsersController::class)->middleware('role:admin,manager');
+        Route::resource('roles', RoleController::class)->middleware('can:isAdmin');
     }
 );
 

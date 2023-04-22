@@ -7,6 +7,7 @@ use App\Http\Requests\Users\UpdateUsersRequest;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class UsersController extends Controller
 {
@@ -15,9 +16,18 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $headName = ['#','Name','Email','Roles','Permissions','Verified','Date','Options'];
+        $headName = [
+            '#',
+            'Name',
+            'Email',
+            'Roles',
+            'Permissions',
+            'Verified',
+            'Date',
+            'Options',
+        ];
         $users = User::orderBy('id')->paginate(10);
-        return view('admin.users.index', compact('users','headName'));
+        return view('admin.users.index', compact('users', 'headName'));
     }
 
     /**
@@ -32,7 +42,7 @@ class UsersController extends Controller
                 'label' => 'Username :',
                 'type' => 'text',
                 'placeholder' => 'Username',
-                'value' => old('name')
+                'value' => old('name'),
             ],
             [
                 'id' => 'email',
@@ -40,7 +50,7 @@ class UsersController extends Controller
                 'label' => 'Email :',
                 'type' => 'email',
                 'placeholder' => 'email@example.com',
-                'value' => old('email')
+                'value' => old('email'),
             ],
             [
                 'id' => 'password',
@@ -52,7 +62,7 @@ class UsersController extends Controller
                 'id' => 'repeat_password',
                 'label' => 'Repeat password :',
                 'type' => 'password',
-            ]
+            ],
         ];
         if ($request->ajax()) {
             $role = Role::where('id', $request->role_id)->first();
@@ -60,7 +70,7 @@ class UsersController extends Controller
             return $permissions;
         }
         $roles = Role::all();
-        return view('admin.users.create', compact('fields','roles'));
+        return view('admin.users.create', compact('fields', 'roles'));
     }
 
     /**
@@ -68,27 +78,32 @@ class UsersController extends Controller
      */
     public function store(StoreUsersRequest $request)
     {
+        // dd($request->all());
         try {
-
-            $user = User::create($request->validated());
-
-            if ($request->role != null) {
-                $user->roles()->attach($request->validated()['role']);
+            $user = User::find(auth()->user()->id)->first();
+            if (Gate::denies('isAdmin')) {
+                dd('El usuario no es admin');
             }
 
-            if ($request->permissions != null) {
-                foreach ($request->validated()['permissions'] as $permission) {
-                    $user->permissions()->attach($permission);
-                }
-            }
+            // $user = User::create($request->validated());
 
-            return redirect()->route('users.index')->with('message', [
-                'type' => 'success',
-                'title' => 'Éxito !',
-                'message' => 'El Usuario a sido guardado correctamente.',
-            ]);
+            // if ($request->role != null) {
+            //     $user->roles()->attach($request->validated()['role']);
+            // }
+
+            // if ($request->permissions != null) {
+            //     foreach ($request->validated()['permissions'] as $permission) {
+            //         $user->permissions()->attach($permission);
+            //     }
+            // }
+
+            // return redirect()->route('users.index')->with('message', [
+            //     'type' => 'success',
+            //     'title' => 'Éxito !',
+            //     'message' => 'El Usuario a sido guardado correctamente.',
+            // ]);
         } catch (\Throwable $th) {
-             return back()->with('message', [
+            return back()->with('message', [
                 'type' => 'danger',
                 'title' => 'Error !',
                 'message' => $th,
@@ -116,7 +131,7 @@ class UsersController extends Controller
                 'label' => 'Username :',
                 'type' => 'text',
                 'placeholder' => 'Username',
-                'value' => old('name', $user->name)
+                'value' => old('name', $user->name),
             ],
             [
                 'id' => 'email',
@@ -124,7 +139,7 @@ class UsersController extends Controller
                 'label' => 'Email :',
                 'type' => 'email',
                 'placeholder' => 'email@example.com',
-                'value' => old('email', $user->email)
+                'value' => old('email', $user->email),
             ],
             [
                 'id' => 'password',
@@ -136,12 +151,15 @@ class UsersController extends Controller
                 'id' => 'repeat_password',
                 'label' => 'Repeat password :',
                 'type' => 'password',
-            ]
+            ],
         ];
         $roles = Role::all();
         $roleuser = $user->roles->first();
         $permissionsuser = $user->permissions;
-        return view('admin.users.edit', compact('user','fields','roles','roleuser','permissionsuser'));
+        return view(
+            'admin.users.edit',
+            compact('user', 'fields', 'roles', 'roleuser', 'permissionsuser')
+        );
     }
 
     /**
@@ -150,12 +168,12 @@ class UsersController extends Controller
     public function update(UpdateUsersRequest $request, User $user)
     {
         try {
-
             $user->update($request->validated());
 
             if ($request->permissions != null) {
-
-                $user->permissions()->sync($request->validated()['permissions']);
+                $user
+                    ->permissions()
+                    ->sync($request->validated()['permissions']);
             } else {
                 $user->permissions()->detach();
             }
@@ -166,13 +184,15 @@ class UsersController extends Controller
                 $user->roles()->detach();
             }
 
-            return redirect()->route('users.index')->with('message', [
-                'type' => 'info',
-                'title' => 'Éxito !',
-                'message' => 'El Usuario a sido actualizado correctamente.',
-            ]);
+            return redirect()
+                ->route('users.index')
+                ->with('message', [
+                    'type' => 'info',
+                    'title' => 'Éxito !',
+                    'message' => 'El Usuario a sido actualizado correctamente.',
+                ]);
         } catch (\Throwable $th) {
-             return back()->with('message', [
+            return back()->with('message', [
                 'type' => 'danger',
                 'title' => 'Error !',
                 'message' => $th,
@@ -185,17 +205,19 @@ class UsersController extends Controller
      */
     public function destroy(User $user)
     {
-       try {
+        try {
             $user->permissions()->detach();
             $user->roles()->detach();
             $user->delete();
-            return redirect()->route('users.index')->with('message', [
-                'type' => 'warning',
-                'title' => 'Éxito !',
-                'message' => 'El Usuario a sido eliminado correctamente.',
-            ]);
+            return redirect()
+                ->route('users.index')
+                ->with('message', [
+                    'type' => 'warning',
+                    'title' => 'Éxito !',
+                    'message' => 'El Usuario a sido eliminado correctamente.',
+                ]);
         } catch (\Throwable $th) {
-             return back()->with('message', [
+            return back()->with('message', [
                 'type' => 'danger',
                 'title' => 'Error !',
                 'message' => $th,

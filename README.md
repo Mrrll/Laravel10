@@ -69,6 +69,7 @@
 - [Dashboard simple](#item32)
 - [Relación muchos a muchos (Many To Many) Parte 2](#item33)
 - [Roles y Permissions Implementación](#item34)
+- [Gates (Puertas)](#item35)
 
 <a name="item1"></a>
 
@@ -8240,6 +8241,228 @@ foreach ($roles->permissions as $permission) {
         })
     </script>
 @endsection
+```
+
+[Subir](#top)
+
+<a name="item35"></a>
+
+## Gates (Puertas)
+
+###### Creamos nuestro primer Gate.
+
+> Abrimos el archivo `AuthServiceProvider.php` en la carpeta `app\Providers\AuthServiceProvider.php` en la función `boot` y escribimos lo siguiente.
+
+```php
+// Definimos puerta si el usuario es admin
+Gate::define('isAdmin', function (User $user) {
+    return $user->roles->first()->slug == 'admin';
+});
+```
+
+> Abrimos el archivo `UsersController.php` en la carpeta `app\Http\Controllers\UsersController.php` en la función `store` y añadimos lo siguiente.
+
+```php
+if (Gate::allows('isAdmin')) {
+    dd('El usuario es admin');
+} else {
+    dd('El usuario no es admin');
+}
+```
+
+###### Restringimos el acceso a los botones del menu dashboard.
+
+> Abrimos el archivo `Aside.php` en la carpeta `app\View\Components\Aside.php` en `links` en el link `Users` y `Roles` y añadimos lo siguiente.
+
+```php
+'can' => 'isAdmin',
+```
+
+> Abrimos el archivo `aside.blade.php` en la carpeta `resources\views\components\aside.blade.php` y añadimos lo siguiente.
+
+```php
+{{-- Botón del link --}}
+<div id="btn_link_dashboard" class="d-none">
+    @foreach ($links as $link)
+        @if (array_key_exists('can', $link))
+            @can($link['can'])
+                <button class="btn btn-outline-secondary text-start mb-1" style="width: 100%;" type="button" data-bs-toggle="collapse" data-bs-target="#{{ $link['name_collapse'] }}"  aria-expanded="false" aria-controls="{{ $link['name_collapse'] }}" id="btn_link_dashboard">
+                    <i class="{{ $link['icono'] }}" style="color:{{ $link['icono_color'] }};"></i>
+                    <span>{{ $link['name'] }}</span>
+                </button>
+                {{-- Lista del colapsos --}}
+                <ul class="dropdown-menu collapse collapse-vertical bg-dark" id="{{ $link['name_collapse'] }}">
+                    @foreach ($link['items'] as $item)
+                        <li>
+                            <a href="{{ $item['route'] }}" class="dropdown-item text-white" type="button">
+                                <i class="{{ $item['icono'] }}" style="color:{{ $item['icono_color'] }};"></i>
+                                {{ $item['name'] }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            @endcan
+        @else
+            <button class="btn btn-outline-secondary text-start mb-1" style="width: 100%;" type="button" data-bs-toggle="collapse" data-bs-target="#{{ $link['name_collapse'] }}" aria-expanded="false" aria-controls="{{ $link['name_collapse'] }}" id="btn_link_dashboard">
+                <i class="{{ $link['icono'] }}" style="color:{{ $link['icono_color'] }};"></i>
+                <span>{{ $link['name'] }}</span>
+            </button>
+            {{-- Lista del colapsos --}}
+            <ul class="dropdown-menu collapse collapse-vertical bg-dark" id="{{ $link['name_collapse'] }}">
+                @foreach ($link['items'] as $item)
+                    <li>
+                        <a href="{{ $item['route'] }}" class="dropdown-item text-white" type="button">
+                            <i class="{{ $item['icono'] }}" style="color:{{ $item['icono_color'] }};"></i>
+                            {{ $item['name'] }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+    @endforeach
+</div>
+{{-- Botones de los links en Iconos --}}
+<div class="btn-group dropend d-block" id="btn_links_iconos_dashboard">
+    @foreach ($links as $link)
+        @if (array_key_exists('can', $link))
+            @can($link['can'])
+                <button type="button" class="btn btn-circle dropdown-toggle mb-1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="{{ $link['icono'] }}" style="color:{{ $link['icono_color'] }};"></i>
+                </button>
+                <ul class="dropdown-menu bg-dark">
+                    @foreach ($link['items'] as $item)
+                        <li>
+                            <a href="{{ $item['route'] }}" class="dropdown-item text-white" type="button">
+                                {{ $item['name'] }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            @endcan
+        @else
+            <button type="button" class="btn btn-circle dropdown-toggle mb-1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="{{ $link['icono'] }}" style="color:{{ $link['icono_color'] }};"></i>
+            </button>
+            <ul class="dropdown-menu bg-dark">
+                @foreach ($link['items'] as $item)
+                    <li>
+                        <a href="{{ $item['route'] }}" class="dropdown-item text-white" type="button">
+                            {{ $item['name'] }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+    @endforeach
+</div>
+```
+
+###### Restringimos el acceso de los usuarios a las rutas.
+
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y añadimos lo siguiente.
+
+```php
+Route::resource('users', UsersController::class)->middleware('can:isAdmin');
+Route::resource('roles', RoleController::class)->middleware('can:isAdmin');
+```
+
+###### Creamos Gate para varios roles.
+
+> Abrimos el archivo `AuthServiceProvider.php` en la carpeta `app\Providers\AuthServiceProvider.php` en la función `boot` y añadimos lo siguiente.
+
+```php
+// Definimos puerta si el usuario es admin
+Gate::define('isAdmin', function (User $user) {
+    return $user->roles->first()->slug == 'admin';
+});
+```
+
+###### Restringimos el acceso a los botones del menu dashboard.
+
+> Abrimos el archivo `Aside.php` en la carpeta `app\View\Components\Aside.php` en `links` en el link `Users` y `Roles` y cambiamos lo siguiente.
+
+```php
+'can' => ['isAdmin','isManager'],
+```
+
+> Abrimos el archivo `aside.blade.php` en la carpeta `resources\views\components\aside.blade.php` y cambiamos la directiva `@can` por lo siguiente.
+
+```php
+@canany($link['can'])
+    ....
+@endcanany
+```
+###### Creamos middleware para restringir por varios roles el acceso de los usuarios a las rutas.
+
+> Typee: en la Consola:
+```console
+    php artisan make:middleware RoleMiddleware
+```
+###### Registrar middleware a la aplicación.
+
+> Abrimos el archivo `Kernel.php` en la carpeta `app\Http\Kernel.php` y añadimos lo siguiente.
+
+```php
+protected $middlewareAliases = [
+    .....
+    'roles' => \App\Http\Middleware\RoleMiddleware::class
+];
+```
+
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos lo siguiente.
+
+```php
+public function hasRole($role)
+{
+    if ($this->roles->contains('slug',$role)) {
+        return true;
+    }
+    return false;
+}
+```
+
+> Abrimos el archivo `RoleMiddleware.php` en la carpeta `app\Http\Middleware\RoleMiddleware.php` y añadimos lo siguiente.
+
+```php
+public function handle(Request $request, Closure $next, ...$roles): Response
+{
+    // Obtenemos todos los parámetros
+    // $roles = array_slice(func_get_args(),2);
+    foreach ($roles as $role) {
+        if (auth()->user()->hasRole($role)) {
+        return $next($request);
+        }
+    }
+    abort(403);
+}
+```
+
+**`Nota : ` Error de metodo `hasRole` no encontrado en la extension intelephense, [cómo mejorar intellisense para laravel](https://arunas.dev/how-to-improve-intellisense-for-laravel/) y añadir al archivo `settings.json` lo siguiente.**
+
+```json
+"intelephense.telemetry.enabled": false,
+"intelephense.completion.triggerParameterHints": true,
+"intelephense.completion.insertUseDeclaration": true,
+"intelephense.trace.server": "messages",
+"intelephense.diagnostics.undefinedClassConstants": false,
+"intelephense.diagnostics.undefinedFunctions": false,
+"intelephense.diagnostics.undefinedConstants": false,
+"intelephense.diagnostics.undefinedProperties": false,
+"intelephense.diagnostics.undefinedTypes": false,
+"intelephense.diagnostics.undefinedMethods": false,
+```
+
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y añadimos lo siguiente.
+
+```php
+Route::resource('users', UsersController::class)->middleware('role:admin,manager');
+```
+###### Escondemos registro de la tabla según el role del usuario.
+
+> Abrimos el archivo `index.blade.php` en la carpeta `resources\views\admin\users\index.blade.php` debajo de cada foreach para los registro y añadimos lo siguiente.
+
+```php
+@if (!Auth::user()->hasRole('admin') && $user->hasRole('admin')) @continue @endif
 ```
 
 [Subir](#top)
