@@ -5,7 +5,7 @@
 @elseif ($type == 'submit')
     <form action="{{ $route ?? '' }}" method="post">
         @csrf
-        @method('{{$method}}')
+        @method("$method")
         <button type="submit" {{ $attributes->merge(['class' => "btn $class"]) }}>
             {{ $icon }}
         </button>

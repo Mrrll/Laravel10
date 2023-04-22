@@ -77,8 +77,8 @@ class Aside extends Component
                     'icono_color' => '#0045bd',
                 ],
                 [
-                    'name' => 'Crear Post',
-                    'route' => route('blog.create'),
+                    'name' => 'Crear User',
+                    'route' => route('users.create'),
                     'active' =>  '',
                     'icono' => 'fa-solid fa-users fa-lg',
                     'icono_color' => '#0045bd',
@@ -102,7 +102,9 @@ class Aside extends Component
                 ],
                 [
                     'name' => 'Crear role',
-                    'route' => route('roles.create'),
+                    'route' => '',
+                    'data-bs-toggle' => "modal",
+                    'data-bs-target' => "#createrole",
                     'active' =>  '',
                     'icono' => 'fa-solid fa-users-gear fa-lg',
                     'icono_color' => '#c12115',

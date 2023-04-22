@@ -8,15 +8,16 @@ use Illuminate\View\Component;
 
 class Card extends Component
 {
-    public $style, $class, $classheader, $classfooter;
+    public $style, $class, $classheader, $classfooter,$classbody;
     /**
      * Create a new component instance.
      */
-    public function __construct($style = null, $class = null, $classheader = null, $classfooter = null)
+    public function __construct($style = null, $class = null, $classheader = null, $classbody = null, $classfooter = null)
     {
         $this->style = $style;
         $this->class = $class;
         $this->classheader = $classheader;
+        $this->classbody = $classbody;
         $this->classfooter = $classfooter;
     }
 

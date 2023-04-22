@@ -19,8 +19,20 @@ class CursoController extends Controller
     }
     public function store(StoreCursoRequest $request)
     {
-        $curso = Curso::create($request->all() + ['slug' => Str::slug($request['name'], '-')]);
-        return redirect()->route('cursos.show', $curso);
+        try {
+            Curso::create($request->all() + ['slug' => Str::slug($request['name'], '-')]);
+            return redirect()->route('cursos.mycursos')->with('message', [
+                    'type' => 'success',
+                    'title' => 'Éxito !',
+                    'message' => 'El Curso a sido creado correctamente.',
+                ]);
+        } catch (\Throwable $th) {
+             return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
     }
     public function show(Curso $curso)
     {
@@ -32,13 +44,37 @@ class CursoController extends Controller
     }
     public function update(StoreCursoRequest $request, Curso $curso)
     {
-        $curso->update($request->all() + ['slug' => Str::slug($request['name'], '-')]);
-        return redirect()->route('cursos.show', $curso);
+        try {
+            $curso->update($request->all() + ['slug' => Str::slug($request['name'], '-')]);
+            return redirect()->route('cursos.mycursos')->with('message', [
+                    'type' => 'info',
+                    'title' => 'Éxito !',
+                    'message' => 'El Curso a sido actualizado correctamente.',
+                ]);
+        } catch (\Throwable $th) {
+             return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
     }
     public function destroy(Curso $curso)
     {
-        $curso->delete();
-        return redirect()->route('cursos.index');
+        try {
+            $curso->delete();
+            return redirect()->route('cursos.mycursos')->with('message', [
+                    'type' => 'warning',
+                    'title' => 'Éxito !',
+                    'message' => 'El Curso a sido eliminado correctamente.',
+                ]);
+        } catch (\Throwable $th) {
+            return back()->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $th,
+            ]);
+        }
     }
     public function showmycursos()
     {

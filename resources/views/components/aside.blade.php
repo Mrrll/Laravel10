@@ -25,39 +25,64 @@
                     @foreach ($links as $link)
                         @if (array_key_exists('can', $link))
                             @canany($link['can'])
-                                <button class="btn btn-outline-secondary text-start mb-1" style="width: 100%;" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#{{ $link['name_collapse'] }}"
-                                    aria-expanded="false" aria-controls="{{ $link['name_collapse'] }}" id="btn_link_dashboard">
+                                <button class="btn btn-outline-secondary text-start mb-1" style="width: 100%;"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#{{ $link['name_collapse'] }}"
+                                    aria-expanded="false" aria-controls="{{ $link['name_collapse'] }}"
+                                    id="btn_link_dashboard">
                                     <i class="{{ $link['icono'] }}" style="color:{{ $link['icono_color'] }};"></i>
                                     <span>{{ $link['name'] }}</span>
                                 </button>
                                 {{-- Lista del colapsos --}}
-                                <ul class="dropdown-menu collapse collapse-vertical bg-dark" id="{{ $link['name_collapse'] }}">
+                                <ul class="dropdown-menu collapse collapse-vertical bg-dark"
+                                    id="{{ $link['name_collapse'] }}">
                                     @foreach ($link['items'] as $item)
                                         <li>
-                                            <a href="{{ $item['route'] }}" class="dropdown-item text-white" type="button">
-                                                <i class="{{ $item['icono'] }}" style="color:{{ $item['icono_color'] }};"></i>
-                                                {{ $item['name'] }}
-                                            </a>
+                                            @if (!empty($item['data-bs-toggle']))
+                                                <a data-bs-toggle="{{ $item['data-bs-toggle'] }}"
+                                                    data-bs-target="{{ $item['data-bs-target'] }}"
+                                                    class="dropdown-item text-white" type="button">
+                                                    <i class="{{ $item['icono'] }}"
+                                                        style="color:{{ $item['icono_color'] }};"></i>
+                                                    {{ $item['name'] }}
+                                                </a>
+                                            @else
+                                                <a href="{{ $item['route'] }}" class="dropdown-item text-white"
+                                                    type="button">
+                                                    <i class="{{ $item['icono'] }}"
+                                                        style="color:{{ $item['icono_color'] }};"></i>
+                                                    {{ $item['name'] }}
+                                                </a>
+                                            @endif
                                         </li>
                                     @endforeach
                                 </ul>
                             @endcanany
                         @else
-                            <button class="btn btn-outline-secondary text-start mb-1" style="width: 100%;" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#{{ $link['name_collapse'] }}"
-                                aria-expanded="false" aria-controls="{{ $link['name_collapse'] }}" id="btn_link_dashboard">
+                            <button class="btn btn-outline-secondary text-start mb-1" style="width: 100%;"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#{{ $link['name_collapse'] }}"
+                                aria-expanded="false" aria-controls="{{ $link['name_collapse'] }}"
+                                id="btn_link_dashboard">
                                 <i class="{{ $link['icono'] }}" style="color:{{ $link['icono_color'] }};"></i>
                                 <span>{{ $link['name'] }}</span>
                             </button>
                             {{-- Lista del colapsos --}}
-                            <ul class="dropdown-menu collapse collapse-vertical bg-dark" id="{{ $link['name_collapse'] }}">
+                            <ul class="dropdown-menu collapse collapse-vertical bg-dark"
+                                id="{{ $link['name_collapse'] }}">
                                 @foreach ($link['items'] as $item)
                                     <li>
-                                        <a href="{{ $item['route'] }}" class="dropdown-item text-white" type="button">
-                                            <i class="{{ $item['icono'] }}" style="color:{{ $item['icono_color'] }};"></i>
-                                            {{ $item['name'] }}
-                                        </a>
+                                        @if (!empty($item['data-bs-toggle']))
+                                            <a data-bs-toggle="{{ $item['data-bs-toggle'] }}" data-bs-target="{{ $item['data-bs-target'] }}" class="dropdown-item text-white" type="button">
+                                                <i class="{{ $item['icono'] }}"
+                                                    style="color:{{ $item['icono_color'] }};"></i>
+                                                {{ $item['name'] }}
+                                            </a>
+                                        @else
+                                            <a href="{{ $item['route'] }}" class="dropdown-item text-white" type="button">
+                                                <i class="{{ $item['icono'] }}"
+                                                    style="color:{{ $item['icono_color'] }};"></i>
+                                                {{ $item['name'] }}
+                                            </a>
+                                        @endif
                                     </li>
                                 @endforeach
                             </ul>
@@ -69,31 +94,57 @@
                     @foreach ($links as $link)
                         @if (array_key_exists('can', $link))
                             @canany($link['can'])
-                                <button type="button" class="btn btn-circle dropdown-toggle mb-1"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <button type="button" class="btn btn-circle dropdown-toggle mb-1" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
                                     <i class="{{ $link['icono'] }}" style="color:{{ $link['icono_color'] }};"></i>
                                 </button>
                                 <ul class="dropdown-menu bg-dark">
                                     @foreach ($link['items'] as $item)
                                         <li>
-                                            <a href="{{ $item['route'] }}" class="dropdown-item text-white" type="button">
-                                                {{ $item['name'] }}
-                                            </a>
+                                            @if (!empty($item['data-bs-toggle']))
+                                                <a data-bs-toggle="{{ $item['data-bs-toggle'] }}"
+                                                    data-bs-target="{{ $item['data-bs-target'] }}"
+                                                    class="dropdown-item text-white" type="button">
+                                                    <i class="{{ $item['icono'] }}"
+                                                        style="color:{{ $item['icono_color'] }};"></i>
+                                                    {{ $item['name'] }}
+                                                </a>
+                                            @else
+                                                <a href="{{ $item['route'] }}" class="dropdown-item text-white"
+                                                    type="button">
+                                                    <i class="{{ $item['icono'] }}"
+                                                        style="color:{{ $item['icono_color'] }};"></i>
+                                                    {{ $item['name'] }}
+                                                </a>
+                                            @endif
                                         </li>
                                     @endforeach
                                 </ul>
                             @endcanany
                         @else
-                            <button type="button" class="btn btn-circle dropdown-toggle mb-1"
-                                data-bs-toggle="dropdown" aria-expanded="false">
+                            <button type="button" class="btn btn-circle dropdown-toggle mb-1" data-bs-toggle="dropdown"
+                                aria-expanded="false">
                                 <i class="{{ $link['icono'] }}" style="color:{{ $link['icono_color'] }};"></i>
                             </button>
                             <ul class="dropdown-menu bg-dark">
                                 @foreach ($link['items'] as $item)
                                     <li>
-                                        <a href="{{ $item['route'] }}" class="dropdown-item text-white" type="button">
-                                            {{ $item['name'] }}
-                                        </a>
+                                        @if (!empty($item['data-bs-toggle']))
+                                                <a data-bs-toggle="{{ $item['data-bs-toggle'] }}"
+                                                    data-bs-target="{{ $item['data-bs-target'] }}"
+                                                    class="dropdown-item text-white" type="button">
+                                                    <i class="{{ $item['icono'] }}"
+                                                        style="color:{{ $item['icono_color'] }};"></i>
+                                                    {{ $item['name'] }}
+                                                </a>
+                                            @else
+                                                <a href="{{ $item['route'] }}" class="dropdown-item text-white"
+                                                    type="button">
+                                                    <i class="{{ $item['icono'] }}"
+                                                        style="color:{{ $item['icono_color'] }};"></i>
+                                                    {{ $item['name'] }}
+                                                </a>
+                                            @endif
                                     </li>
                                 @endforeach
                             </ul>

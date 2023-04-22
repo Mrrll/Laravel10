@@ -70,6 +70,7 @@
 - [Relación muchos a muchos (Many To Many) Parte 2](#item33)
 - [Roles y Permissions Implementación](#item34)
 - [Gates (Puertas)](#item35)
+- [Policies (políticas)](#item36)
 
 <a name="item1"></a>
 
@@ -8464,5 +8465,13 @@ Route::resource('users', UsersController::class)->middleware('role:admin,manager
 ```php
 @if (!Auth::user()->hasRole('admin') && $user->hasRole('admin')) @continue @endif
 ```
+
+[Subir](#top)
+
+<a name="item36"></a>
+
+## Policies (políticas)
+
+
 
 [Subir](#top)

@@ -63,18 +63,21 @@ Route::controller(LoginController::class)->group(function () {
 // Rutas Protegidas
 
 Route::group(['middleware' => ['verified', 'auth', 'auth.session']],function () {
+        // Cerrar Sesión
         Route::get('logout', [LoginController::class, 'logout'])->name('logout');
-        Route::resource('cursos', CursoController::class)->except(['create', 'edit']);
+        // Cursos
+        Route::get('cursos/mycursos', [CursoController::class, 'showmycursos'])->name('cursos.mycursos');
+        Route::resource('cursos', CursoController::class);
+        // Post
+        Route::get('blog/myposts', [PostController::class, 'showmypost'])->name('blog.mypost');
+        Route::resource('blog', PostController::class)->parameters(['blog' => 'post']);
+        // Dashboard
+        Route::view('dashboard', 'dashboard')->name('dashboard');
+        // Profile
         Route::resource('profile', ProfileController::class)->except(['index', 'show', 'destroy']);
-        Route::resource('blog', PostController::class)->parameters(['blog' => 'post'])->except(['create', 'edit', 'destroy']);
-        Route::get('dashboard/blog/create', [PostController::class, 'create'])->name('blog.create');
-        Route::get('dashboard/blog/{post}/edit', [PostController::class, 'edit'])->name('blog.edit');
-        Route::delete('dashboard/blog/{post}', [PostController::class, 'destroy'])->name('blog.destroy');
-        Route::get('dashboard/blog/myposts', [PostController::class, 'showmypost'])->name('blog.mypost');
-        Route::get('dashboard/cursos/create', [CursoController::class, 'create'])->name('cursos.create');
-        Route::get('dashboard/cursos/mycursos', [CursoController::class, 'showmycursos'])->name('cursos.mycursos');
-        Route::get('dashboard/cursos/{curso}/edit', [CursoController::class, 'edit'])->name('cursos.edit');
+        // Users
         Route::resource('users', UsersController::class)->middleware('role:admin,manager');
+        // Roles
         Route::resource('roles', RoleController::class)->middleware('can:isAdmin');
     }
 );
@@ -87,7 +90,7 @@ Route::get('/email/verify', function () {
 
 Route::get('/email/verification', function (EmailVerificationRequest $request) {
     $request->fulfill();
-    return redirect('cursos');
+    return redirect()->intended('/');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 Route::post('/email/verification-notification', function (Request $request) {
@@ -174,8 +177,3 @@ Route::get('notificacion', function () {
     $user->notify(new NewRegistered($user));
     return 'Mensaje enviado!';
 });
-
-Route::view('dashboard', 'dashboard')->name('dashboard');
-// Route::get('dashboard/cursos/create', function () {
-//     return view('cursos.create');
-// });

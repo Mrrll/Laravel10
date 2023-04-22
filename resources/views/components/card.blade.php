@@ -4,7 +4,7 @@
             {{ $card_header }}
         </div>
     @endif
-    <div class="card-body">
+    <div {{ $attributes->merge(['class' => "card-body $classbody"]) }} style="padding:0;">
         {{ $slot }}
     </div>
     @if (!empty($card_footer))

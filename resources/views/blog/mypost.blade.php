@@ -3,94 +3,115 @@
 @section('title', 'My Posts')
 
 @section('content-dashboard')
-    <main class="container center_container flex-column main-dashboard">
-        <h1>Mypost</h1>
-        {{-- Tabla --}}
-        <x-table :thead="$headName" class="table-striped table-hover table-responsive-sm" theadclass="table-dark">
-            @foreach ($posts as $post)
-                <tr>
-                    <th scope="col">{{ $post->id }}</th>
-                    <td>{{ $post->title }}</td>
-                    <td>{{ $post->slug }}</td>
-                    <td>
-                        <span class="d-inline-block text-truncate" style="max-width: 250px;">
-                            {{ $post->body }}
-                        </span>
-                    </td>
-                    <td>{{ $post->category->name }}</td>
-                    <td>{{ $post->updated_at->format('d-m-Y') }}</td>
-                    <td>
-                        <span class="d-inline-flex">
-                            <x-table.button type='link' class='btn-outline-warning me-1' :route="route('blog.edit', $post)">
-                                <x-slot name="icon">
-                                    <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
-                                </x-slot>
-                            </x-table.button>
-                            <x-table.button type='submit' class='btn-outline-danger' :route="route('blog.destroy', $post)" method='delete'>
-                                <x-slot name="icon">
-                                    <i class="fa-solid fa-trash" style="color: #f66661;"></i>
-                                </x-slot>
-                            </x-table.button>
-                        </span>
-                    </td>
-                </tr>
-            @endforeach
-        </x-table>
-        {{-- Tabla en Movil --}}
-        @foreach ($posts as $post)
-            <x-table class="table-striped" typetable="movil">
-                <x-slot name="head">
-                    <x-table.button type='link' class='btn-outline-warning me-1' :route="route('blog.edit', $post)">
-                        <x-slot name="icon">
-                            <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
-                        </x-slot>
-                    </x-table.button>
-                    <x-table.button type='submit' class='btn-outline-danger' :route="route('blog.destroy', $post)" method='delete'>
-                        <x-slot name="icon">
-                            <i class="fa-solid fa-trash" style="color: #f66661;"></i>
-                        </x-slot>
-                    </x-table.button>
-                </x-slot>
-                <tr>
-                    <th scope="col" class="d-flex flex-column">
-                        <strong># :</strong>
-                        {{ $post->id }}
-                    </th>
-                </tr>
-                <tr>
-                    <td class="d-flex flex-column">
-                        <strong>Title :</strong>
-                        {{ $post->title }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="d-flex flex-column">
-                        <strong>Slug :</strong>
-                        {{ $post->slug }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="d-flex flex-column">
-                        <strong>Body :</strong>
-                        <span class="d-inline-block text-truncate" style="max-width: 250px;">
-                            {{ $post->body }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="d-flex flex-column">
-                        <strong>Category :</strong>
-                        {{ $post->category->name }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="d-flex flex-column">
-                        <strong>Date :</strong>
-                        {{ $post->updated_at->format('d-m-Y') }}
-                    </td>
-                </tr>
+    <main class="container flex-column main-dashboard">
+        @include('layouts.components.alert')
+        <x-card class="mt-2" classheader="d-flex justify-content-between"
+            classfooter="d-flex justify-content-end align-items-center class-footer-card">
+            <x-slot name="card_header">
+                <h2>List of Posts</h2>
+                <div class="align-self-center">
+                    <a href="{{ route('blog.create') }}" class="btn btn-primary"> Create Post</a>
+                </div>
+            </x-slot>
+            {{-- Tabla --}}
+            <x-table :thead="$headName" class="table-striped table-hover table-responsive-sm" theadclass="table-dark">
+                @foreach ($posts as $post)
+                    <tr>
+                        <th scope="col">{{ $post->id }}</th>
+                        <td>{{ $post->title }}</td>
+                        <td>{{ $post->slug }}</td>
+                        <td>
+                            <span class="d-inline-block text-truncate" style="max-width: 250px;">
+                                {{ $post->body }}
+                            </span>
+                        </td>
+                        <td>{{ $post->category->name }}</td>
+                        <td>{{ $post->updated_at->format('d-m-Y') }}</td>
+                        <td>
+                            <span class="d-inline-flex">
+                                <x-table.button type='link' class='btn-outline-success me-1' :route="route('blog.show', $post)">
+                                    <x-slot name="icon">
+                                        <i class="fa-solid fa-eye" style="color: #7cf884;"></i>
+                                    </x-slot>
+                                </x-table.button>
+                                <x-table.button type='link' class='btn-outline-warning me-1' :route="route('blog.edit', $post)">
+                                    <x-slot name="icon">
+                                        <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                                    </x-slot>
+                                </x-table.button>
+                                <x-table.button type='submit' class='btn-outline-danger' :route="route('blog.destroy', $post)" method='delete'>
+                                    <x-slot name="icon">
+                                        <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                                    </x-slot>
+                                </x-table.button>
+                            </span>
+                        </td>
+                    </tr>
+                @endforeach
             </x-table>
-        @endforeach
-        {{ $posts->links() }}
+            {{-- Tabla en Movil --}}
+            @foreach ($posts as $post)
+                <x-table class="table-striped" typetable="movil">
+                    <x-slot name="head">
+                        <x-table.button type='link' class='btn-outline-success me-1' :route="route('blog.show', $post)">
+                            <x-slot name="icon">
+                                <i class="fa-solid fa-eye" style="color: #7cf884;"></i>
+                            </x-slot>
+                        </x-table.button>
+                        <x-table.button type='link' class='btn-outline-warning me-1' :route="route('blog.edit', $post)">
+                            <x-slot name="icon">
+                                <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                            </x-slot>
+                        </x-table.button>
+                        <x-table.button type='submit' class='btn-outline-danger' :route="route('blog.destroy', $post)" method='delete'>
+                            <x-slot name="icon">
+                                <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                            </x-slot>
+                        </x-table.button>
+                    </x-slot>
+                    <tr>
+                        <th scope="col" class="d-flex flex-column">
+                            <strong># :</strong>
+                            {{ $post->id }}
+                        </th>
+                    </tr>
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Title :</strong>
+                            {{ $post->title }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Slug :</strong>
+                            {{ $post->slug }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Body :</strong>
+                            <span class="d-inline-block text-truncate" style="max-width: 250px;">
+                                {{ $post->body }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Category :</strong>
+                            {{ $post->category->name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="d-flex flex-column">
+                            <strong>Date :</strong>
+                            {{ $post->updated_at->format('d-m-Y') }}
+                        </td>
+                    </tr>
+                </x-table>
+            @endforeach
+            <x-slot name="card_footer">
+                {{ $posts->links() }}
+            </x-slot>
+        </x-card>
     </main>
 @endsection

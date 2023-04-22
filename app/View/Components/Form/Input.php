@@ -17,7 +17,9 @@ class Input extends Component
     $class,
     $value,
     $readyonly,
-    $disable;
+    $disable,
+    $textarearow,
+    $textareacols;
     /**
      * Create a new component instance.
      */
@@ -30,7 +32,9 @@ class Input extends Component
         $class = null,
         $value = null,
         $readyonly = false,
-        $disable = false
+        $disable = false,
+        $textarearow = 10,
+        $textareacols = 30,
         )
     {
         $this->type = $type;
@@ -42,6 +46,8 @@ class Input extends Component
         $this->value = $value;
         $this->readyonly = $readyonly;
         $this->disable = $disable;
+        $this->textarearow = $textarearow;
+        $this->textareacols = $textareacols;
     }
 
     /**

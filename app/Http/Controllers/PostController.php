@@ -32,11 +32,12 @@ class PostController extends Controller
      */
     public function store(PostRequest $request)
     {
+        dd($request->all());
         try {
             $request->merge(['slug' => Str::slug($request['title'], '-')]);
             Post::create($request->all());
             return redirect()
-                ->route('blog.index')
+                ->route('blog.mypost')
                 ->with('message', [
                     'type' => 'success',
                     'title' => 'Éxito !',
@@ -77,9 +78,9 @@ class PostController extends Controller
             $request->merge(['slug' => Str::slug($request['title'], '-')]);
             $post->update($request->all());
             return redirect()
-                ->route('blog.index')
+                ->route('blog.mypost')
                 ->with('message', [
-                    'type' => 'success',
+                    'type' => 'info',
                     'title' => 'Éxito !',
                     'message' => 'El post a sido actualizado correctamente.',
                 ]);
@@ -100,9 +101,9 @@ class PostController extends Controller
         try {
             $post->delete();
             return redirect()
-            ->route('blog.index')
+            ->route('blog.mypost')
             ->with('message', [
-                    'type' => 'info',
+                    'type' => 'warning',
                     'title' => 'Éxito !',
                     'message' => 'El post a sido eliminado correctamente.',
                 ]);

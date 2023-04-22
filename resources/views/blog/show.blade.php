@@ -13,7 +13,7 @@
                 <p class="card-text">{{ $post->body }} </p>
             </div>
             <div class="card-footer text-muted d-flex justify-content-between">
-                <a class="btn btn-primary" href="{{ route('blog.index') }}">Volver</a>
+                <a class="btn btn-primary" href="{{ url()->previous() }}">Volver</a>
             </div>
         </div>
     </main>

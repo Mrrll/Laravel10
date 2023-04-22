@@ -17,4 +17,13 @@
   --bs-table-hover-color: white;
   --bs-table-hover-bg: rgba(6, 3, 3, 0.598);
   color: var(--bs-table-color);
+  margin:0;
+}
+.pagination
+ {
+    margin-top: 1rem !important;
+    margin-right: 1rem !important;
+ }
+.class-footer-card {
+    padding: 0 !important;
 }

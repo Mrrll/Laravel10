@@ -5,7 +5,7 @@
 @section('content-dashboard')
     <main class="container flex-column main-dashboard">
         <x-form :route="route('users.update', $user)" method="patch" style="width:100%">
-            <x-card class="mt-2" style="width:100%" classfooter="d-flex justify-content-end">
+            <x-card class="mt-2" style="width:100%" classfooter="d-flex justify-content-end" classbody="p-2">
                 <x-slot name="card_header">
                     <h1>Editar User</h1>
                 </x-slot>
