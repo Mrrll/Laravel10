@@ -71,6 +71,7 @@
 - [Roles y Permissions Implementación](#item34)
 - [Gates (Puertas)](#item35)
 - [Policies (políticas)](#item36)
+- [Crear directivas (Provider)](#item37)
 
 <a name="item1"></a>
 
@@ -8590,5 +8591,75 @@ public function isAdmin()
     }
 }
 ```
+
+[Subir](#top)
+
+<a name="item37"></a>
+
+## Crear directivas (Provider)
+
+> Typee: en la Consola:
+```console
+php artisan make:provider RolesServiceProvider
+```
+###### Registrar Provider.
+
+> Abrimos el archivo `app.php` en la carpeta `config\app.php` en `providers` y añadimos lo siguiente.
+
+```php
+/*
+* Application Service Providers...
+*/
+
+....
+
+App\Providers\RolesServiceProvider::class,
+```
+
+###### Cargar Provider.
+
+> Typee: en la Consola:
+```console
+composer dump-autoload
+```
+
+###### Crear Directiva.
+
+> Abrimos el archivo `RolesServiceProvider.php` en la carpeta `app\Providers\RolesServiceProvider.php` en `boot` y escribimos lo siguiente.
+
+```php
+// Abertura de la directiva
+Blade::directive('role', function($roles){
+    return "<?php if(auth()->check() && auth()->user()->hasRole($roles)) : ?>";
+});
+// Cierre de la directiva
+Blade::directive('endrole', function($roles){
+    return "<?php endif; ?>";
+});
+```
+
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` en `hasRole` y cambiamos a lo siguiente.
+
+```php
+public function hasRole($role)
+{
+    // Chequeo si una lista de roles.
+    if (strpos($role, ',') !== false) {
+        $listOfRoles = explode(',', $role);
+
+        foreach ($listOfRoles as $role) {
+            if ($this->roles->contains('slug',$role)) {
+                    return true;
+            }
+        }
+    } elseif ($this->roles->contains('slug',$role)) {
+        return true;
+    }
+
+    return false;
+}
+```
+
+**`Agradecimientos :` A Tech School Media Es por su video tutorial que podéis ver desde aquí [Laravel 7.0 Course - Roles and Permissions without package](https://www.youtube.com/watch?v=ejAAl0TdN-Y&list=PLX54xtp5Ni0t1ASTqrg5ojdmQohnQsnQw).**
 
 [Subir](#top)

@@ -95,9 +95,19 @@ class User extends Authenticatable implements MustVerifyEmail
     // Asegurarse que el usuario tenga un rol para las rutas.
     public function hasRole($role)
     {
-        if ($this->roles->contains('slug',$role)) {
+        // Chequeo si una lista de roles.
+        if (strpos($role, ',') !== false) {
+            $listOfRoles = explode(',', $role);
+
+            foreach ($listOfRoles as $role) {
+                if ($this->roles->contains('slug',$role)) {
+                    return true;
+                }
+            }
+        } elseif ($this->roles->contains('slug',$role)) {
             return true;
         }
+
        return false;
     }
     public function isAdmin()

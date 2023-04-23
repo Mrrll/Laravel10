@@ -150,8 +150,12 @@
                             </ul>
                         @endif
                     @endforeach
+
                 </div>
             </li>
         </ul>
+        @role('admin,manager,editor')
+            <button class="btn btn-primary">Text</button>
+        @endrole
     </div>
 </aside>
