@@ -72,6 +72,7 @@
 - [Gates (Puertas)](#item35)
 - [Policies (políticas)](#item36)
 - [Crear directivas (Provider)](#item37)
+- [Crear Trait (User)](#item38)
 
 <a name="item1"></a>
 
@@ -8658,6 +8659,81 @@ public function hasRole($role)
 
     return false;
 }
+```
+
+[Subir](#top)
+
+<a name="item38"></a>
+
+## Crear Trait (User)
+
+> Creamos y abrimos el archivo `HasRolesAndPermissions.php` en la carpeta `app\Traits\HasRolesAndPermissions.php` y escribimos lo siguiente.
+
+```php
+<?php
+
+namespace App\Traits;
+
+use App\Models\Role;
+use App\Models\Permission;
+
+trait HasRolesAndPermissions
+{
+    /**
+     * @return mixed
+     */
+    // Relación muchos a muchos
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+    /**
+     * @return mixed
+     */
+    // Relación muchos a muchos
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class);
+    }
+    // Asegurarse que el usuario tenga un rol para las rutas.
+    public function hasRole($role)
+    {
+        // Chequeo si una lista de roles.
+        if (strpos($role, ',') !== false) {
+            $listOfRoles = explode(',', $role);
+
+            foreach ($listOfRoles as $role) {
+                if ($this->roles->contains('slug',$role)) {
+                    return true;
+                }
+            }
+        } elseif ($this->roles->contains('slug',$role)) {
+            return true;
+        }
+
+       return false;
+    }
+    public function isAdmin()
+    {
+        if ($this->roles->contains('slug','admin')) {
+            return true;
+        }
+    }
+}
+```
+
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y borramos los métodos que hemos insertado en el trait y añadimos lo siguiente.
+
+```php
+use App\Traits\HasRolesAndPermissions;
+
+.....
+
+class User extends Authenticatable implements MustVerifyEmail
+{
+    use HasApiTokens, HasFactory, Notifiable, HasRolesAndPermissions;
+
+    .....
 ```
 
 **`Agradecimientos :` A Tech School Media Es por su video tutorial que podéis ver desde aquí [Laravel 7.0 Course - Roles and Permissions without package](https://www.youtube.com/watch?v=ejAAl0TdN-Y&list=PLX54xtp5Ni0t1ASTqrg5ojdmQohnQsnQw).**

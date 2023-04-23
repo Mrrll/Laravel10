@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Lang;
 
 class UsersController extends Controller
 {
@@ -78,30 +79,32 @@ class UsersController extends Controller
      */
     public function store(StoreUsersRequest $request)
     {
-        // dd($request->all());
         try {
             $user = User::find(auth()->user()->id)->first();
             if (Gate::denies('isAdmin')) {
-                dd('El usuario no es admin');
+                return redirect()->route('users.index')->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => Lang::get('You do not have permissions to :action this :model.',['action' => 'Crear','model' => 'Usuario']),
+            ]);
+            }
+            $user = User::create($request->validated());
+
+            if ($request->role != null) {
+                $user->roles()->attach($request->validated()['role']);
             }
 
-            // $user = User::create($request->validated());
+            if ($request->permissions != null) {
+                foreach ($request->validated()['permissions'] as $permission) {
+                    $user->permissions()->attach($permission);
+                }
+            }
 
-            // if ($request->role != null) {
-            //     $user->roles()->attach($request->validated()['role']);
-            // }
-
-            // if ($request->permissions != null) {
-            //     foreach ($request->validated()['permissions'] as $permission) {
-            //         $user->permissions()->attach($permission);
-            //     }
-            // }
-
-            // return redirect()->route('users.index')->with('message', [
-            //     'type' => 'success',
-            //     'title' => 'Éxito !',
-            //     'message' => 'El Usuario a sido guardado correctamente.',
-            // ]);
+            return redirect()->route('users.index')->with('message', [
+                'type' => 'success',
+                'title' => 'Éxito !',
+                'message' => 'El Usuario a sido guardado correctamente.',
+            ]);
         } catch (\Throwable $th) {
             return back()->with('message', [
                 'type' => 'danger',
