@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Carbon\Carbon;
 
 class PostRequest extends FormRequest
 {
@@ -11,11 +12,12 @@ class PostRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if ($this->user_id == auth()->user()->id) {
-            return true;
-        } else {
-            return false;
-        }
+        // if ($this->user_id == auth()->user()->id) {
+        //     return true;
+        // } else {
+        //     return false;
+        // }
+        return true;
     }
 
     /**
@@ -25,17 +27,35 @@ class PostRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'title' => 'required|max:45' ,
+        $validation = [
+            'title' => 'required|max:45',
             'body' => 'required|min:5',
             'category_id' => 'required|integer',
-            'user_id' => 'required|integer'
+            'user_id' => 'required|integer',
         ];
+        if ($this->published != '') {
+            $validationPublished = [
+                'published' => 'required|date',
+            ];
+            $validation = array_merge($validationPublished, $validation);
+        }
+        return $validation;
     }
     public function messages()
     {
         return [
-            'category_id.integer' => 'Debe de seleccionar una categoría.'
+            'category_id.integer' => 'Debe de seleccionar una categoría.',
         ];
+    }
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->published != '') {
+            $this->merge([
+                'published' => Carbon::now('Europe/Madrid'),
+            ]);
+        }
     }
 }

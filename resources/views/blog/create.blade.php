@@ -4,7 +4,7 @@
 
 @section('content-dashboard')
     <main class="container center_container flex-column main-dashboard">
-        <form action="{{ route('blog.store') }}" method="post">
+        <form action="{{ route('blog.store') }}" method="post" style="width: 100%">
             @csrf
             @include('blog.partials.form')
         </form>

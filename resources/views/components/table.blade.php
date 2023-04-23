@@ -16,7 +16,7 @@
 @else
     <table {{ $attributes->merge(['class' => "d-none d-lg-table table $class"]) }}>
         <thead>
-            <tr class="{{ $theadclass }}">
+            <tr class="text-center {{ $theadclass }}">
                 @for ($i = 0; $i < count($thead); $i++)
                     <th class="{{($i == count($thead) -1) ? 'text-center' : ''}}" scope="col">{{ $thead[$i] }}</th>
                 @endfor

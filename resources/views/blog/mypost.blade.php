@@ -14,10 +14,10 @@
                 </div>
             </x-slot>
             {{-- Tabla --}}
-            <x-table :thead="$headName" class="table-striped table-hover table-responsive-sm" theadclass="table-dark">
+            <x-table :thead="$headName" class="table-striped table-hover table-responsive-sm align-middle" theadclass="table-dark">
                 @foreach ($posts as $post)
-                    <tr>
-                        <th scope="col">{{ $post->id }}</th>
+                    <tr class="text-center">
+                        <th  scope="col">{{ $post->id }}</th>
                         <td>{{ $post->title }}</td>
                         <td>{{ $post->slug }}</td>
                         <td>
@@ -26,24 +26,30 @@
                             </span>
                         </td>
                         <td>{{ $post->category->name }}</td>
+                        <td>{{ $post->user->name }}</td>
+                        <td>{{ (!empty($post->published)) ? $post->published->format('d-m-Y') : ''}}</td>
                         <td>{{ $post->updated_at->format('d-m-Y') }}</td>
-                        <td>
+                        <td class="text-end">
                             <span class="d-inline-flex">
-                                <x-table.button type='link' class='btn-outline-success me-1' :route="route('blog.show', $post)">
+                                <x-table.button type='link' class='btn-outline-success ms-1' :route="route('blog.show', $post)">
                                     <x-slot name="icon">
                                         <i class="fa-solid fa-eye" style="color: #7cf884;"></i>
                                     </x-slot>
                                 </x-table.button>
-                                <x-table.button type='link' class='btn-outline-warning me-1' :route="route('blog.edit', $post)">
-                                    <x-slot name="icon">
-                                        <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
-                                    </x-slot>
-                                </x-table.button>
-                                <x-table.button type='submit' class='btn-outline-danger' :route="route('blog.destroy', $post)" method='delete'>
-                                    <x-slot name="icon">
-                                        <i class="fa-solid fa-trash" style="color: #f66661;"></i>
-                                    </x-slot>
-                                </x-table.button>
+                                @can('edit', $post)
+                                    <x-table.button type='link' class='btn-outline-warning ms-1' :route="route('blog.edit', $post)">
+                                        <x-slot name="icon">
+                                            <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                                        </x-slot>
+                                    </x-table.button>
+                                @endcan
+                                @can('delete', $post)
+                                    <x-table.button type='submit' class='btn-outline-danger ms-1' :route="route('blog.destroy', $post)" method='delete'>
+                                        <x-slot name="icon">
+                                            <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                                        </x-slot>
+                                    </x-table.button>
+                                @endcan
                             </span>
                         </td>
                     </tr>
@@ -58,11 +64,13 @@
                                 <i class="fa-solid fa-eye" style="color: #7cf884;"></i>
                             </x-slot>
                         </x-table.button>
-                        <x-table.button type='link' class='btn-outline-warning me-1' :route="route('blog.edit', $post)">
-                            <x-slot name="icon">
-                                <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
-                            </x-slot>
-                        </x-table.button>
+                        @can('edit', $post)
+                            <x-table.button type='link' class='btn-outline-warning me-1' :route="route('blog.edit', $post)">
+                                <x-slot name="icon">
+                                    <i class="fa-solid fa-pen-to-square" style="color: #ffee33;"></i>
+                                </x-slot>
+                            </x-table.button>
+                        @endcan
                         <x-table.button type='submit' class='btn-outline-danger' :route="route('blog.destroy', $post)" method='delete'>
                             <x-slot name="icon">
                                 <i class="fa-solid fa-trash" style="color: #f66661;"></i>

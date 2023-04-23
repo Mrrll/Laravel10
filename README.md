@@ -8472,6 +8472,123 @@ Route::resource('users', UsersController::class)->middleware('role:admin,manager
 
 ## Policies (políticas)
 
+###### Creamos el policies para un modelo.
 
+> Typee: en la Consola:
+```console
+php artisan make:policy PostPolicy --model=Post
+```
+###### Registro de policies.
+
+> Abrimos el archivo `AuthServiceProvider.php` en la carpeta `app\Providers\AuthServiceProvider.php` en `policies` y escribimos lo siguiente.
+
+```php
+protected $policies = [
+    Post::class => PostPolicy::class,
+];
+```
+
+> Abrimos el archivo `PostPolicy.php` en la carpeta `app\Policies\PostPolicy.php` en `update` y escribimos lo siguiente.
+
+```php
+public function update(User $user, Post $post): bool
+{
+    if ($user->roles->contains('slug', 'editor')) {
+        // Si el usuario tiene el role editor
+        return true;
+    } elseif ($post->user_id == $user->id) {
+        // Si el usuario es el propietario del post
+        return true;
+    }
+    return false;
+}
+```
+
+> Abrimos el archivo `PostController.php` en la carpeta `app\Http\Controllers\PostController.php` en `update` y añadimos lo siguiente.
+
+```php
+$this->authorize('update', $post);
+```
+
+**`Nota :` Si va todo bien y se redirige aun error 403 de no autorización, o si no, que da es un error de serialización, podemos hacer lo siguiente.**
+
+> Abrimos el archivo `PostPolicy.php` en la carpeta `app\Policies\PostPolicy.php` en `update` y escribimos lo siguiente.
+
+```php
+public function update(User $user, Post $post): Response
+{
+    $response = false;
+    if ($user->roles->contains('slug', 'editor')) {
+        // Si el usuario tiene el role editor
+        $response = true;
+    } elseif ($post->user_id == $user->id) {
+        // Si el usuario es el propietario del post
+        $response = true;
+    }
+    return $response
+            ? Response::allow()
+            : Response::deny(Lang::get('You do not have permissions to :action this :model.',['action' => 'actualizar','model' => 'Post']));
+
+}
+```
+
+> Abrimos el archivo `PostController.php` en la carpeta `app\Http\Controllers\PostController.php` en `update` y añadimos lo siguiente.
+
+```php
+$response = Gate::inspect('update', $post);
+
+if ($response->allowed()) {
+    // La acción esta autorizada...
+} else {
+    return redirect()->route('blog.mypost')->with('message', [
+        'type' => 'danger',
+        'title' => 'Error !',
+        'message' => $response->message(),
+    ]);
+}
+```
+> Abrimos el archivo `mypost.blade.php` en la carpeta `resources\views\blog\mypost.blade.php` y añadimos lo siguiente.
+
+```php
+@can('edit', $post)
+@endcan
+```
+> Para pasar el modelo global
+
+```php
+@can('edit', App\Post::class)
+@endcan
+```
+
+**`Nota : ` Podemos ocultar en la vista según la política .**
+
+###### Permisos de Administrador.
+
+> Abrimos el archivo `PostPolicy.php` en la carpeta `app\Policies\PostPolicy.php` y añadimos al comienzo lo siguiente.
+
+```php
+/**
+* Perform pre-authorization checks.
+*/
+public function before(User $user, string $ability): bool|null
+{
+    if ($user->isAdmin()) {
+        return true;
+    }
+
+    return null;
+}
+```
+
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos lo siguiente.
+
+```php
+public function isAdmin()
+{
+    if ($this->roles->contains('slug','admin')) {
+        return true;
+    }
+}
+```
 
 [Subir](#top)

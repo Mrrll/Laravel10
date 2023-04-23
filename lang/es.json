@@ -44,5 +44,8 @@
     "you want to delete the :model <strong>:name</strong>, if you click continue, the :model will be deleted and cannot be recovered." : "que desea eliminar el :model <strong>:name</strong>, si hace clic en continuar, el :model se eliminará y no se podrá recuperar.",
     "Delete" : "Borrar",
     "Do not continue" : "No continuar",
-    "Continue" : "Continuar"
+    "Continue" : "Continuar",
+    "You do not own this :model." : "No eres el dueño de este :model.",
+    "You do not have permissions to :action this :model." : "No tienes permisos para :action este :model.",
+    "Publish this :model" : "Publicar este :model"
 }

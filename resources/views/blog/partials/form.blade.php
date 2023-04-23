@@ -1,11 +1,20 @@
-<div class="card" style="width: 18rem;">
-    <div class="card-header text-center">
-        <h5>
+<div class="card" style="width: 100%;">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2>
             {{ Route::currentRouteName() == 'blog.edit' ? 'Editar post' : 'Crear post' }}
-        </h5>
+        </h2>
+        @if (Route::currentRouteName() == 'blog.edit')
+            @canany(['isAdmin', 'isManager'])
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="published" name="published" {{$post->published ? 'checked' : ''}} value="true">
+                    <label class="form-check-label" for="published">@lang('Publish this :model', ['model' => 'Post'])</label>
+                </div>
+            @endcanany
+        @endif
     </div>
     <div class="card-body">
-        <input type="hidden" name="user_id" value="{{auth()->user()->id}}">
+        <input type="hidden" name="user_id"
+            value="{{ Route::currentRouteName() == 'blog.edit' ? $post->user_id : auth()->user()->id }}">
         <div class="mb-0">
             <label class="form-label">Titulo:</label>
             <input type="text" class="form-control" placeholder="Diseñador"
@@ -27,7 +36,11 @@
             <select class="form-select form-select-sm" aria-label="Ejemplo de .form-select-sm" name="category_id">
                 <option selected>Elige una categoría</option>
                 @foreach ($categories as $category)
-                    <option value="{{$category->id}}">{{$category->name}} </option>
+                    @if (Route::currentRouteName() == 'blog.edit')
+                        <option value="{{ $category->id }}" @selected(old('category_id', $post->category->id ) == $category->id)>{{ $category->name }} </option>
+                    @else
+                        <option value="{{ $category->id }}" @selected(old('category_id'))>{{ $category->name }} </option>
+                    @endif
                 @endforeach
             </select>
             @error('category_id')
@@ -35,9 +48,9 @@
             @enderror
         </div>
     </div>
-    <div class="card-footer text-center">
+    <div class="card-footer d-flex justify-content-end">
         <button type="submit"
-            class="btn btn-primary">{{ Route::currentRouteName() == 'blog.edit' ? 'Editar blog' : 'Crear blog' }}</button>
-            <a class="btn btn-danger" href="{{ url()->previous() }}">Cancelar</a>
+            class="btn btn-primary me-1">{{ Route::currentRouteName() == 'blog.edit' ? 'Editar blog' : 'Crear blog' }}</button>
+        <a class="btn btn-danger" href="{{ url()->previous() }}">Cancelar</a>
     </div>
 </div>

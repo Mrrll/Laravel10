@@ -100,4 +100,10 @@ class User extends Authenticatable implements MustVerifyEmail
         }
        return false;
     }
+    public function isAdmin()
+    {
+        if ($this->roles->contains('slug','admin')) {
+            return true;
+        }
+    }
 }

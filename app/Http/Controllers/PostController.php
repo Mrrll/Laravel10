@@ -6,6 +6,8 @@ use App\Http\Requests\PostRequest;
 use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Lang;
 
 class PostController extends Controller
 {
@@ -14,7 +16,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::orderBy('id', 'desc')->paginate(10);
+        $posts = Post::orderBy('id', 'desc')->whereNotNull('published')->paginate(10);
         return view('blog.index', compact('posts'));
     }
 
@@ -32,7 +34,6 @@ class PostController extends Controller
      */
     public function store(PostRequest $request)
     {
-        dd($request->all());
         try {
             $request->merge(['slug' => Str::slug($request['title'], '-')]);
             Post::create($request->all());
@@ -65,8 +66,18 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        $categories = Category::all();
-        return view('blog.edit', compact(['post','categories']));
+        $response = Gate::inspect('edit', $post);
+
+        if ($response->allowed()) {
+            $categories = Category::all();
+            return view('blog.edit', compact(['post', 'categories']));
+        } else {
+            return redirect()->route('blog.mypost')->with('message', [
+                'type' => 'danger',
+                'title' => 'Error !',
+                'message' => $response->message(),
+            ]);
+        }
     }
 
     /**
@@ -75,15 +86,29 @@ class PostController extends Controller
     public function update(PostRequest $request, Post $post)
     {
         try {
-            $request->merge(['slug' => Str::slug($request['title'], '-')]);
-            $post->update($request->all());
-            return redirect()
-                ->route('blog.mypost')
-                ->with('message', [
-                    'type' => 'info',
-                    'title' => 'Éxito !',
-                    'message' => 'El post a sido actualizado correctamente.',
-                ]);
+
+            $response = Gate::inspect('update', $post);
+
+            if ($response->allowed()) {
+                $request->merge(['slug' => Str::slug($request['title'], '-')]);
+                $post->update($request->all());
+                return redirect()
+                    ->route('blog.mypost')
+                    ->with('message', [
+                        'type' => 'info',
+                        'title' => 'Éxito !',
+                        'message' =>
+                            'El post a sido actualizado correctamente.',
+                    ]);
+            } else {
+                return redirect()
+                    ->route('blog.mypost')
+                    ->with('message', [
+                        'type' => 'danger',
+                        'title' => 'Error !',
+                        'message' => $response->message(),
+                    ]);
+            }
         } catch (\Throwable $th) {
             return back()->with('message', [
                 'type' => 'danger',
@@ -101,14 +126,14 @@ class PostController extends Controller
         try {
             $post->delete();
             return redirect()
-            ->route('blog.mypost')
-            ->with('message', [
+                ->route('blog.mypost')
+                ->with('message', [
                     'type' => 'warning',
                     'title' => 'Éxito !',
                     'message' => 'El post a sido eliminado correctamente.',
                 ]);
         } catch (\Throwable $th) {
-             return back()->with('message', [
+            return back()->with('message', [
                 'type' => 'danger',
                 'title' => 'Error !',
                 'message' => $th,
@@ -117,8 +142,27 @@ class PostController extends Controller
     }
     public function showmypost()
     {
-        $headName = ['#', 'Title', 'Slug', 'Body', 'Category', 'Date', 'Options'];
-        $posts = Post::orderBy('id', 'desc')->where('user_id', auth()->user()->id)->paginate(10);
+        $headName = [
+            '#',
+            'Title',
+            'Slug',
+            'Body',
+            'Category',
+            'Author',
+            'Published',
+            'Date',
+            'Options',
+        ];
+        switch (auth()->user()->roles()->first()->slug) {
+            case 'admin':
+            case 'manager':
+            case 'editor':
+                $posts = Post::orderBy('id', 'desc')->paginate(10);
+                break;
+                default:
+                $posts = Post::orderBy('id', 'desc')->where('user_id', auth()->user()->id)->paginate(10);
+                break;
+        }
         return view('blog.mypost', compact('posts', 'headName'));
     }
 }
