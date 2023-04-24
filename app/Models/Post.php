@@ -12,6 +12,9 @@ class Post extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'published' => 'datetime',
+    ];
     // Buscar modelo por el campo slug
     public function getRouteKeyName()
     {
@@ -27,8 +30,11 @@ class Post extends Model
     {
         return $this->belongsTo(Category::class);
     }
-     protected $casts = [
-        'published' => 'datetime',
-    ];
-    
+
+    // Relación uno a uno Polimórfica
+    public function image()
+    {
+        return $this->morphOne(Image::class, 'imageable');
+    }
+
 }

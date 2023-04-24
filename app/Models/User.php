@@ -80,5 +80,10 @@ class User extends Authenticatable implements MustVerifyEmail
             }
         );
     }
+    // Relación uno a uno Polimórfica
+    public function image()
+    {
+        return $this->morphOne(Image::class, 'imageable');
+    }
 
 }

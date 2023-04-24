@@ -73,6 +73,7 @@
 - [Policies (políticas)](#item36)
 - [Crear directivas (Provider)](#item37)
 - [Crear Trait (User)](#item38)
+- [Relación uno a uno Polimórfica (One To One) Polymorphic](#item39)
 
 <a name="item1"></a>
 
@@ -8737,5 +8738,64 @@ class User extends Authenticatable implements MustVerifyEmail
 ```
 
 **`Agradecimientos :` A Tech School Media Es por su video tutorial que podéis ver desde aquí [Laravel 7.0 Course - Roles and Permissions without package](https://www.youtube.com/watch?v=ejAAl0TdN-Y&list=PLX54xtp5Ni0t1ASTqrg5ojdmQohnQsnQw).**
+
+[Subir](#top)
+
+<a name="item39"></a>
+
+## Relación uno a uno Polimórfica (One To One) Polymorphic.
+
+> Typee: en la Consola:
+```console
+php artisan make:model Image -m
+```
+
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_images_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_images_table.php` en `up` y escribimos lo siguiente.
+
+```php
+Schema::create('images', function (Blueprint $table) {
+
+    $table->string('url');
+    $table->unsignedBigInteger('imageable_id');
+    $table->string('imageable_type');
+    $table->primary(['imageable_id','imageable_type']);
+
+    $table->timestamps();
+});
+```
+
+> Typee: en la Consola:
+```console
+php artisan migrate
+```
+
+> Abrimos el archivo `Image.php` en la carpeta `app\Models\Image.php` y escribimos lo siguiente.
+
+```php
+public function imageable()
+{
+    return $this->morphTo();
+}
+```
+
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y escribimos lo siguiente.
+
+```php
+// Relación uno a uno Polimórfica
+public function image()
+{
+    return $this->morphOne(Image::class, 'imageable');
+}
+```
+
+> Abrimos el archivo `Post.php` en la carpeta `app\Models\Post.php` y escribimos lo siguiente.
+
+```php
+// Relación uno a uno Polimórfica
+public function image()
+{
+    return $this->morphOne(Image::class, 'imageable');
+}
+```
 
 [Subir](#top)
