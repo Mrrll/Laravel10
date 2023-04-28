@@ -26,7 +26,7 @@
         </div>
         <div class="mb-0">
             <label class="form-label">Cuerpo:</label>
-            <textarea class="form-control" rows="3" name="body"> {{ Route::currentRouteName() == 'blog.edit' ? old('body', $post->body) : old('body') }}</textarea>
+            <textarea id="editor" class="form-control" rows="3" name="body"> {{ Route::currentRouteName() == 'blog.edit' ? old('body', $post->body) : old('body') }}</textarea>
             @error('body')
                 <small class="text-danger">*{{ $message }}</small>
             @enderror

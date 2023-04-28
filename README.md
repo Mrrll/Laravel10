@@ -74,6 +74,7 @@
 - [Crear directivas (Provider)](#item37)
 - [Crear Trait (User)](#item38)
 - [Relación uno a uno Polimórfica (One To One) Polymorphic](#item39)
+- [Integrar CKEditor](#item40)
 
 <a name="item1"></a>
 
@@ -8796,6 +8797,102 @@ public function image()
 {
     return $this->morphOne(Image::class, 'imageable');
 }
+```
+
+[Subir](#top)
+
+<a name="item40"></a>
+
+## Integrar CKEditor
+
+###### Instalar Paquetes (npm).
+
+> Typee: en la Consola:
+```console
+npm install --save @ckeditor/ckeditor5-theme-lark @ckeditor/ckeditor5-autoformat @ckeditor/ckeditor5-basic-styles @ckeditor/ckeditor5-block-quote @ckeditor/ckeditor5-editor-classic @ckeditor/ckeditor5-essentials @ckeditor/ckeditor5-heading @ckeditor/ckeditor5-link  @ckeditor/ckeditor5-list  @ckeditor/ckeditor5-paragraph
+```
+
+>Instalamos la dependencia para la integración en Vite
+
+> Typee: en la Consola:
+```console
+npm install --save @ckeditor/vite-plugin-ckeditor5
+```
+
+###### Configuramos CKEditor con Vite.
+
+> Abrimos el archivo `vite.config.js` en la carpeta `/` y añadimos lo siguiente.
+
+```js
+
+....
+
+import ckeditor5 from '@ckeditor/vite-plugin-ckeditor5';
+import { createRequire } from 'node:module';
+const require = createRequire( import.meta.url );
+
+export default defineConfig({
+    plugins: [
+
+        ....
+
+        ckeditor5( { theme: require.resolve( '@ckeditor/ckeditor5-theme-lark' ) } )
+    ],
+
+   ....
+
+});
+```
+
+###### Configuramos CKEditor.
+
+> Creamos y abrimos el archivo `ckeditor.js` en la carpeta `resources\js\ckeditor.js` y escribimos lo siguiente.
+
+```js
+import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor';
+
+import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
+import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold';
+import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
+import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph';
+
+
+ClassicEditor
+    .create( document.querySelector( '#editor' ), {
+        plugins: [ Essentials, Paragraph, Bold, Italic ],
+        toolbar: [ 'bold', 'italic' ]
+    } )
+    .then( editor => {
+        console.log( 'Editor was initialized', editor );
+    } )
+    .catch( error => {
+        console.error( error.stack );
+    } );
+
+```
+
+> Abrimos el archivo `app.js` en la carpeta `resources\js\app.js` y añadimos lo siguiente.
+
+```js
+
+....
+
+import './ckeditor';
+```
+
+###### Usamos CKEditor en nuestra plantilla blade.
+
+> Abrimos el archivo `form.blade.php` en la carpeta `resources\views\blog\partials\form.blade.php` y añadimos lo siguiente.
+
+```php
+
+....
+
+<textarea id="editor" ....>
+
+    ....
+
+</textarea>
 ```
 
 [Subir](#top)
