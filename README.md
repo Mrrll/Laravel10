@@ -8996,7 +8996,11 @@ ClassicEditor
         const wordCountPlugin = editor.plugins.get( 'WordCount' );
         const wordCountWrapper = document.getElementById( 'word-count' );
 
-        wordCountWrapper.appendChild( wordCountPlugin.wordCountContainer );
+        // wordCountWrapper.appendChild( wordCountPlugin.wordCountContainer );
+        editor.plugins.get('WordCount').on('update', (evt, stats) => {
+        // Prints the current content statistics.
+        wordCountWrapper.innerHTML = '<span class="me-1 badge bg-secondary bg-gradient">Characters: '+stats.characters+'</span><span class="me-1 badge bg-secondary bg-gradient">Words: '+stats.words+'</span>';
+    })
     } )
     .catch( error => {
         console.error( error.stack );
@@ -9014,9 +9018,18 @@ ClassicEditor
 
     ....
 
-    <div id="word-count"></div>
+    <div id="word-count" class="d-flex justify-content-end mt-1"></div>
 </div>
 <hr>
+```
+
+> Abrimos el archivo `app.css` en la carpeta `resources\css\app.css` y añadimos lo siguiente.
+
+```css
+.ck-editor__editable {
+    min-height: 200px !important;
+    width: auto;
+}
 ```
 
 [Subir](#top)

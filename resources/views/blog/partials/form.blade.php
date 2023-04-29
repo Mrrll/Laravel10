@@ -30,7 +30,7 @@
             @error('body')
                 <small class="text-danger">*{{ $message }}</small>
             @enderror
-            <div id="word-count"></div>
+            <div id="word-count" class="d-flex justify-content-end mt-1"></div>
         </div>
         <hr>
         <div class="mb-0">
