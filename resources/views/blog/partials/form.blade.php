@@ -30,7 +30,9 @@
             @error('body')
                 <small class="text-danger">*{{ $message }}</small>
             @enderror
+            <div id="word-count"></div>
         </div>
+        <hr>
         <div class="mb-0">
             <label class="form-label">Categoria:</label>
             <select class="form-select form-select-sm" aria-label="Ejemplo de .form-select-sm" name="category_id">

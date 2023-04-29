@@ -97,3 +97,7 @@
 .badge{
     max-width: 150px;
 }
+.ck-editor__editable {
+    min-height: 200px !important;
+    width: auto;
+}
