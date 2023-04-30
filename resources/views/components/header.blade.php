@@ -21,9 +21,15 @@
                 @auth
                     <ul class="navbar-nav">
                         <li class="nav-link d-none d-lg-block">
+
                             <a href="#" class="nav-link dropdown-toggle" data-bs-display="static"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fa-solid fa-circle-user fa-2xl" style="color: #8a0000;"></i>
+
+                                @if (!empty(auth()->user()->image->url))
+                                    <img src="{{asset(auth()->user()->image->url)}}" width="40px" height="40px">
+                                @else
+                                    <i class="fa-solid fa-circle-user fa-2xl" style="color: #8a0000;"></i>
+                                @endif
                                 {{ auth()->user()->name }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">

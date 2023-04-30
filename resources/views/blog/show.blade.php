@@ -10,7 +10,7 @@
             </div>
             <div class="card-body">
                 <h5 class="card-title">{{ $post->category->name }}</h5>
-                <p class="card-text">{{ $post->body }} </p>
+                <p class="card-text">{!! $post->body !!} </p>
             </div>
             <div class="card-footer text-muted d-flex justify-content-between">
                 <a class="btn btn-primary" href="{{ url()->previous() }}">Volver</a>

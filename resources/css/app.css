@@ -65,8 +65,7 @@
   display: grid;
   grid-template-columns: 1fr auto auto;
   grid-template-rows: auto;
-  grid-template-areas:
-    'inptsearch btnsearch btnclose';
+  grid-template-areas: 'inptsearch btnsearch btnclose';
 }
 .inptsearch {
   grid-area: inptsearch;
@@ -79,25 +78,40 @@
   align-self: center;
   justify-self: center;
 }
-.hover-link:hover{
-    background-color: #6c757d !important;
+.hover-link:hover {
+  background-color: #6c757d !important;
 }
-.dropdown-item:hover, .dropdown-item:focus {
-    background-color: #6c757d !important;
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: #6c757d !important;
 }
 .btn-circle {
-    width: 48px !important;
-    height: 48px !important;
-    border-radius: 50% !important;
-    border: solid 1px #6c757d !important;
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  border: solid 1px #6c757d !important;
 }
-.btn-circle:hover{
-    background-color: #6c757d !important;
+.btn-circle:hover {
+  background-color: #6c757d !important;
 }
-.badge{
-    max-width: 150px;
+.badge {
+  max-width: 150px;
 }
 .ck-editor__editable {
-    min-height: 200px !important;
-    width: auto;
+  min-height: 200px !important;
+  width: auto;
+}
+.avatar {
+  vertical-align: middle;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+}
+.truncate {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: initial;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
 }

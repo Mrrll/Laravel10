@@ -48,3 +48,28 @@ if ($btnopenaside != null) {
     $aside = true
   })
 }
+function previewImage(event, querySelector){
+
+	//Recuperamos el input que desencadeno la acción
+	const input = event.target;
+
+	//Recuperamos la etiqueta img donde cargaremos la imagen
+	 let imgPreview = document.querySelector(querySelector);
+
+    $('#preview_image').addClass('d-none');
+    $('#imgPreview').removeClass('d-none');
+	// Verificamos si existe una imagen seleccionada
+	if(!input.files.length) return
+
+	//Recuperamos el archivo subido
+	let file = input.files[0];
+
+	//Creamos la url
+	let objectURL = URL.createObjectURL(file);
+
+	//Modificamos el atributo src de la etiqueta img
+	imgPreview.src = objectURL;
+
+}
+window.previewImage = previewImage;
+

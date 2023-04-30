@@ -4,9 +4,9 @@
 
 @section('content-dashboard')
     <main class="container center_container flex-column main-dashboard">
-        <form action="{{ route('blog.update', $post) }}" method="post" style="width: 100%">
+        <form action="{{ route('blog.update', $post) }}" method="post" style="width: 100%" enctype="multipart/form-data">
             @csrf
-            @method('put')
+            @method('patch')
             @include('blog.partials.form')
         </form>
     </main>

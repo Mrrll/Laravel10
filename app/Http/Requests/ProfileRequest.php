@@ -28,7 +28,9 @@ class ProfileRequest extends FormRequest
         return [
             'title' => 'required|max:45' ,
             'biography' => 'required|min:5',
-            'website' => 'required|max:45'
+            'website' => 'required|max:45',
+            'user_id' => 'required|integer',
+            'avatar' => 'mimes:jpg,png,jpeg,gif,bmp'
         ];
     }
 }

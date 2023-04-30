@@ -29,9 +29,11 @@ class PostRequest extends FormRequest
     {
         $validation = [
             'title' => 'required|max:45',
+            'slug' => 'required|max:45',
             'body' => 'required|min:5',
             'category_id' => 'required|integer',
             'user_id' => 'required|integer',
+            'image' => 'mimes:jpg,png,jpeg,gif,bmp'
         ];
         if ($this->published != '') {
             $validationPublished = [

@@ -9,14 +9,22 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Lang;
 
+
 class PostController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         $posts = Post::orderBy('id', 'desc')->whereNotNull('published')->paginate(10);
+        // foreach ($posts as $post) {
+        //     dump(substr($post->body,strpos($post->body,'<p>'), 60));
+
+        // }
+
+
         return view('blog.index', compact('posts'));
     }
 
@@ -35,8 +43,12 @@ class PostController extends Controller
     public function store(PostRequest $request)
     {
         try {
-            $request->merge(['slug' => Str::slug($request['title'], '-')]);
-            Post::create($request->all());
+            // $request->merge(['slug' => Str::slug($request['title'], '-')]);
+            $post = Post::create($request->safe()->except(['image']));
+            if ($request->validated()['image'] != null) {
+                $url = Post::Upload($request, 'image', 'images/posts', 'image_portada_post_'.$post->id);
+                $post->image()->create(['url' => $url]);
+            }
             return redirect()
                 ->route('blog.mypost')
                 ->with('message', [
@@ -90,8 +102,11 @@ class PostController extends Controller
             $response = Gate::inspect('update', $post);
 
             if ($response->allowed()) {
-                $request->merge(['slug' => Str::slug($request['title'], '-')]);
-                $post->update($request->all());
+                $post->update($request->safe()->except(['image']));
+                if ($request->validated()['image'] != null) {
+                    $url = Post::Upload($request, 'image', 'images/posts', 'image_portada_post_'.$post->id);
+                    $post->image()->create(['url' => $url]);
+                }
                 return redirect()
                     ->route('blog.mypost')
                     ->with('message', [

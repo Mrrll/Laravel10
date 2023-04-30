@@ -51,8 +51,13 @@ class ProfileController extends Controller
     }
     public function store(ProfileRequest $request)
     {
+
         try {
-            $profile = Profile::create($request->all());
+            $profile = Profile::create($request->safe()->except(['avatar']));
+            if ($request->validated()['avatar']  != null) {
+                $url = Profile::Upload($request, 'avatar', 'images/avatars','image_avatar_user_'.$profile->user->id);
+                $profile->user->image()->create(['url' => $url]);
+            }
 
             return redirect()->route('profile.edit', $profile)->with('message', [
                 'type' => 'success',
@@ -111,7 +116,11 @@ class ProfileController extends Controller
     public function update(ProfileRequest $request, Profile $profile)
     {
         try {
-            $profile->update($request->all());
+            $profile->update($request->safe()->except(['avatar']));
+            if ($request->validated()['avatar']  != null) {
+                $url = Profile::Upload($request, 'avatar', 'images/avatars','image_avatar_user_'.$profile->user->id);
+                $profile->user->image()->create(['url' => $url]);
+            }
             return back()->with('message', [
                 'type' => 'success',
                 'title' => 'Éxito !',

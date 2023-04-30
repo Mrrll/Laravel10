@@ -75,6 +75,7 @@
 - [Crear Trait (User)](#item38)
 - [Relación uno a uno Polimórfica (One To One) Polymorphic](#item39)
 - [Integrar CKEditor](#item40)
+- [Imagen de Usuarios y Post Implementación](#item41)
 
 <a name="item1"></a>
 
@@ -8942,69 +8943,70 @@ import MediaEmbed from '@ckeditor/ckeditor5-media-embed/src/mediaembed';
 import CodeBlock from '@ckeditor/ckeditor5-code-block/src/codeblock';
 import BlockQuote from '@ckeditor/ckeditor5-block-quote/src/blockquote';
 import WordCount from '@ckeditor/ckeditor5-word-count/src/wordcount';
+if (document.querySelector('#editor')) {
+    ClassicEditor
+        .create( document.querySelector( '#editor' ), {
+            plugins: [ Essentials, Paragraph, Bold, Italic, SourceEditing, Heading, Link, AutoLink, Font, Underline, Strikethrough, Code, Subscript, Superscript, RemoveFormat, Autoformat, Alignment, List, TodoList, Indent,Image, ImageToolbar, ImageCaption, ImageStyle, ImageResize, LinkImage, ImageInsert, AutoImage, MediaEmbed, CodeBlock, BlockQuote,WordCount ],
+            image: {
+                toolbar: [
+                    'imageStyle:block',
+                    'imageStyle:side',
+                    '|',
+                    'toggleImageCaption',
+                    'imageTextAlternative',
+                    '|',
+                    'linkImage'
+                ]
+            },
+            codeBlock: {
+                languages: [
+                    // Do not render the CSS class for the plain text code blocks.
+                    { language: 'plaintext', label: 'Plain text', class: '' },
 
-ClassicEditor
-    .create( document.querySelector( '#editor' ), {
-        plugins: [ Essentials, Paragraph, Bold, Italic, SourceEditing, Heading, Link, AutoLink, Font, Underline, Strikethrough, Code, Subscript, Superscript, RemoveFormat, Autoformat, Alignment, List, TodoList, Indent,Image, ImageToolbar, ImageCaption, ImageStyle, ImageResize, LinkImage, ImageInsert, AutoImage, MediaEmbed, CodeBlock, BlockQuote,WordCount ],
-        image: {
-            toolbar: [
-                'imageStyle:block',
-                'imageStyle:side',
-                '|',
-                'toggleImageCaption',
-                'imageTextAlternative',
-                '|',
-                'linkImage'
-            ]
-        },
-        codeBlock: {
-            languages: [
-                // Do not render the CSS class for the plain text code blocks.
-                { language: 'plaintext', label: 'Plain text', class: '' },
+                    // Use the "php-code" class for PHP code blocks.
+                    { language: 'php', label: 'PHP', class: 'php-code' },
 
-                // Use the "php-code" class for PHP code blocks.
-                { language: 'php', label: 'PHP', class: 'php-code' },
+                    // Use the "js" class for JavaScript code blocks.
+                    // Note that only the first ("js") class will determine the language of the block when loading data.
+                    { language: 'javascript', label: 'JavaScript', class: 'js javascript js-code' },
 
-                // Use the "js" class for JavaScript code blocks.
-                // Note that only the first ("js") class will determine the language of the block when loading data.
-                { language: 'javascript', label: 'JavaScript', class: 'js javascript js-code' },
+                    // Python code blocks will have the default "language-python" CSS class.
+                    { language: 'python', label: 'Python' }
+                ]
+            },
+            toolbar: {
+                items :['sourceEditing', '|', 'heading', '|', 'link', '|',
+                    {
+                        label: 'Font',
+                        icon: 'text',
+                        items: [  'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor' ]
+                    }, '|', 'bold', 'italic', 'underline',
+                    {
+                        label: 'Formatting',
+                        icon: 'plus',
+                        items: [ 'strikethrough', 'subscript', 'superscript', 'code' ]
+                    }, 'removeFormat', '|', 'alignment',
+                    {
+                        label: 'List',
+                        icon: '<svg width="16px" height="16px" viewBox="0 -3 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"/><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/><g id="SVGRepo_iconCarrier"> <title>list [#1497]</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Dribbble-Light-Preview" transform="translate(-179.000000, -322.000000)" fill="#000000"> <g id="icons" transform="translate(56.000000, 160.000000)"> <path d="M124.575,174 C123.7056,174 123,174.672 123,175.5 C123,176.328 123.7056,177 124.575,177 C125.4444,177 126.15,176.328 126.15,175.5 C126.15,174.672 125.4444,174 124.575,174 L124.575,174 Z M128.25,177 L144,177 L144,175 L128.25,175 L128.25,177 Z M124.575,168 C123.7056,168 123,168.672 123,169.5 C123,170.328 123.7056,171 124.575,171 C125.4444,171 126.15,170.328 126.15,169.5 C126.15,168.672 125.4444,168 124.575,168 L124.575,168 Z M128.25,171 L144,171 L144,169 L128.25,169 L128.25,171 Z M124.575,162 C123.7056,162 123,162.672 123,163.5 C123,164.328 123.7056,165 124.575,165 C125.4444,165 126.15,164.328 126.15,163.5 C126.15,162.672 125.4444,162 124.575,162 L124.575,162 Z M128.25,165 L144,165 L144,163 L128.25,163 L128.25,165 Z" id="list-[#1497]"> </path> </g> </g> </g> </g></svg>',
+                        items: [ 'bulletedList', 'numberedList', 'todoList' ]
+                    },'outdent', 'indent', '|', 'insertImage', 'mediaEmbed', '|', 'codeBlock', 'blockQuote'], shouldNotGroupWhenFull: true }
+        } )
+        .then( editor => {
+            console.log( 'Editor was initialized', editor );
+            const wordCountPlugin = editor.plugins.get( 'WordCount' );
+            const wordCountWrapper = document.getElementById( 'word-count' );
 
-                // Python code blocks will have the default "language-python" CSS class.
-                { language: 'python', label: 'Python' }
-            ]
-        },
-        toolbar: {
-            items :['sourceEditing', '|', 'heading', '|', 'link', '|',
-                {
-                    label: 'Font',
-                    icon: 'text',
-                    items: [  'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor' ]
-                }, '|', 'bold', 'italic', 'underline',
-                {
-                    label: 'Formatting',
-                    icon: 'plus',
-                    items: [ 'strikethrough', 'subscript', 'superscript', 'code' ]
-                }, 'removeFormat', '|', 'alignment',
-                {
-                    label: 'List',
-                    icon: '<svg width="16px" height="16px" viewBox="0 -3 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"/><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/><g id="SVGRepo_iconCarrier"> <title>list [#1497]</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Dribbble-Light-Preview" transform="translate(-179.000000, -322.000000)" fill="#000000"> <g id="icons" transform="translate(56.000000, 160.000000)"> <path d="M124.575,174 C123.7056,174 123,174.672 123,175.5 C123,176.328 123.7056,177 124.575,177 C125.4444,177 126.15,176.328 126.15,175.5 C126.15,174.672 125.4444,174 124.575,174 L124.575,174 Z M128.25,177 L144,177 L144,175 L128.25,175 L128.25,177 Z M124.575,168 C123.7056,168 123,168.672 123,169.5 C123,170.328 123.7056,171 124.575,171 C125.4444,171 126.15,170.328 126.15,169.5 C126.15,168.672 125.4444,168 124.575,168 L124.575,168 Z M128.25,171 L144,171 L144,169 L128.25,169 L128.25,171 Z M124.575,162 C123.7056,162 123,162.672 123,163.5 C123,164.328 123.7056,165 124.575,165 C125.4444,165 126.15,164.328 126.15,163.5 C126.15,162.672 125.4444,162 124.575,162 L124.575,162 Z M128.25,165 L144,165 L144,163 L128.25,163 L128.25,165 Z" id="list-[#1497]"> </path> </g> </g> </g> </g></svg>',
-                    items: [ 'bulletedList', 'numberedList', 'todoList' ]
-                },'outdent', 'indent', '|', 'insertImage', 'mediaEmbed', '|', 'codeBlock', 'blockQuote'], shouldNotGroupWhenFull: true }
-    } )
-    .then( editor => {
-        console.log( 'Editor was initialized', editor );
-        const wordCountPlugin = editor.plugins.get( 'WordCount' );
-        const wordCountWrapper = document.getElementById( 'word-count' );
-
-        // wordCountWrapper.appendChild( wordCountPlugin.wordCountContainer );
-        editor.plugins.get('WordCount').on('update', (evt, stats) => {
-        // Prints the current content statistics.
-        wordCountWrapper.innerHTML = '<span class="me-1 badge bg-secondary bg-gradient">Characters: '+stats.characters+'</span><span class="me-1 badge bg-secondary bg-gradient">Words: '+stats.words+'</span>';
-    })
-    } )
-    .catch( error => {
-        console.error( error.stack );
-    } );
+            // wordCountWrapper.appendChild( wordCountPlugin.wordCountContainer );
+            editor.plugins.get('WordCount').on('update', (evt, stats) => {
+            // Prints the current content statistics.
+            wordCountWrapper.innerHTML = '<span class="me-1 badge bg-secondary bg-gradient">Characters: '+stats.characters+'</span><span class="me-1 badge bg-secondary bg-gradient">Words: '+stats.words+'</span>';
+        })
+        } )
+        .catch( error => {
+            console.error( error.stack );
+        } );
+}
 ```
 
 > Abrimos el archivo `form.blade.php` en la carpeta `resources\views\blog\partials\form.blade.php` y añadimos lo siguiente.
@@ -9030,6 +9032,341 @@ ClassicEditor
     min-height: 200px !important;
     width: auto;
 }
+```
+
+[Subir](#top)
+
+<a name="item41"></a>
+
+## Imagen de Usuarios y Post Implementación
+
+###### Implementamos la imagen avatar de los usuarios.
+
+> Abrimos el archivo `edit.blade.php` en la carpeta `resources\views\admin\profiles\edit.blade.php` y añadimos lo siguiente.
+
+```php
+<x-form :route="route('profile.update', $profile)" method="patch" style="width:100%">
+
+    ....
+<div class="grid p-2" style="--bs-columns: 1; --bs-gap: 1rem;">
+    <div id="preview_image" class="d-flex justify-content-center">
+        <div class="avatar">
+            @if(isset($profile->user->image->url))
+                <img src="{{asset($profile->user->image->url)}}" class="avatar">
+            @else
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM12 6C10.3431 6 9 7.34315 9 9C9 10.6569 10.3431 12 12 12C13.6569 12 15 10.6569 15 9C15 7.34315 13.6569 6 12 6ZM17.8946 17.4473L17.0002 17C17.8946 17.4473 17.8939 17.4487 17.8939 17.4487L17.8932 17.4502L17.8916 17.4532L17.8882 17.46L17.88 17.4756C17.8739 17.4871 17.8666 17.5004 17.858 17.5155C17.8409 17.5458 17.8186 17.5832 17.7906 17.6267C17.7346 17.7138 17.6558 17.8254 17.5497 17.9527C17.3369 18.208 17.0163 18.5245 16.5549 18.8321C15.6228 19.4534 14.1751 20 12.0001 20C8.31494 20 6.76549 18.4304 6.26653 17.7115C5.96463 17.2765 5.99806 16.7683 6.18066 16.4031C6.91705 14.9303 8.42234 14 10.069 14H13.7642C15.5134 14 17.1124 14.9883 17.8947 16.5528C18.0354 16.8343 18.0354 17.1657 17.8946 17.4473Z" fill="#8a0000"></path> </g></svg>
+            @endif
+        </div>
+    </div>
+    <div class="form-group text-center">
+        <img id="imgPreview" class="avatar d-none">
+    </div>
+    <div class="form-group">
+        <label for="formFileLg" class="ms-1">Avatar :</label>
+        <input class="form-control form-control-lg" id="formFileLg" type="file" accept="image/*" onchange="previewImage(event, '#imgPreview')" name="avatar">
+    </div>
+
+    ....
+
+</div>
+
+....
+
+<x-form.button type="submit" color="primary" class="me-2">
+     @lang('Update :model', ['model' => 'Profile'])
+</x-form.button>
+```
+
+> Abrimos el archivo `create.blade.php` en la carpeta `resources\views\admin\profiles\create.blade.php` y añadimos lo siguiente.
+
+```php
+<div class="grid p-2" style="--bs-columns: 1; --bs-gap: 1rem;">
+    <div id="preview_image" class="d-flex justify-content-center">
+        <div class="avatar">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM12 6C10.3431 6 9 7.34315 9 9C9 10.6569 10.3431 12 12 12C13.6569 12 15 10.6569 15 9C15 7.34315 13.6569 6 12 6ZM17.8946 17.4473L17.0002 17C17.8946 17.4473 17.8939 17.4487 17.8939 17.4487L17.8932 17.4502L17.8916 17.4532L17.8882 17.46L17.88 17.4756C17.8739 17.4871 17.8666 17.5004 17.858 17.5155C17.8409 17.5458 17.8186 17.5832 17.7906 17.6267C17.7346 17.7138 17.6558 17.8254 17.5497 17.9527C17.3369 18.208 17.0163 18.5245 16.5549 18.8321C15.6228 19.4534 14.1751 20 12.0001 20C8.31494 20 6.76549 18.4304 6.26653 17.7115C5.96463 17.2765 5.99806 16.7683 6.18066 16.4031C6.91705 14.9303 8.42234 14 10.069 14H13.7642C15.5134 14 17.1124 14.9883 17.8947 16.5528C18.0354 16.8343 18.0354 17.1657 17.8946 17.4473Z" fill="#8a0000"></path> </g></svg>
+        </div>
+    </div>
+    <div class="form-group text-center">
+        <img id="imgPreview" class="avatar d-none">
+    </div>
+    <div class="form-group">
+        <label for="formFileLg" class="ms-1">Avatar :</label>
+        <input class="form-control form-control-lg" id="formFileLg" type="file" accept="image/*" onchange="previewImage(event, '#imgPreview')" name="avatar">
+    </div>
+    ....
+</div>
+```
+
+> Abrimos el archivo `form.blade.php` en la carpeta `resources\views\components\form.blade.php` y añadimos lo siguiente.
+
+```php
+<form action="{{$route}}" method="post" {{ $attributes->merge(['class' => "$class"]) }} {{ $attributes->style([$style]) }} enctype="multipart/form-data">
+    @csrf
+    @method($method)
+    {{$slot}}
+</form>
+```
+
+> Abrimos el archivo `header.blade.php` en la carpeta `resources\views\components\header.blade.php` y añadimos lo siguiente.
+
+```php
+@if (!empty(auth()->user()->image->url))
+    <img src="{{asset(auth()->user()->image->url)}}" width="40px" height="40px">
+@else
+    <i class="fa-solid fa-circle-user fa-2xl" style="color: #8a0000;"></i>
+@endif
+```
+
+> Creamos y abrimos el archivo `UploadImage.php` en la carpeta `app\Traits\UploadImage.php` y escribimos lo siguiente.
+
+```php
+<?php
+
+namespace App\Traits;
+
+trait UploadImage
+{
+    public static function Upload($request, $key, $dir = "image", $name = null)
+    {
+        $data = $request->validated();
+        if ($name == null) {
+            $filename = $data[$key]->getClientOriginalName();
+        } else {
+            $filename = $name.'.'.$data[$key]->extension();
+        }
+        $route = public_path($dir);
+        $request->validated()[$key]->move($route, $filename);
+        return $dir.'/'.$filename;
+    }
+}
+```
+
+> Abrimos el archivo `Profile.php` en la carpeta `app\Models\Profile.php` y añadimos lo siguiente.
+
+```php
+use App\Traits\UploadImage;
+use HasFactory, UploadImage;
+```
+
+> Abrimos el archivo `ProfileRequest.php` en la carpeta `app\Http\Requests\ProfileRequest.php` y añadimos lo siguiente.
+
+```php
+'user_id' => 'required|integer',
+'avatar' => 'mimes:jpg,png,jpeg,gif,bmp'
+```
+
+> Abrimos el archivo `ProfileController.php` en la carpeta `app\Http\Controllers\ProfileController.php` y añadimos lo siguiente.
+
+```php
+`store`
+$profile = Profile::create($request->safe()->except(['avatar']));
+if ($request->validated()['avatar']  != null) {
+    $url = Profile::Upload($request, 'avatar', 'images/avatars','image_avatar_user_'.$profile->user->id);
+    $profile->user->image()->create(['url' => $url]);
+}
+`update`
+$profile->update($request->safe()->except(['avatar']));
+if ($request->validated()['avatar']  != null) {
+    $url = Profile::Upload($request, 'avatar', 'images/avatars','image_avatar_user_'.$profile->user->id);
+    $profile->user->image()->create(['url' => $url]);
+}
+```
+
+> Abrimos el archivo `Image.php` en la carpeta `app\Models\Image.php` y añadimos lo siguiente.
+
+```php
+protected $guarded = [];
+```
+
+> Abrimos el archivo `interface.js` en la carpeta `resources\js\interface.js` y añadimos lo siguiente.
+
+```js
+function previewImage(event, querySelector){
+
+	//Recuperamos el input que desencadeno la acción
+	const input = event.target;
+
+	//Recuperamos la etiqueta img donde cargaremos la imagen
+	 let imgPreview = document.querySelector(querySelector);
+
+    $('#preview_image').addClass('d-none');
+    $('#imgPreview').removeClass('d-none');
+	// Verificamos si existe una imagen seleccionada
+	if(!input.files.length) return
+
+	//Recuperamos el archivo subido
+	let file = input.files[0];
+
+	//Creamos la url
+	let objectURL = URL.createObjectURL(file);
+
+	//Modificamos el atributo src de la etiqueta img
+	imgPreview.src = objectURL;
+
+}
+window.previewImage = previewImage;
+```
+
+###### Implementamos la imagen de portada de los posts.
+
+> Abrimos el archivo `Post.php` en la carpeta `app\Models\Post.php` y añadimos lo siguiente.
+
+```php
+use App\Traits\UploadImage;
+use HasFactory, UploadImage;
+```
+
+> Abrimos el archivo `PostRequest.php` en la carpeta `app\Http\Requests\PostRequest.php` y añadimos lo siguiente.
+
+```php
+'slug' => 'required|max:45',
+'image' => 'mimes:jpg,png,jpeg,gif,bmp'
+```
+
+> Abrimos el archivo `PostController.php` en la carpeta `app\Http\Controllers\PostController.php` y añadimos lo siguiente.
+
+```php
+`store`
+$post = Post::create($request->safe()->except(['image']));
+if ($request->validated()['image'] != null) {
+    $url = Post::Upload($request, 'image', 'images/posts', 'image_portada_post_'.$post->id);
+    $post->image()->create(['url' => $url]);
+}
+
+`update`
+if ($response->allowed()) {
+    $post->update($request->safe()->except(['image']));
+    if ($request->validated()['image'] != null) {
+        $url = Post::Upload($request, 'image', 'images/posts', 'image_portada_post_'.$post->id);
+        $post->image()->create(['url' => $url]);
+    }
+    ....
+} else {
+    ....
+}
+```
+
+> Abrimos el archivo `create.blade.php` en la carpeta `resources\views\blog\create.blade.php` en el `form` y tambien en `resources\views\blog\edit.blade.php` añadimos lo siguiente.
+
+```php
+enctype="multipart/form-data"
+```
+
+> Abrimos el archivo `index.blade.php` en la carpeta `resources\views\blog\index.blade.php` y añadimos lo siguiente.
+
+```php
+<div class="grid justify-content-center align-content-center">
+    @if (!empty($posts))
+        @foreach ($posts as $post)
+            <div class="g-col-12 g-col-md-6 g-col-lg-4 m-2" style="padding-left: 0px;padding-right: 0px;">
+                <div class="card" style="width: 100%">
+                    @if (isset($post->image->url))
+                    <img src="{{asset($post->image->url)}}" class="card-img-top" style="height: 190px">
+                    @else
+                        <svg class="bd-placeholder-img card-img-top" width="100%" height="100"
+                            xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Capa de imagen"
+                            preserveAspectRatio="xMidYMid slice" focusable="false">
+                            <title>Placeholder</title>
+                            <rect width="100%" height="100%" fill="#868e96"></rect><text x="37%"
+                                y="50%" fill="#dee2e6" dy=".3em">Falta imagen</text>
+                        </svg>
+                    @endif
+                    <div class="card-body" style="max-width:400px;">
+                        <h5 class="card-title">{{ $post->title }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ $post->category->name }}</h6>
+                        <div class="card-text truncate">
+                            {{preg_replace("/<(script|style)[^>]*>[\s\S]*?<\/\1>|<\/?[^>]+>/m",'', $post->body)}}
+                        </div>
+                        <a href="{{ route('blog.show', $post) }}" class="btn btn-primary mt-3">Leer mas...</a>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+        {{ $posts->links() }}
+    @else
+        <h2>No hay ningún post en estos momentos.</h2>
+    @endif
+</div>
+```
+
+> Abrimos el archivo `app.css` en la carpeta `resources\css\app.css` y añadimos lo siguiente.
+
+```css
+.avatar {
+  vertical-align: middle;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+}
+.truncate {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: initial;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+}
+```
+
+> Abrimos el archivo `form.blade.php` en la carpeta `resources\views\blog\partials\form.blade.php` y añadimos lo siguiente.
+
+```php
+<div class="form-group text-center">
+    <img id="imgPreview" class="card-img-top d-none" style="height:250px">
+</div>
+{{-- <img src="..." class="card-img-top" alt="..."> --}}
+@if (isset($post->image->url))
+    <img src="{{asset($post->image->url)}}" class="card-img-top" style="height:250px">
+@else
+    <div id="preview_image" class="d-flex justify-content-center">
+        <svg class="bd-placeholder-img card-img-top" width="100%" height="250" xmlns="http://www.w3.org/2000/svg"
+            role="img" aria-label="Placeholder: Capa de imagen" preserveAspectRatio="xMidYMid slice"
+            focusable="false">
+            <title>Placeholder</title>
+            <rect width="100%" height="100%" fill="#868e96"></rect><text x="45%" y="50%" fill="#dee2e6"
+                dy=".3em">Falta imagen</text>
+        </svg>
+    </div>
+@endif
+<div class="card-body">
+    <div class="form-group">
+        <label for="formFileLg" class="form-label ms-1">Imagen :</label>
+        <input class="form-control form-control-lg" id="formFileLg" type="file" accept="image/*"
+            onchange="previewImage(event, '#imgPreview')" name="image">
+    </div>
+    <input type="hidden" name="user_id"
+        value="{{ Route::currentRouteName() == 'blog.edit' ? $post->user_id : auth()->user()->id }}">
+    <div class="mb-0">
+        <label class="form-label">Titulo:</label>
+        <input type="text" class="form-control" placeholder="Diseñador"
+            value="{{ Route::currentRouteName() == 'blog.edit' ? old('title', $post->title) : old('title') }}"
+            name="title">
+        @error('title')
+            <small class="text-danger">*{{ $message }}</small>
+        @enderror
+        <label class="form-label">Slug:</label>
+        <input type="text" class="form-control" placeholder="Diseñador-siguiente"
+            value="{{ Route::currentRouteName() == 'blog.edit' ? old('slug', $post->slug) : old('slug') }}"
+            name="slug" readonly>
+        @error('slug')
+            <small class="text-danger">*{{ $message }}</small>
+        @enderror
+    </div>
+    ....
+</div>
+
+`al final`
+<script type="module">
+    $(document).ready(function() {
+        $("input[name='title']").on('blur keyup keydown change paste',function() {
+            let inputslug = $(this).next().next();
+            var str = $(this).val();
+            str = str.replace(/\W+(?!$)/g, '-').toLowerCase();
+            $(inputslug).val(str);
+            $(inputslug).attr('placeholder', str);
+        })
+    })
+</script>
 ```
 
 [Subir](#top)
