@@ -76,6 +76,7 @@
 - [Relación uno a uno Polimórfica (One To One) Polymorphic](#item39)
 - [Integrar CKEditor](#item40)
 - [Imagen de Usuarios y Post Implementación](#item41)
+- [Relación uno a muchos Polimórfica (One To Many) Polymorphic](#item42)
 
 <a name="item1"></a>
 
@@ -9367,6 +9368,83 @@ enctype="multipart/form-data"
         })
     })
 </script>
+```
+
+[Subir](#top)
+
+<a name="item42"></a>
+
+## Relación uno a muchos Polimórfica (One To Many) Polymorphic
+
+###### Creamos la tabla y el modelo de los Comentarios.
+
+> Typee: en la Consola:
+```console
+php artisan make:model Comment -m
+```
+
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_comments_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_comments_table.php` y añadimos lo siguiente.
+
+```php
+Schema::create('comments', function (Blueprint $table) {
+    $table->id();
+    $table->string('message');
+    $table->unsignedBigInteger('commentable_id');
+    $table->string('commentable_type');
+    $table->unsignedBigInteger('user_id');
+    $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+    $table->timestamps();
+});
+```
+
+> Typee: en la Consola:
+```console
+php artisan migrate
+```
+
+> Abrimos el archivo `Comment.php` en la carpeta `app\Models\Comment.php` y añadimos lo siguiente.
+
+```php
+// Definimos que tiene una relación polimórfica
+public function commentable()
+{
+    return $this->morphTo();
+}
+// Relación uno a muchos (inversa)
+public function user()
+{
+    return $this->belongsTo(User::class);
+}
+```
+
+> Abrimos el archivo `Post.php` en la carpeta `app\Models\Post.php` y añadimos lo siguiente.
+
+```php
+// Relación uno a muchos Polimórfica
+public function comments()
+{
+    return $this->morphMany(Comment::class, 'commentable');
+}
+```
+
+> Abrimos el archivo `Video.php` en la carpeta `app\Models\Video.php` y añadimos lo siguiente.
+
+```php
+// Relación uno a muchos Polimórfica
+public function comments()
+{
+    return $this->morphMany(Comment::class, 'commentable');
+}
+```
+
+> Abrimos el archivo `User.php` en la carpeta `app\Models\User.php` y añadimos lo siguiente.
+
+```php
+// Relación uno a muchos
+public function comments()
+{
+    return $this->hasMany(Comment::class);
+}
 ```
 
 [Subir](#top)

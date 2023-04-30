@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Video extends Model
 {
     use HasFactory;
-    
+
     protected $guarded = [];
 
     // Buscar modelo por el campo slug
@@ -20,5 +20,10 @@ class Video extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    // Relación uno a muchos Polimórfica
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
     }
 }
