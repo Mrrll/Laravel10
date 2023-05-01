@@ -78,6 +78,7 @@
 - [Imagen de Usuarios y Post Implementación](#item41)
 - [Relación uno a muchos Polimórfica (One To Many) Polymorphic](#item42)
 - [Comentarios de Usuarios en  Post Implementación](#item43)
+- [Relación muchos a muchos Polimórfica (Many To Many) Polymorphic](#item44)
 
 <a name="item1"></a>
 
@@ -9697,6 +9698,90 @@ class CommentPolicy
 protected $policies = [
     Comment::class => CommentPolicy::class,
 ];
+```
+
+[Subir](#top)
+
+<a name="item44"></a>
+
+## Relación muchos a muchos Polimórfica (Many To Many) Polymorphic
+
+###### Creamos el Modelo Tag
+
+> Typee: en la Consola:
+```console
+php artisan make:model Tag -m
+```
+
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_tags_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_tags_table.php` y añadimos lo siguiente.
+
+```php
+Schema::create('tags', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->timestamps();
+});
+```
+
+###### Creamos tabla intermedia
+
+> Typee: en la Consola:
+```console
+php artisan make:migration create_taggables_table
+```
+
+> Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_taggables_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_taggables_table.php` y añadimos lo siguiente.
+
+```php
+ Schema::create('taggables', function (Blueprint $table) {
+    $table->id();
+    $table->unsignedBigInteger('taggable_id');
+    $table->string('taggable_type');
+    $table->unsignedBigInteger('tag_id');
+    $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
+    $table->timestamps();
+});
+```
+
+> Typee: en la Consola:
+```console
+php artisan migrate
+```
+
+###### Relacionamos los modelos
+
+> Abrimos el archivo `Tag.php` en la carpeta `app\Models\Tag.php` y añadimos lo siguiente.
+
+```php
+// Relación muchos a muchos inversa Polimórfica
+public function posts()
+{
+    return $this->morphByMany(Post::class, 'taggable');
+}
+public function videos()
+{
+    return $this->morphByMany(Video::class, 'taggable');
+}
+```
+
+> Abrimos el archivo `Video.php` en la carpeta `app\Models\Video.php` y añadimos lo siguiente.
+
+```php
+// Relación muchos a muchos Polimórfica
+public function tags()
+{
+    return $this->morphToMany(Tag::class, 'taggable');
+}
+```
+
+> Abrimos el archivo `Post.php` en la carpeta `app\Models\Post.php` y añadimos lo siguiente.
+
+```php
+// Relación muchos a muchos Polimórfica
+public function tags()
+{
+    return $this->morphToMany(Tag::class, 'taggable');
+}
 ```
 
 [Subir](#top)
