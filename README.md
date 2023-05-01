@@ -79,6 +79,7 @@
 - [Relación uno a muchos Polimórfica (One To Many) Polymorphic](#item42)
 - [Comentarios de Usuarios en  Post Implementación](#item43)
 - [Relación muchos a muchos Polimórfica (Many To Many) Polymorphic](#item44)
+- [Implementación de tags en los post](#item45)
 
 <a name="item1"></a>
 
@@ -9733,13 +9734,11 @@ php artisan make:migration create_taggables_table
 > Abrimos el archivo `XXXX_XX_XX_XXXXXX_create_taggables_table.php` en la carpeta `database\migrations\XXXX_XX_XX_XXXXXX_create_taggables_table.php` y añadimos lo siguiente.
 
 ```php
- Schema::create('taggables', function (Blueprint $table) {
-    $table->id();
+Schema::create('taggables', function (Blueprint $table) {
     $table->unsignedBigInteger('taggable_id');
     $table->string('taggable_type');
     $table->unsignedBigInteger('tag_id');
     $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
-    $table->timestamps();
 });
 ```
 
@@ -9782,6 +9781,136 @@ public function tags()
 {
     return $this->morphToMany(Tag::class, 'taggable');
 }
+```
+
+[Subir](#top)
+
+<a name="item45"></a>
+
+## Implementación de tags en los post
+
+###### Input de los tags.
+
+> Abrimos el archivo `form.blade.php` en la carpeta `resources\views\blog\partials\form.blade.php` y añadimos lo siguiente.
+
+```php
+<div class="mb-0">
+        @if (isset($post) && is_object($post->tags) && $post->tags != '[]')
+        @php
+            $tags = "";
+            foreach ($post->tags as $tag) {
+                $tags .= $tag->name.',';
+            }
+        @endphp
+    @endif
+    <label class="form-label">Tags :</label>
+    <input type="text" name="tags" id="tags" data-role="tagsinput" value="{{ Route::currentRouteName() == 'blog.edit' && isset($tags) ? old('tags', $tags) : old('tags') }}">
+    @error('tags')
+        <small class="text-danger">*{{ $message }}</small>
+    @enderror
+</div>
+```
+
+###### Configuramos Controlador para los tags.
+
+> Abrimos el archivo `PostRequest.php` en la carpeta `app\Http\Requests\PostRequest.php` y añadimos lo siguiente.
+
+```php
+'tags' => 'string'
+```
+
+> Abrimos el archivo `PostController.php` en la carpeta `app\Http\Controllers\PostController.php` y añadimos lo siguiente.
+
+```php
+`store`
+if ($request->validated()['tags'] != null) {
+    $listOftags = explode(',', $request->validated()['tags']);
+    foreach ($listOftags as $tags) {
+        $tag = new Tag();
+        $tag->name = trim($tags);
+        $tag->save();
+        $post->tags()->attach($tag);
+    }
+}
+
+public function update(PostRequest $request, Post $post)
+{
+    try {
+        $response = Gate::inspect('update', $post);
+
+        if ($response->allowed()) {
+            $post->update($request->safe()->except(['image','tags']));
+            if (isset($request->validated()['image']) && $request->validated()['image'] != null) {
+                $url = Post::Upload($request, 'image', 'images/posts', 'image_portada_post_'.$post->id);
+                $post->image()->update(['url' => $url]);
+            }
+            $post->tags()->delete();
+            $post->tags()->detach();
+            if (isset($request->validated()['tags']) && $request->validated()['tags'] != null) {
+                $listOftags = explode(',', $request->validated()['tags']);
+                foreach ($listOftags as $tags) {
+                    $tag = new Tag();
+                    $tag->name = trim($tags);
+                    $tag->save();
+                    $post->tags()->attach($tag);
+                }
+            }
+            return redirect()
+                ->route('blog.mypost')
+                ->with('message', [
+                    'type' => 'info',
+                    'title' => 'Éxito !',
+                    'message' =>
+                        'El post a sido actualizado correctamente.',
+                ]);
+        } else {
+            return redirect()
+                ->route('blog.mypost')
+                ->with('message', [
+                    'type' => 'danger',
+                    'title' => 'Error !',
+                    'message' => $response->message(),
+                ]);
+        }
+    } catch (\Throwable $th) {
+        return back()->with('message', [
+            'type' => 'danger',
+            'title' => 'Error !',
+            'message' => $th,
+        ]);
+    }
+}
+
+public function destroy(Post $post)
+{
+    try {
+        $post->tags()->delete();
+        $post->tags()->detach();
+        File::delete($post->image->url);
+        $post->image()->delete();
+        $post->delete();
+        return redirect()
+            ->route('blog.mypost')
+            ->with('message', [
+                'type' => 'warning',
+                'title' => 'Éxito !',
+                'message' => 'El post a sido eliminado correctamente.',
+            ]);
+    } catch (\Throwable $th) {
+        return back()->with('message', [
+            'type' => 'danger',
+            'title' => 'Error !',
+            'message' => $th,
+        ]);
+    }
+}
+```
+
+> Abrimos el archivo `mypost.blade.php` en la carpeta `resources\views\blog\mypost.blade.php` y añadimos lo siguiente.
+
+```php
+`Para visualizar el body de los post correctamente`
+{{preg_replace("/<(script|style)[^>]*>[\s\S]*?<\/\1>|<\/?[^>]+>/m",'', $post->body)}}
 ```
 
 [Subir](#top)

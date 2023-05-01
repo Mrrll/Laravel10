@@ -33,7 +33,8 @@ class PostRequest extends FormRequest
             'body' => 'required|min:5',
             'category_id' => 'required|integer',
             'user_id' => 'required|integer',
-            'image' => 'mimes:jpg,png,jpeg,gif,bmp'
+            'image' => 'mimes:jpg,png,jpeg,gif,bmp',
+            'tags' => 'string'
         ];
         if ($this->published != '') {
             $validationPublished = [

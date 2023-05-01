@@ -111,7 +111,6 @@
                     <div>
                         @foreach ($fields as $field)
                             @if (is_object($role[$field['name']]) && $role[$field['name']] != '[]')
-                            @dump($role[$field['name']])
                                 @php
                                      $permissions = "";
                                      foreach ($role[$field['name']] as $permission) {

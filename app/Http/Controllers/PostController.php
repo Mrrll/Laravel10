@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostRequest;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\Tag;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Lang;
-
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -19,12 +21,6 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::orderBy('id', 'desc')->whereNotNull('published')->paginate(10);
-        // foreach ($posts as $post) {
-        //     dump(substr($post->body,strpos($post->body,'<p>'), 60));
-
-        // }
-
-
         return view('blog.index', compact('posts'));
     }
 
@@ -43,11 +39,19 @@ class PostController extends Controller
     public function store(PostRequest $request)
     {
         try {
-            // $request->merge(['slug' => Str::slug($request['title'], '-')]);
-            $post = Post::create($request->safe()->except(['image']));
+            $post = Post::create($request->safe()->except(['image','tags']));
             if ($request->validated()['image'] != null) {
                 $url = Post::Upload($request, 'image', 'images/posts', 'image_portada_post_'.$post->id);
                 $post->image()->create(['url' => $url]);
+            }
+            if ($request->validated()['tags'] != null) {
+                $listOftags = explode(',', $request->validated()['tags']);
+                foreach ($listOftags as $tags) {
+                    $tag = new Tag();
+                    $tag->name = trim($tags);
+                    $tag->save();
+                    $post->tags()->attach($tag);
+                }
             }
             return redirect()
                 ->route('blog.mypost')
@@ -98,14 +102,28 @@ class PostController extends Controller
     public function update(PostRequest $request, Post $post)
     {
         try {
-
             $response = Gate::inspect('update', $post);
 
             if ($response->allowed()) {
-                $post->update($request->safe()->except(['image']));
-                if ($request->validated()['image'] != null) {
+                $post->update($request->safe()->except(['image','tags']));
+                if (isset($request->validated()['image']) && $request->validated()['image'] != null) {
                     $url = Post::Upload($request, 'image', 'images/posts', 'image_portada_post_'.$post->id);
-                    $post->image()->create(['url' => $url]);
+                    if (isset($post->image->url)) {
+                        $post->image()->update(['url' => $url]);
+                    } else {
+                        $post->image()->create(['url' => $url]);
+                    }
+                }
+                $post->tags()->delete();
+                $post->tags()->detach();
+                if (isset($request->validated()['tags']) && $request->validated()['tags'] != null) {
+                    $listOftags = explode(',', $request->validated()['tags']);
+                    foreach ($listOftags as $tags) {
+                        $tag = new Tag();
+                        $tag->name = trim($tags);
+                        $tag->save();
+                        $post->tags()->attach($tag);
+                    }
                 }
                 return redirect()
                     ->route('blog.mypost')
@@ -139,6 +157,10 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         try {
+            $post->tags()->delete();
+            $post->tags()->detach();
+            File::delete($post->image->url);
+            $post->image()->delete();
             $post->delete();
             return redirect()
                 ->route('blog.mypost')
@@ -172,10 +194,10 @@ class PostController extends Controller
             case 'admin':
             case 'manager':
             case 'editor':
-                $posts = Post::orderBy('id', 'desc')->paginate(10);
+                $posts = Post::orderBy('id', 'desc')->paginate(5);
                 break;
                 default:
-                $posts = Post::orderBy('id', 'desc')->where('user_id', auth()->user()->id)->paginate(10);
+                $posts = Post::orderBy('id', 'desc')->where('user_id', auth()->user()->id)->paginate(5);
                 break;
         }
         return view('blog.mypost', compact('posts', 'headName'));

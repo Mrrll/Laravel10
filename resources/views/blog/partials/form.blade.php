@@ -18,15 +18,15 @@
     </div>
     {{-- <img src="..." class="card-img-top" alt="..."> --}}
     @if (isset($post->image->url))
-        <img src="{{asset($post->image->url)}}" class="card-img-top" style="height:250px">
+        <img src="{{ asset($post->image->url) }}" class="card-img-top" style="height:250px">
     @else
         <div id="preview_image" class="d-flex justify-content-center">
-            <svg class="bd-placeholder-img card-img-top" width="100%" height="250" xmlns="http://www.w3.org/2000/svg"
-                role="img" aria-label="Placeholder: Capa de imagen" preserveAspectRatio="xMidYMid slice"
-                focusable="false">
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="250"
+                xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Capa de imagen"
+                preserveAspectRatio="xMidYMid slice" focusable="false">
                 <title>Placeholder</title>
-                <rect width="100%" height="100%" fill="#868e96"></rect><text x="45%" y="50%" fill="#dee2e6"
-                    dy=".3em">Falta imagen</text>
+                <rect width="100%" height="100%" fill="#868e96"></rect><text x="45%" y="50%"
+                    fill="#dee2e6" dy=".3em">Falta imagen</text>
             </svg>
         </div>
     @endif
@@ -70,7 +70,8 @@
                 <option selected>Elige una categoría</option>
                 @foreach ($categories as $category)
                     @if (Route::currentRouteName() == 'blog.edit')
-                        <option value="{{ $category->id }}" @selected(old('category_id', $post->category->id) == $category->id)>{{ $category->name }} </option>
+                        <option value="{{ $category->id }}" @selected(old('category_id', $post->category->id) == $category->id)>{{ $category->name }}
+                        </option>
                     @else
                         <option value="{{ $category->id }}" @selected(old('category_id'))>{{ $category->name }}
                         </option>
@@ -78,6 +79,21 @@
                 @endforeach
             </select>
             @error('category_id')
+                <small class="text-danger">*{{ $message }}</small>
+            @enderror
+        </div>
+        <div class="mb-0">
+             @if (isset($post) && is_object($post->tags) && $post->tags != '[]')
+                @php
+                    $tags = "";
+                    foreach ($post->tags as $tag) {
+                        $tags .= $tag->name.',';
+                    }
+                @endphp
+            @endif
+            <label class="form-label">Tags :</label>
+            <input type="text" name="tags" id="tags" data-role="tagsinput" value="{{ Route::currentRouteName() == 'blog.edit' && isset($tags) ? old('tags', $tags) : old('tags') }}">
+            @error('tags')
                 <small class="text-danger">*{{ $message }}</small>
             @enderror
         </div>

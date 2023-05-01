@@ -22,7 +22,7 @@
                         <td>{{ $post->slug }}</td>
                         <td>
                             <span class="d-inline-block text-truncate" style="max-width: 250px;">
-                                {{ $post->body }}
+                                {{preg_replace("/<(script|style)[^>]*>[\s\S]*?<\/\1>|<\/?[^>]+>/m",'', $post->body)}}
                             </span>
                         </td>
                         <td>{{ $post->category->name }}</td>
@@ -99,7 +99,7 @@
                         <td class="d-flex flex-column">
                             <strong>Body :</strong>
                             <span class="d-inline-block text-truncate" style="max-width: 250px;">
-                                {{ $post->body }}
+                                {{preg_replace("/<(script|style)[^>]*>[\s\S]*?<\/\1>|<\/?[^>]+>/m",'', $post->body)}}
                             </span>
                         </td>
                     </tr>
