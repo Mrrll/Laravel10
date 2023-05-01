@@ -77,6 +77,7 @@
 - [Integrar CKEditor](#item40)
 - [Imagen de Usuarios y Post Implementación](#item41)
 - [Relación uno a muchos Polimórfica (One To Many) Polymorphic](#item42)
+- [Comentarios de Usuarios en  Post Implementación](#item43)
 
 <a name="item1"></a>
 
@@ -9405,6 +9406,7 @@ php artisan migrate
 > Abrimos el archivo `Comment.php` en la carpeta `app\Models\Comment.php` y añadimos lo siguiente.
 
 ```php
+protected $guarded = [];
 // Definimos que tiene una relación polimórfica
 public function commentable()
 {
@@ -9445,6 +9447,256 @@ public function comments()
 {
     return $this->hasMany(Comment::class);
 }
+```
+
+[Subir](#top)
+
+<a name="item43"></a>
+
+## Comentarios de Usuarios en  Post Implementación
+
+###### Creamos el formulario de creación de comentarios.
+
+> Abrimos el archivo `show.blade.php` en la carpeta `resources\views\blog\show.blade.php` y añadimos lo siguiente.
+
+```php
+`class="card-footer ...."`
+<button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseComments"aria-expanded="false" aria-controls="collapseComments">
+    Read comments
+</button>
+
+....
+
+<div class="collapse mb-4" id="collapseComments">
+    <div class="card card-body" style="padding: 1em 0;">
+        <x-form :route="route('comments.store')" style="width:100%">
+            <div class="grid justify-content-center align-items-center">
+                @if (!empty(auth()->user()->image->url))
+                    <img src="{{ asset(auth()->user()->image->url) }}" width="48px" height="48px" class="g-col-1 ms-3 mt-4">
+                @else
+                    <i class="fa-solid fa-circle-user fa-2xl g-col-1 ms-3 mt-4" style="color: #8a0000;"></i>
+                @endif
+                <div class="form-group g-col-10">
+                    <label for="message" class="form-label ms-1">Your message :</label>
+                    <input class="form-control form-control-lg" id="message" type="text" name="message">
+                </div>
+                <button type="submit" class="btn g-col-1 me-3 mt-4" width="48px" height="48px">
+                    <i class="fa-solid fa-check fa-2xl" style="color: #17b019;"></i>
+                </button>
+            </div>
+            <input type="hidden" name="post_id" value="{{$post->id}}">
+        </x-form>
+    </div>
+    @if (isset($post->comments))
+        @foreach ($post->comments->reverse() as $comment)
+            <div class="card card-body">
+                <div class="grid justify-content-center align-items-center">
+                    @if (!empty($comment->user->image->url))
+                        <img src="{{ asset($comment->user->image->url) }}" width="48px" height="48px" class="g-col-1">
+                    @else
+                        <i class="fa-solid fa-circle-user fa-2xl g-col-1" style="color: #8a0000;"></i>
+                    @endif
+                    <div class="form-group g-col-10">
+                        <p>{{ $comment->message }}</p>
+                    </div>
+                    @can('delete', $comment)
+                        <x-table.button type='modal' route="" class='btn-outline-danger'
+                            target="#deletecomment{{ $comment->id }}">
+                            <x-slot name="icon">
+                                <i class="fa-solid fa-trash" style="color: #f66661;"></i>
+                            </x-slot>
+                        </x-table.button>
+                    @endcan
+                </div>
+            </div>
+            {{-- Modal Borrar --}}
+            <x-modal id="deletecomment{{ $comment->id }}" class="modal-dialog-centered" title="Delete"
+            name="{{ $comment->id }}" model="comment" btnactioncolor="btn-danger" :btnactionroute="route('comments.destroy', $comment)"
+            btnactionmethod="delete"></x-modal>
+        @endforeach
+    @endif
+</div>
+`main`
+```
+###### Creamos el controlador de comentarios.
+
+> Typee: en la Consola:
+```console
+php artisan make:controller CommentController --resource
+```
+
+> Abrimos el archivo `CommentController.php` en la carpeta `app\Http\Controllers\CommentController.php` y añadimos lo siguiente.
+
+```php
+use Illuminate\Support\Facades\Gate;
+
+public function store(CommentRequest $request)
+{
+    try {
+        $post = Post::find($request->validated()['post_id']);
+        $post->comments()->create([
+            'message' => $request->validated()['message'],
+            'user_id' => $request->validated()['user_id']
+        ]);
+        return redirect()
+            ->back()
+            ->with('message', [
+                'type' => 'success',
+                'title' => 'Éxito !',
+                'message' => 'El Comentario a sido publicado correctamente.',
+            ]);
+    } catch (\Throwable $th) {
+            return back()->with('message', [
+            'type' => 'danger',
+            'title' => 'Error !',
+            'message' => $th,
+        ]);
+    }
+}
+public function destroy(Comment $comment)
+{
+    $response = Gate::inspect('delete', $comment);
+
+    if ($response->allowed()) {
+        $comment->delete();
+        return back()->with('message', [
+                'type' => 'warning',
+                'title' => 'Éxito !',
+                'message' => 'El Comentario a sido eliminado correctamente.',
+            ]);
+    } else {
+        return back()->with('message', [
+            'type' => 'danger',
+            'title' => 'Error !',
+            'message' => $response->message(),
+        ]);
+    }
+}
+```
+
+###### Creamos las rutas de comentarios.
+
+> Abrimos el archivo `web.php` en la carpeta `routes\web.php` y añadimos lo siguiente.
+
+```php
+use App\Http\Controllers\CommentController;
+Route::resource('comments', CommentController::class)->only(['store', 'destroy']);
+```
+
+###### Creamos request de comentarios.
+
+> Typee: en la Consola:
+```console
+php artisan make:request CommentRequest
+```
+
+> Abrimos el archivo `CommentRequest.php` en la carpeta `app\Http\Requests\CommentRequest.php` y añadimos lo siguiente.
+
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class CommentRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'message' => 'required|min:5',
+            'post_id' => 'required|integer',
+            'user_id' => 'required|integer'
+        ];
+    }
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'user_id' => auth()->user()->id,
+        ]);
+    }
+}
+```
+
+###### Creamos el policies para comentarios..
+
+> Typee: en la Consola:
+```console
+php artisan make:policy CommentPolicy --model=Comment
+```
+
+> Abrimos el archivo `CommentPolicy.php` en la carpeta `app\Http\Requests\CommentRequest.php` y añadimos lo siguiente.
+
+```php
+<?php
+
+namespace App\Policies;
+
+use App\Models\Comment;
+use App\Models\User;
+use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\Lang;
+
+class CommentPolicy
+{
+    /**
+    * Perform pre-authorization checks.
+    */
+    public function before(User $user, string $ability): bool|null
+    {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        return null;
+    }
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, Comment $comment): response
+    {
+        $response = false;
+        if ($user->roles->contains('slug', 'manager')) {
+            // Si el usuario tiene el role editor
+            $response = true;
+        } elseif ($comment->user_id == $user->id) {
+            // Si el usuario es el propietario del post
+            $response = true;
+        }
+        return $response
+            ? Response::allow()
+            : Response::deny(
+                Lang::get(
+                    'You do not have permissions to :action this :model.',
+                    ['action' => 'eliminar', 'model' => 'Comentario']
+                )
+            );
+    }
+}
+```
+
+> Abrimos el archivo `AuthServiceProvider.php` en la carpeta `app\Providers\AuthServiceProvider.php` en `policies` y escribimos lo siguiente.
+
+```php
+protected $policies = [
+    Comment::class => CommentPolicy::class,
+];
 ```
 
 [Subir](#top)

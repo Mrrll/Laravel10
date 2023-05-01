@@ -115,3 +115,6 @@
   -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
 }
+.text-break {
+    word-wrap: break-word;
+}

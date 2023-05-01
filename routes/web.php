@@ -18,6 +18,7 @@ use App\Notifications\NewRegistered;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Http\Controllers\CommentController;
 
 // use App\Mail\ContactanosMailable;
 // use Illuminate\Support\Facades\Mail;
@@ -79,6 +80,8 @@ Route::group(['middleware' => ['verified', 'auth', 'auth.session']],function () 
         Route::resource('users', UsersController::class)->middleware('role:admin,manager');
         // Roles
         Route::resource('roles', RoleController::class)->middleware('can:isAdmin');
+        // Comments
+        Route::resource('comments', CommentController::class)->only(['store', 'destroy']);
     }
 );
 
