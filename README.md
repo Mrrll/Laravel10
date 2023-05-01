@@ -9913,4 +9913,8 @@ public function destroy(Post $post)
 {{preg_replace("/<(script|style)[^>]*>[\s\S]*?<\/\1>|<\/?[^>]+>/m",'', $post->body)}}
 ```
 
+**`Agradecimientos:` Por el Tutorial [Coders Free](https://www.youtube.com/watch?v=3e1IsZJuYAw&list=PLZ2ovOgdI-kWWS9aq8mfUDkJRfYib-SvF) de curso Laravel 10 desde cero.**
+
+>Pues eso es todo espero que sirva. 👍
+
 [Subir](#top)
