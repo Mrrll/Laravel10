@@ -365,7 +365,8 @@ return view('cursos.index');
 <body>
     <h1>Bienvenido al curso <?php echo $curso; ?></h1>
 </body>
-</html>```
+</html>
+```
 
 > Abrimos el archivo `CursoController.php` que esta en la carpeta `app\Http\Controllers\CursoController.php` y escribimos dentro de la función `show`.
 
